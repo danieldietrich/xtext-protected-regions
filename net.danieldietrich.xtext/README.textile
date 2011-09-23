@@ -14,7 +14,7 @@ h2. Dependencies
 This project depends on antlr3-runtime and antlr3-generator jars.
 Because the protected region support is built on top of Xtext 2.0.1,
 the shipped Xtext antlr libraries are referenced.
-Antlr is available for download here: http://www.antlr.org/download.html
+See: "Antlr download page":http://www.antlr.org/download.html
 
 h2. Files
 
