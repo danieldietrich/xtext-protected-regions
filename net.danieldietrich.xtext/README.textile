@@ -1,0 +1,51 @@
+h1. Xtext 2.0 Protected Region Support
+
+h2. Project Contents
+
+* src
+p(((.  contains the manually written source
+* src-gen
+p(((.  contains the antlr generated files
+* test
+p(((.  contains just a simple test/example
+
+h2. Dependencies
+
+This project depends on antlr3-runtime and antlr3-generator jars.
+Because the protected region support is built on top of Xtext 2.0.1,
+the shipped Xtext antlr libraries are referenced.
+Antlr is available for download here: http://www.antlr.org/download.html
+
+h2. Files
+
+@test/Main@ starts the example. This is a good starting point.
+
+@src/net.danieldietrich.xtext.generator.protectedregionsupport.generator.Gen@ generates contents of @src-gen@.
+I decided to use an anti-pattern and check in the generated antlr code for the sake of laziness,
+@src-gen@ is unlikely to be changed in near future.
+
+h2. Notes
+
+* Currently the uniqueness of protected regions is checked per file.
+p((.  But it should be easy to build a layer above and check for global uniqueness.
+
+A common practice is to
+
+1. collect all protected regions
+2. clean up directories
+3. generate new files and insert protected regions.
+
+or
+
+1. collect all protected regions
+2. generate new files to a temp-dir and insert protected regions.
+3. on success delete old gen-dir and rename temp-dir to gen-dir
+    
+If protected regions should survive the renaming or moving of a generated file,
+the protected region id's have to be globally unique.
+  
+Hint: This will be implemented as layer above this library, in your generator
+      (standalone or mwe2 workflow) + a specific IFileSystemAccess implementation.
+        
+I've done this so far and will submit my code along with Xtext extensions for java support
+when I've found an appropriate way to separate that code from existing Xtext projects.
