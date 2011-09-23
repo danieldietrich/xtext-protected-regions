@@ -24,12 +24,12 @@ public class ProtectedRegionUtilTest {
 
 	@Test
 	public void mergeShouldMatchExpected() throws FileNotFoundException, IOException {
-	    IDocument _generated = ProtectedRegionUtil.parse("test/generated.txt");
-	    IDocument _protected = ProtectedRegionUtil.parse("test/protected.txt");
+	    IDocument _generated = ProtectedRegionUtil.parse("src/test/resources/generated.txt");
+	    IDocument _protected = ProtectedRegionUtil.parse("src/test/resources/protected.txt");
 	    
 	    IDocument _merged = ProtectedRegionUtil.merge(_generated, _protected);
 	    String mergedContents = _merged.getContents();
-	    String expectedContents = IOUtils.toString(new FileReader("test/expected.txt"));
+	    String expectedContents = IOUtils.toString(new FileReader("src/test/resources/expected.txt"));
 	    
 	    assertEquals(expectedContents, mergedContents);
 	}
