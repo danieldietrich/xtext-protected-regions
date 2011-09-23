@@ -1,0 +1,29 @@
+package net.danieldietrich.xtext.generator.protectedregionsupport.generator;
+
+import org.antlr.Tool;
+
+/*PROTECTED REGION ID(custom.imports) START*/
+
+// TODO: need to import some types
+
+/*PROTECTED REGION END*/
+
+public class FunWithXtext {
+
+  public static void main(String[] args) {
+  
+    new FunWithXtext().generatedMethod();
+    
+  }
+  
+  private void generatedMethod() {
+  
+        /* PROTECTED   REGION  ID (  _i_.like.generatedMethod$  ) START */
+        
+    System.out.println("manual code");
+    
+  /* PROTECTED  REGION  END */
+  
+  }
+  
+}
