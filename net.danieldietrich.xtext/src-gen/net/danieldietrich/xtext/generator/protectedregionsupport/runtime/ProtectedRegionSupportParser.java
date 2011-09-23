@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 src/net/danieldietrich/xtext/generator/protectedregionsupport/generator/ProtectedRegionSupport.g 2011-09-23 04:25:45
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 src/net/danieldietrich/xtext/generator/protectedregionsupport/generator/ProtectedRegionSupport.g 2011-09-23 11:29:50
 
   package net.danieldietrich.xtext.generator.protectedregionsupport.runtime;
 
@@ -138,7 +138,7 @@ public class ProtectedRegionSupportParser extends Parser {
                     // src/net/danieldietrich/xtext/generator/protectedregionsupport/generator/ProtectedRegionSupport.g:24:5: C_END
                     {
                     match(input,C_END,FOLLOW_C_END_in_block74); 
-                     if (comment) { doc.dump("*/"); doc.save(comment); comment = false; } 
+                     doc.dump("*/"); if (comment) { doc.save(comment); comment = false; } 
 
                     }
                     break;

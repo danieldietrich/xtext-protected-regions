@@ -1,4 +1,4 @@
-// $ANTLR 3.2 Sep 23, 2009 12:02:23 src/net/danieldietrich/xtext/generator/protectedregionsupport/generator/ProtectedRegionSupport.g 2011-09-23 04:25:45
+// $ANTLR 3.2 Sep 23, 2009 12:02:23 src/net/danieldietrich/xtext/generator/protectedregionsupport/generator/ProtectedRegionSupport.g 2011-09-23 11:29:50
 
   package net.danieldietrich.xtext.generator.protectedregionsupport.runtime;
 

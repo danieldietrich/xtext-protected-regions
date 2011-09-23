@@ -21,7 +21,7 @@ document [IWritableDocument doc]
 
 block [IWritableDocument doc]
   : C_START { if (!comment) { doc.save(comment); comment = true; } doc.dump("/*"); }
-  | C_END   { if (comment) { doc.dump("*/"); doc.save(comment); comment = false; } }
+  | C_END   { doc.dump("*/"); if (comment) { doc.save(comment); comment = false; } }
   | OTHER   { doc.dump($OTHER.text); }
   ;
   
