@@ -3,16 +3,11 @@ h1. Xtext 2.0 Protected Region Support
 h2. Project Contents
 
 * src
-
-p(((.  contains the manually written source
-
+  contains the manually written source
 * src-gen
-
-p(((.  contains the antlr generated files
-
+  contains the antlr generated files
 * test
-
-p(((.  contains just a simple test/example
+  contains just a simple test/example
 
 h2. Dependencies
 
@@ -32,8 +27,7 @@ I decided to use an anti-pattern and check in the generated antlr code for the s
 h2. Notes
 
 * Currently the uniqueness of protected regions is checked per file.
-
-p((.  But it should be easy to build a layer above and check for global uniqueness.
+  But it should be easy to build a layer above and check for global uniqueness.
 
 A common practice is to
 
