@@ -97,14 +97,15 @@ class DefaultWritableDocument extends DefaultDocument implements IWritableDocume
     
     dump.append(current);
     current.setLength(0);
+    current = null;
     
     String text = dump.toString();
     dump.setLength(0);
+    dump = null;
     
-    IPart part = new Part(protectedRegion, id, text);
-    addPart(part);
-    if (protectedRegion) {
-      id = null;
+    if (text.length() > 0) {
+      IPart part = new Part(protectedRegion, id, text);
+      addPart(part);
     }
     
     flushed = true;
