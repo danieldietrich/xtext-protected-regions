@@ -1,0 +1,38 @@
+h1. Xtext 2.0 Protected Region Support
+
+h2. Starting Point
+
+An example can be found in @ProtectedRegionUtil@.
+
+h2. Defaults
+
+Use @ProtectedRegionUtil@ to merge generated and modified contents.
+Use @ProtectedRegionParserFactory@ to create default parsers.
+
+h2. Customization
+
+Use @DefaultProtectedRegionParser@ to configure custom parsers.
+Implement @IProtectedRegionOracle@ to change the style ofconfigure custom parsers.
+
+h2. Notes
+
+* Currently the uniqueness of protected regions is checked per file.
+  But it should be easy to build a layer above and check for global uniqueness.
+
+A common practice is to
+
+1. collect all protected regions
+2. clean up directories
+3. generate new files and insert protected regions.
+
+or
+
+1. collect all protected regions
+2. generate new files to a temp-dir and insert protected regions.
+3. on success delete old gen-dir and rename temp-dir to gen-dir
+    
+If protected regions should survive the renaming or moving of a generated file,
+the protected region id's have to be globally unique.
+  
+Hint: This will be implemented as layer above this library, in your generator
+      (standalone or mwe2 workflow) + a specific IFileSystemAccess implementation.

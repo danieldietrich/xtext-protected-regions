@@ -1,0 +1,13 @@
+package net.danieldietrich.xtext.generator.protectedregionsupport;
+
+/*PROTECTED REGION ID(uniqueId) START*/
+/*PROTECTED REGION END*/
+
+public class ThisWillNotWork_hopefully {
+
+  public static void main(String[] args) {
+    /*PROTECTED REGION ID(uniqueId) START*/
+    /*PROTECTED REGION END*/
+  }
+  
+}
