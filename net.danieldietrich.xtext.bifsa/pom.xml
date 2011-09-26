@@ -73,16 +73,26 @@
   		<version>2.0.1.v201108020636</version>
   	</dependency>
   	<dependency>
+  		<groupId>org.eclipse.xtext</groupId>
+  		<artifactId>org.eclipse.xtext.builder</artifactId>
+  		<version>2.0.1.v201108020636</version>
+  		<scope>provided</scope>
+  	</dependency>
+  	<dependency>
   		<groupId>commons-io</groupId>
   		<artifactId>commons-io</artifactId>
   		<version>2.0.1</version>
-  		<scope>test</scope>
   	</dependency>
   	<dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
   		<version>4.8.2</version>
   		<scope>test</scope>
+  	</dependency>
+  	<dependency>
+  		<groupId>com.google.inject</groupId>
+  		<artifactId>com.google.inject</artifactId>
+  		<version>2.0.0.v201105231817</version>
   	</dependency>
   </dependencies>
   <url>https://github.com/danieldietrich/net.danieldietrich.xtext</url>
