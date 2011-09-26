@@ -1,0 +1,18 @@
+h1. "Bi" FileSystemAccess
+
+Xtext FileSystemAccess interface (@IBiFileSystemAccess@) and implementations with extended read operations, useful for implementing protected region support.
+
+Why "Bi"? It comes from bi-directional, and it's very short. :)
+
+h2. Xtext Dependency
+
+Use @mvn install:install-file@ to install Xtext bundles into your (local) Maven repository with the following coordinates:
+
+* @org.eclipse.xtext:org.eclipse.xtext:2.0.1.v201108020636@
+
+e.g.
+
+bc. mvn install:install-file -Dfile=org.eclipse.xtext_2.0.1.v201108020636.jar \
+	-DgroupId=org.eclipse.xtext -DartifactId=org.eclipse.xtext -Dversion=2.0.1.v201108020636 \
+	-Dpackaging=jar
+	
