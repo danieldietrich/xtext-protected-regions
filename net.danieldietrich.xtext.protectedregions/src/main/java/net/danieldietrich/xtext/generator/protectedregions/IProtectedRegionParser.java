@@ -9,17 +9,26 @@ import java.io.InputStream;
 public interface IProtectedRegionParser {
 
   /**
-   * Add multiline comment
+   * Add multiline comment.
    * 
    * @param start Start String of comment
    * @param end End String of comment
    * @return this
    */
   IProtectedRegionParser addComment(String start, String end);
+  
+  /**
+   * Add nestable multiline comment.
+   * 
+   * @param start
+   * @param end
+   * @return
+   */
+  IProtectedRegionParser addNestableComment(String start, String end);
 
   /**
-   * Add singleline comment. Singleline comments end with
-   * newline '\n', '\r\n' or '\r' or with EOF.
+   * Add singleline comment. A singleline comment ends with the
+   * end of a line, namely newline '\n', '\r\n', '\r' or EOF.
    * 
    * @param start Start String of comment
    * @return this
