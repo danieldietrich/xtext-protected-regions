@@ -12,7 +12,10 @@ Use @mvn install:install-file@ to install Xtext bundles into your (local) Maven 
 
 e.g.
 
-bc. mvn install:install-file -Dfile=org.eclipse.xtext_2.0.1.v201108020636.jar \
+bc.. 
+mvn install:install-file -Dfile=org.eclipse.xtext_2.0.1.v201108020636.jar \
 	-DgroupId=org.eclipse.xtext -DartifactId=org.eclipse.xtext -Dversion=2.0.1.v201108020636 \
 	-Dpackaging=jar
-	
+mvn install:install-file -Dfile=org.eclipse.xtext.source_2.0.1.v201108020636.jar \
+	-DgroupId=org.eclipse.xtext -DartifactId=org.eclipse.xtext -Dversion=2.0.1.v201108020636 \
+	-Dpackaging=jar -Dclassifier=sources
