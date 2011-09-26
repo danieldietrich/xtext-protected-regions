@@ -27,34 +27,34 @@ import org.junit.Test;
  */
 public class ProtectedRegionUtilTest {
 
-  //  private IProtectedRegionParser javaParser;
-  //  
-  //  @Before
-  //  public void setup() {
-  //    javaParser = ProtectedRegionParserFactory.createDefaultJavaParser();
-  //  }
-  //  
-  //  @Test
-  //  public void mergeShouldMatchExpected() throws FileNotFoundException, IOException {
-  //
-  //    IDocument currentDoc = javaParser.parse(new FileInputStream("src/test/resources/current.txt"));
-  //    IDocument previousDoc = javaParser.parse(new FileInputStream("src/test/resources/previous.txt"));
-  //
-  //    IDocument _merged = ProtectedRegionUtil.merge(currentDoc, previousDoc);
-  //    String mergedContents = _merged.getContents();
-  //    String expectedContents = IOUtils.toString(new FileReader("src/test/resources/expected.txt"));
-  //
-  //    assertEquals(expectedContents, mergedContents);
-  //  }
-  //  
-  //  @Test
-  //  public void idsAreUniquePerFile() throws FileNotFoundException, IOException {
-  //    try {
-  //      javaParser.parse(new FileInputStream("src/test/resources/non_unique_ids.txt"));
-  //    } catch(IllegalStateException x) {
-  //      assertEquals(x.getMessage(), "Duplicate protected region id: uniqueId");
-  //    }
-  //  }
+    private IProtectedRegionParser javaParser;
+    
+    @Before
+    public void setup() {
+      javaParser = ProtectedRegionParserFactory.createDefaultJavaParser();
+    }
+    
+    @Test
+    public void mergeShouldMatchExpected() throws FileNotFoundException, IOException {
+  
+      IDocument currentDoc = javaParser.parse(new FileInputStream("src/test/resources/current.txt"));
+      IDocument previousDoc = javaParser.parse(new FileInputStream("src/test/resources/previous.txt"));
+  
+      IDocument _merged = ProtectedRegionUtil.merge(currentDoc, previousDoc);
+      String mergedContents = _merged.getContents();
+      String expectedContents = IOUtils.toString(new FileReader("src/test/resources/expected.txt"));
+  
+      assertEquals(expectedContents, mergedContents);
+    }
+    
+    @Test
+    public void idsAreUniquePerFile() throws FileNotFoundException, IOException {
+      try {
+        javaParser.parse(new FileInputStream("src/test/resources/non_unique_ids.txt"));
+      } catch(IllegalStateException x) {
+        assertEquals(x.getMessage(), "Duplicate protected region id: uniqueId");
+      }
+    }
 
   IProtectedRegionOracle NESTED_COMMENT_ORACLE = new IProtectedRegionOracle() {
     // example: PROTECTED REGION /*1234*/ START
