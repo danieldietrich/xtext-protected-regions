@@ -2,13 +2,12 @@ package net.danieldietrich.xtext.generator.protectedregions;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import net.danieldietrich.xtext.generator.protectedregions.IDocument.IRegion;
+
+import org.apache.commons.io.IOUtils;
 
 /**
  * Parses InputStream, returning an IDocument which consists of IRegions.
@@ -60,6 +59,14 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   }
 
   /**
+   * @see #parse(CharSequence)
+   */
+  @Override
+  public IDocument parse(InputStream in) throws IOException {
+    return parse(IOUtils.toString(in));
+  }
+  
+  /**
    * This implementation first reads the whole InputStream.
    * Then the document is read region by region until
    * no more regions exist.<br>
@@ -80,16 +87,17 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
    * @see #getNextRegion(Input)
    */
   @Override
-  public IDocument parse(InputStream in) throws IOException {
+  public IDocument parse(CharSequence in) {
     
     DefaultDocument result = new DefaultDocument();
-    Input input = new Input(in);
+    Input input = new Input(in.toString());
     
     // subsequentially read regions until end of input reached
     while (!input.endOfDocumentReached()) {
       result.addRegion(getNextRegion(input));
     }
     
+    // consider buffered input
     if (input.hasRemaining()) {
       result.addRegion(remainingRegion(input));
     }
@@ -341,15 +349,8 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
     int commentStart;
     
     // read InputStream into String
-    Input(InputStream in) throws IOException {
-      StringBuilder result = new StringBuilder();
-      Reader reader = new InputStreamReader(in);
-      char[] cbuf = new char[4096];
-      int len;
-      while ((len = reader.read(cbuf)) != -1) {
-        result.append(len == cbuf.length ? cbuf : Arrays.copyOfRange(cbuf, 0, len));
-      }
-      document = result.toString();
+    Input(String document) {
+      this.document = document;
     }
     
     // cursor reached end?

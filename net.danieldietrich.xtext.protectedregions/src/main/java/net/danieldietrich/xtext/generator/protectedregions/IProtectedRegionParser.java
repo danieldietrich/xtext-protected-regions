@@ -45,13 +45,22 @@ public interface IProtectedRegionParser {
   IProtectedRegionParser setOracle(IProtectedRegionOracle oracle);
   
   /**
-   * Parses an InputStream and returns an IDocument, consisting of
-   * IRegions.
+   * @see #parse(CharSequence)
    * 
    * @param in InputStream to parse
-   * @return IDocument
+   * @return IDocument result document containing the regions
    * @throws IOException If an error occurs reading the InputStream
    */
   IDocument parse(InputStream in) throws IOException;
+  
+  /**
+   * Parses an InputStream and returns an IDocument, consisting of
+   * IRegions.
+   * 
+   * @param in CharSequence to parse
+   * @return IDocument result document containing the regions
+   * @throws IOException If an error occurs reading the InputStream
+   */
+  IDocument parse(CharSequence in);
   
 }
