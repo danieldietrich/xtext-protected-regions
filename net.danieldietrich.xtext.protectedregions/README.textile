@@ -1,4 +1,4 @@
-h1. Xtext 2.0 Protected Region Support
+h1. Xtext 2.0.1 Protected Region Support
 
 h2. Starting Point
 
