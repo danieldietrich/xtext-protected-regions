@@ -1,2 +1,2 @@
-See @net.danieldietrich.xtext/README.textile@
+See @net.danieldietrich.xtext.protectedregions/README.textile@
 
