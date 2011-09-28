@@ -9,19 +9,19 @@ public interface IProtectedRegionOracle {
    * Checks whether a given String is the start of a protected region.
    * Caution: Comment start and end Strings are not taken into account.
    * 
-   * @param s A String to check
-   * @return true, if s is a protected region start, false otherwise
+   * @param comment A String to check
+   * @return true, if comment is a protected region start, false otherwise
    */
-  boolean isProtectedRegionStart(String s);
+  boolean isProtectedRegionStart(String comment);
   
   /**
    * Checks whether a given String is the end of a protected region.
    * Caution: Comment start and end Strings are not taken into account.
    * 
-   * @param s A String to check
-   * @return true, if s is a protected region end, false otherwise
+   * @param comment A String to check
+   * @return true, if comment is a protected region end, false otherwise
    */
-  boolean isProtectedRegionEnd(String s);
+  boolean isProtectedRegionEnd(String comment);
   
   /**
    * The id of a protected region start String.

@@ -28,7 +28,7 @@ public class ProtectedRegionParserFactory {
     return new DefaultProtectedRegionParser()
       .addComment("/*", "*/")
       .addComment("//")
-      .setOracle(oracle);    
+      .setOracle(oracle);
   }
   
   // Ruby
@@ -38,6 +38,17 @@ public class ProtectedRegionParserFactory {
   public static IProtectedRegionParser createRubyParser(IProtectedRegionOracle oracle) {
     return new DefaultProtectedRegionParser()
       .addComment("#")
+      .setOracle(oracle);
+  }
+  
+  // Scala
+  public static IProtectedRegionParser createDefaultScalaParser() {
+    return createScalaParser(getDefaultOracle());
+  }
+  public static IProtectedRegionParser createScalaParser(IProtectedRegionOracle oracle) {
+    return new DefaultProtectedRegionParser()
+      .addNestableComment("/*", "*/")
+      .addComment("//")
       .setOracle(oracle);
   }
   
