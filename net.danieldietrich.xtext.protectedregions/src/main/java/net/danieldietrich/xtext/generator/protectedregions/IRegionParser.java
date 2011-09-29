@@ -33,10 +33,10 @@ public interface IRegionParser {
   void addComment(String start);
   
   /**
-   * The parser asks the IProtectedRegionOracle if comments
-   * are valid protected region starts/ends.
+   * The parser asks the IRegionOracle if comments
+   * are valid marked region starts/ends.
    * 
-   * @param oracle A specific IProtectedRegionOracle
+   * @param oracle A specific IRegionOracle
    */
   void setOracle(IRegionOracle oracle);
   

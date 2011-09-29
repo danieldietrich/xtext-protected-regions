@@ -34,6 +34,8 @@ public class RegionUtil {
   }
   
   /**
+   * Fills in generated regions, if switchable && enabled or !switchable.
+   * By default the whole document is protected.
    * 
    * @param currentDoc The new generated IDocument, containing no manual code.
    * @param previousDoc The previously generated IDocument, possibly containing manual code. 
