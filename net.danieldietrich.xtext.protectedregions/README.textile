@@ -1,5 +1,12 @@
 h1. Xtext 2.0.1 Protected Region Support
 
+h2. Features
+
+* Fill-in generation
+* Multilingual
+* Renaming / Moving of Files Supported
+* Switchable Regions
+
 h2. Starting Point
 
 An example can be found in @ProtectedRegionUtil@.

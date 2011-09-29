@@ -1,0 +1,26 @@
+package one.more.coffee;
+
+public class AllProtectedByDefault {
+
+  public static void main(String[] args) {
+
+    //GENERATED ID(0) START
+
+    new AllProtectedByDefault().cantChangeThis();
+
+    //GENERATED END
+
+  }
+  
+  private void go() {
+  
+    System.out.print("1+1=");
+    
+    /*GENERATED ID(1) DISABLED START*/
+    
+    System.out.println("3");
+    
+    /*GENERATED END*/
+  }
+  
+}

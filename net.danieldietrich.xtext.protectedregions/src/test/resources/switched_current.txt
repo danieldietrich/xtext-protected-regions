@@ -1,0 +1,34 @@
+package net.danieldietrich.xtext.generator.protectedregionsupport.generator;
+
+import org.antlr.Tool;
+
+/*PROTECTED REGION ID(custom.imports) START*/
+/*PROTECTED REGION END*/
+
+public class FunWithXtext {
+
+  public static void main(String[] args) {
+    //PROTECTED REGION ID (singleLineComment) START
+    // generated content overwrites manual code
+    //PROTECTED REGION END
+  }
+  
+  public void tryToDeleteMe() {
+    //PROTECTED REGION ID (will.not.disappear) START
+    // generated content overwrites manual code
+    //PROTECTED REGION END
+  }
+  
+  private void renamedGeneratedMethod() {
+    /*PROTECTED REGION ID (_i_.like.generatedMethod$) START*/
+    
+    // protected region start within protected regions are
+    // treatet as regular comment analogue to comment starts
+    // within regular comments.
+    /*PROTECTED REGION ID (_i_.like.generatedMethod$) START*/
+    
+    /*PROTECTED REGION END*/
+  }
+  
+}
+// single line comment without newline

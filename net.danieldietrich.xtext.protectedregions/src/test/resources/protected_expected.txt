@@ -2,7 +2,7 @@ package net.danieldietrich.xtext.generator.protectedregionsupport.generator;
 
 import org.antlr.Tool;
 
-/*PROTECTED REGION ID(custom.imports) START*/
+/*PROTECTED REGION ID(custom.imports) ENABLED START*/
 
 // TODO: need to import some types
 
@@ -11,26 +11,28 @@ import org.antlr.Tool;
 public class FunWithXtext {
 
   public static void main(String[] args) {
-  
-    this.willBeCleaned().
-  
-    //PROTECTED REGION ID (singleLineComment) START
+    //PROTECTED REGION ID (singleLineComment) ENABLED START
     
     System.out.println("hello protected regions");
     
     //PROTECTED REGION END
   }
   
-  private void generatedMethod() {
+  public void tryToDeleteMe() {
+    //PROTECTED REGION ID (will.not.disappear) START
+    // generated content overwrites manual code
+    //PROTECTED REGION END
+  }
   
-        /* PROTECTED   REGION  ID (  _i_.like.generatedMethod$  ) START */
+  private void renamedGeneratedMethod() {
+    /* PROTECTED   REGION  ID (  _i_.like.generatedMethod$  ) ENABLED START */
         
     System.out.println("manual code");
 
   // the following protected region end will remain there because all
   // characters before start of comment are protected(!)  
   /* PROTECTED  REGION  END */
-  
   }
   
 }
+// single line comment without newline

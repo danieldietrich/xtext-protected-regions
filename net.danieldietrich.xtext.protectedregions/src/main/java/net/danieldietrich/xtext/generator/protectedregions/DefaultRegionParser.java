@@ -12,16 +12,16 @@ import org.apache.commons.io.IOUtils;
 /**
  * Parses InputStream, returning an IDocument which consists of IRegions.
  * <ul>
- *   <li>Each IRegion is either protected or non-protected.</li>
- *   <li>Protected and non-protected regions are alternating.</li>
- *   <li>The protected region start and end comments are not protected, but(!)
- * the protected region end comment indentation may not be restored
- * because all characters within the protected region, including white space, are
- * preserved (=> works as designed).</li>
- * <br>
+ *   <li>Each IRegion is either marked or not marked.</li>
+ *   <li>Marked and not marked regions are alternating.</li>
+ *   <li>The marked region start and end comments are outside of the marked region</li>
+ *   <li>The indentation of a marked region start comment may not be restored in the 'fill-in' scenario.</li>
+ *   <li>The indentation of a marked region end comment may not be restored in the 'protected region' scenario.</li>
+ * </ul>
+ * 
  * @author Daniel Dietrich - Initial contribution and API
  */
-public class DefaultProtectedRegionParser implements IProtectedRegionParser {
+class DefaultRegionParser implements IRegionParser {
  
   /**
    *  CAUTION: the order of this new line strings is sufficient, by the following means:<br>
@@ -32,30 +32,26 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   private static final String[] END_OF_LINE_FLAVORS = new String[] { "\r\n", "\n", "\r",  };
   
   private List<CommentType> commentTypes = new ArrayList<CommentType>();
-  private IProtectedRegionOracle oracle;
+  private IRegionOracle oracle;
   
   @Override
-  public DefaultProtectedRegionParser addComment(String start, String end) {
+  public void addComment(String start, String end) {
     commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE));
-    return this;
   }
 
   @Override
-  public DefaultProtectedRegionParser addNestableComment(String start, String end) {
+  public void addNestableComment(String start, String end) {
     commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE_NESTABLE));
-    return this;
   }
 
   @Override
-  public DefaultProtectedRegionParser addComment(String start) {
+  public void addComment(String start) {
     commentTypes.add(new CommentType(start, null, CommentType.Style.SINGLELINE));
-    return this;
   }
 
   @Override
-  public DefaultProtectedRegionParser setOracle(IProtectedRegionOracle oracle) {
+  public void setOracle(IRegionOracle oracle) {
     this.oracle = oracle;
-    return this;
   }
 
   /**
@@ -107,7 +103,7 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   
   /**
    * Try to find the nearest occurrence of a start character sequence
-   * of one of the comments configured with this ProtectedRegionParser.
+   * of one of the comments configured with this RegionParser.
    * If there are no more comments, return the last Region (i.e. the remaining input).
    * If there is another comment, then read the next region accordingly to
    * the type of the comment (singleline, multiline etc.).
@@ -117,23 +113,23 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
    */
   private IRegion getNextRegion(Input input) {
     
-    // find protected region start/end
+    // find marked region start/end
     String comment;
     boolean stateChanged;
-    boolean isProtectedRegionStart;
-    boolean isProtectedRegionEnd;
+    boolean isMarkedRegionStart;
+    boolean isMarkedRegionEnd;
     
-    // read input until protected region is entered, leaved or eof reached
+    // read input until marked region is entered, leaved or eof reached
     do {
       
       /*
        * Find next comment start,
-       * not necessarily a protected region start/end
+       * not necessarily a marked region start/end
        * - this will be tested later.
        */
       CommentType type = getNextCommentType(input);
       
-      // no more comments => last region found (a non-protected one)
+      // no more comments => last region found (a not marked one)
       if (type == null) {
         return remainingRegion(input);
       }
@@ -155,27 +151,29 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
         default : throw new IllegalStateException("Unknown comment type style: " + type.style);
       }
       
-      isProtectedRegionStart = oracle.isProtectedRegionStart(comment);
-      isProtectedRegionEnd = oracle.isProtectedRegionEnd(comment);
-      stateChanged = (!input.isProtectedRegion() && isProtectedRegionStart)
-          || (input.isProtectedRegion() && isProtectedRegionEnd);
+      isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
+      isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
+      stateChanged = (!input.isMarkedRegion() && isMarkedRegionStart)
+          || (input.isMarkedRegion() && isMarkedRegionEnd);
       
     } while (/*comment != null && */!stateChanged);
     
-    // finished, if no more comments or no protected regions entered/leaved
+    // finished, if no more comments or no marked regions entered/leaved
     if (/*comment == null || */!stateChanged) {
       return remainingRegion(input);
     }
       
-    // comment != null && state changed => current comment is a protected region start or end
-    if (isProtectedRegionStart) {
+    // comment != null && state changed => current comment is a marked region start or end
+    if (isMarkedRegionStart) {
       String id = oracle.getId(comment);
-      String text = input.enterProtectedRegion(id);
+      boolean enabled = oracle.isEnabled(comment);
+      String text = input.enterMarkedRegion(id, enabled);
       return new Region(text);
-    } else if (isProtectedRegionEnd) {
-      String id = input.getProtectedRegionId();
-      String text = input.leaveProtectedRegion();
-      return new Region(id, text);
+    } else if (isMarkedRegionEnd) {
+      String id = input.getMarkedRegionId();
+      boolean enabled = input.isMarkedRegionEnabled();
+      String text = input.leaveMarkedRegion();
+      return new Region(id, text, enabled);
     } else {
       throw new IllegalStateException("tertium non datur");
     }
@@ -189,8 +187,8 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
    * @return
    */
   private IRegion remainingRegion(Input input) {
-    if (input.isProtectedRegion()) {
-      throw new IllegalStateException("Protected region does not end properly.");
+    if (input.isMarkedRegion()) {
+      throw new IllegalStateException("Marked region does not end properly.");
     } else {
       return new Region(input.remaining());
     }
@@ -199,7 +197,7 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   /**
    * Gathers information about the next occurrence of a comment
    * (added via one of the #addComment() methods). The information
-   * is not sufficient to tell if it is a protected region
+   * is not sufficient to tell if it is a marked region
    * start/end. This information will be parsed later.
    * 
    * @param input
@@ -340,12 +338,13 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   private static class Input {
     
     final String document;
-    String protectedRegionId;
+    String markedRegionId;
+    boolean markedRegionEnabled;
     int marker = 0;
     int index = 0;
     
-    // Take care of comment starts because of protected region end comments,
-    // which are not part of protected regions.
+    // Take care of comment starts because of marked region end comments,
+    // which are not part of marked regions.
     int commentStart;
     
     // read InputStream into String
@@ -393,30 +392,36 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
       return document.indexOf(substring, index);
     }
     
-    // entering protected region => remembering id and returning previous region
-    String enterProtectedRegion(String id) {
-      protectedRegionId = id;
-      String result = document.substring(marker, index);
+    // entering marked region => remembering id and returning previous region
+    String enterMarkedRegion(String id, boolean enabled) {
+      markedRegionId = id;
+      markedRegionEnabled = enabled;
+      String result = document.substring(marker, commentStart); // marked region start comment part of marked region
+      marker = commentStart;
+      return result;
+    }
+    
+    // leaving marked region => clearing id and returning previous region
+    String leaveMarkedRegion() {
+      markedRegionId = null;
+      markedRegionEnabled = false;
+      String result = document.substring(marker, index); // marked region end comment part of marked region
       marker = index;
       return result;
     }
     
-    // leaving protected region => clearing id and returning previous region
-    String leaveProtectedRegion() {
-      protectedRegionId = null;
-      String result = document.substring(marker, commentStart); // protected region end comment not part of protected region
-      marker = commentStart; // protected region end comment part of next (non-protected) region
-      return result;
+    // marker currently within marked region? (cursor may be outside)
+    boolean isMarkedRegion() {
+      return markedRegionId != null;
     }
     
-    // marker currently within protected region? (cursor may be outside)
-    boolean isProtectedRegion() {
-      return protectedRegionId != null;
+    // get marked region id (null, if isMarkedRegion() == false)
+    String getMarkedRegionId() {
+      return markedRegionId;
     }
     
-    // get protected region id (null, if isProtectedRegion() == false)
-    String getProtectedRegionId() {
-      return protectedRegionId;
+    boolean isMarkedRegionEnabled() {
+      return markedRegionEnabled;
     }
     
     void setCommentStart(int index) {
@@ -427,25 +432,40 @@ public class DefaultProtectedRegionParser implements IProtectedRegionParser {
   /**
    * A default implementation of IDocument.IRegion, returned by the
    * #parse(InputStream) method and needed to merge documents
-   * (@see ProtectedRegionUtil#merge(IDocument, IDocument)).
+   * (@see RegionUtil#merge(IDocument, IDocument)).
    */
   private static class Region implements IRegion {
     
+    final Boolean enabled;
     final String id;
     final String text;
     
     Region(String text) {
-      this(null, text);
+      this.enabled = null;
+      this.id = null;
+      this.text = text;
     }
     
-    Region(String id, String text) {
+    Region(String id, String text, Boolean enabled) {
+      if (id == null) {
+        throw new IllegalArgumentException("Id of region cannot be null.");
+      }
+      if (enabled == null) {
+        throw new IllegalArgumentException("Region has to be enabled or disabled.");
+      }
+      this.enabled = enabled;
       this.id = id;
       this.text = text;
     }
     
     @Override
-    public boolean isProtectedRegion() {
+    public boolean isMarkedRegion() {
       return id != null;
+    }
+    
+    @Override
+    public boolean isEnabled() {
+      return enabled != null && enabled; 
     }
 
     @Override

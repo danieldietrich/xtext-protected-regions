@@ -15,12 +15,12 @@ public interface IDocument {
   Iterable<IRegion> getRegions();
   
   /**
-   * Get protected region by id.
+   * Get marked region by id.
    * 
    * @param id
    * @return null, if no protected region with corresponding id is present in the current IDocument.
    */
-  IRegion getProtectedRegion(String id);
+  IRegion getMarkedRegion(String id);
   
   /**
    * Get the contents of the document, namely the text of all IRegions.
@@ -30,13 +30,21 @@ public interface IDocument {
   String getContents();
   
   /**
-   * There are to kinds of IRegions: text inside and outside of protected regions,
-   * where a protected region has an ID.<br>
+   * There are to kinds of IRegions: marked and not marked regions,
+   * where a marked region has an ID.<br>
+   * Regarding the 'fill-in' scenario, a marked region contains generated code.<br>
+   * Regarding the 'protected regions' scenario, a marked region contains protected code.<br>
+   * <br>
    * The ID of a protected region is guaranteed to be not null and unique for the
-   * current IDocument. The ID of a non-protected region is always null.
+   * current IDocument. The ID of a non-protected region is always null.<br>
+   * <br>
+   * Marked regions are enabled or disabled.<br>
+   * Regarding the 'fill-in' scenario, enabled marked regions will <em>not</em> be preserved (i.e. the region will be generated).<br>
+   * Regarding the 'protected regions' scenario, enabled marked regions will be preserved (i.e. the previous version merged in).
    */
   static interface IRegion {
-    boolean isProtectedRegion();
+    boolean isMarkedRegion();
+    boolean isEnabled();
     String getId();
     String getText();
   }

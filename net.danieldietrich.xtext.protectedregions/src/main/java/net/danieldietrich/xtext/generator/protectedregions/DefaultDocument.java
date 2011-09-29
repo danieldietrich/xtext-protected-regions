@@ -12,7 +12,7 @@ import java.util.Map;
 class DefaultDocument implements IDocument {
 
   private List<IRegion> regions = new ArrayList<IRegion>();
-  private Map<String,IRegion> protectedRegions = new HashMap<String,IRegion>();
+  private Map<String,IRegion> markedRegions = new HashMap<String,IRegion>();
 
   @Override
   public Iterable<IRegion> getRegions() {
@@ -20,17 +20,17 @@ class DefaultDocument implements IDocument {
   }
   
   @Override
-  public IRegion getProtectedRegion(String id) {
-    return protectedRegions.get(id);
+  public IRegion getMarkedRegion(String id) {
+    return markedRegions.get(id);
   }
   
   public void addRegion(IRegion region) {
     regions.add(region);
-    if (region.isProtectedRegion()) {
-      if (protectedRegions.containsKey(region.getId())) {
-        throw new IllegalStateException("Duplicate protected region id: " + region.getId());
+    if (region.isMarkedRegion()) {
+      if (markedRegions.containsKey(region.getId())) {
+        throw new IllegalStateException("Duplicate marked region id: " + region.getId());
       }
-      protectedRegions.put(region.getId(), region);
+      markedRegions.put(region.getId(), region);
     }
   }
   

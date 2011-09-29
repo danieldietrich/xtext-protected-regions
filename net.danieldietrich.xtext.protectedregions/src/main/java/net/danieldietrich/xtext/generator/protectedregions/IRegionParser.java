@@ -6,43 +6,39 @@ import java.io.InputStream;
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
-public interface IProtectedRegionParser {
+public interface IRegionParser {
 
   /**
    * Add multiline comment.
    * 
    * @param start Start String of comment
    * @param end End String of comment
-   * @return this
    */
-  IProtectedRegionParser addComment(String start, String end);
+  void addComment(String start, String end);
   
   /**
    * Add nestable multiline comment.
    * 
    * @param start
    * @param end
-   * @return
    */
-  IProtectedRegionParser addNestableComment(String start, String end);
+  void addNestableComment(String start, String end);
 
   /**
    * Add singleline comment. A singleline comment ends with the
    * end of a line, namely newline '\n', '\r\n', '\r' or EOF.
    * 
    * @param start Start String of comment
-   * @return this
    */
-  IProtectedRegionParser addComment(String start);
+  void addComment(String start);
   
   /**
    * The parser asks the IProtectedRegionOracle if comments
    * are valid protected region starts/ends.
    * 
    * @param oracle A specific IProtectedRegionOracle
-   * @return this
    */
-  IProtectedRegionParser setOracle(IProtectedRegionOracle oracle);
+  void setOracle(IRegionOracle oracle);
   
   /**
    * @see #parse(CharSequence)

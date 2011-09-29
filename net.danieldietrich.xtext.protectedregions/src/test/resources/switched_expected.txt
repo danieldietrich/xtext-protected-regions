@@ -3,18 +3,13 @@ package net.danieldietrich.xtext.generator.protectedregionsupport.generator;
 import org.antlr.Tool;
 
 /*PROTECTED REGION ID(custom.imports) START*/
-
-// TODO: need to import some types
-
 /*PROTECTED REGION END*/
 
 public class FunWithXtext {
 
   public static void main(String[] args) {
     //PROTECTED REGION ID (singleLineComment) START
-    
-    System.out.println("hello protected regions");
-    
+    // generated content overwrites manual code
     //PROTECTED REGION END
   }
   
@@ -25,13 +20,13 @@ public class FunWithXtext {
   }
   
   private void renamedGeneratedMethod() {
-    /*PROTECTED REGION ID (_i_.like.generatedMethod$) START*/
+    /* PROTECTED   REGION  ID (  _i_.like.generatedMethod$  ) ENABLED START */
         
     System.out.println("manual code");
 
   // the following protected region end will remain there because all
   // characters before start of comment are protected(!)  
-  /*PROTECTED REGION END*/
+  /* PROTECTED  REGION  END */
   }
   
 }
