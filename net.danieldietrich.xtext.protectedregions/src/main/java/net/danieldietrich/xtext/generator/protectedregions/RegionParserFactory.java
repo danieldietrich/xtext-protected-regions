@@ -55,5 +55,23 @@ public class RegionParserFactory {
     return new RegionParserBuilder().addComment("<!--", "-->")
         .setMergeStyle(mergeStyle).setSwitchable(switchable).build();
   }
+  
+  // Xtend2
+  public static IRegionParser createDefaultXtend2Parser() {
+    return createJavaParser(DEFAULT_MERGE_STYLE, DEFAULT_SWITCHABLE);
+  }
+  public static IRegionParser createXtend2Parser(MergeStyle mergeStyle, boolean switchable) {
+    return new RegionParserBuilder().addComment("/*", "*/").addComment("//")
+        .setMergeStyle(mergeStyle).setSwitchable(switchable).build();
+  }
+
+  // Xtext
+  public static IRegionParser createDefaultXtextParser() {
+    return createJavaParser(DEFAULT_MERGE_STYLE, DEFAULT_SWITCHABLE);
+  }
+  public static IRegionParser createXtextParser(MergeStyle mergeStyle, boolean switchable) {
+    return new RegionParserBuilder().addComment("/*", "*/").addComment("//")
+        .setMergeStyle(mergeStyle).setSwitchable(switchable).build();
+  }
 
 }

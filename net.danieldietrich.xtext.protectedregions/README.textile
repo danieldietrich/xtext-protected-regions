@@ -136,10 +136,12 @@ Currently the following programming languages are supported out of the box:
 * Ruby
 * Scala
 * XML
+* Xtend2
+* Xtext
 
 In addition the parser is customizable. There is an API to adapt new languages / new types of comments.
 
-%{color:red}Please let us "know":https://github.com/danieldietrich/xtext-protectedregions/issues if you are missing a language.%
+%{color:red}Please let us "know":https://github.com/danieldietrich/xtext-protectedregions/issues if you are missing any language.%
 
 p. "top":#top
 
