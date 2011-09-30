@@ -48,6 +48,9 @@ public class RegionParserBuilder {
     return parser;
   }
   
+  /**
+   * Default IRegionOracle
+   */
   private static class Oracle implements IRegionOracle {
 
     private static final String ID = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
@@ -63,7 +66,7 @@ public class RegionParserBuilder {
       
       String label;
       switch(mergeStyle) {
-        case FILL_IN : {
+        case GENERATED_REGION : {
           label = "GENERATED";
           break;
         }

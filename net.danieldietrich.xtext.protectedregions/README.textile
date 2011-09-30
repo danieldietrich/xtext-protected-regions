@@ -1,45 +1,286 @@
-h1. Xtext 2.0.1 Protected Region Support
+h1(#top). Xtext Protected Region Support
 
-h2. Features
+h2(#toc). Table of Contents
 
-* Fill-in generation
-* Multilingual
-* Renaming / Moving of Files Supported
+* "Table of Contents":#toc
+* "Features":#features
+* "Introduction":#intro
+** "Protected Regions":#protectedRegions
+** "Inverse Protected Regions":#inverseProtectedRegions
+** "Switchable Regions":#switchableRegions
+** "Language Support":#languageSupport
+* "Usage":#usage
+** "API":#api
+** "Comments":#comments
+** "Default ID's":#defaultIDs
+* "Customization":#customization
+** "Additional Languages":#addLanguages
+** "Change Protected Region Notation":#changeNotation
+** "Change Switchable Regions Behavior":#changeSwitchable
+
+"top":#top
+
+h2(#features). Features
+
+* Protected Regions / Inverse Protected Regions
 * Switchable Regions
+* Multilingualism
+* Extensibility
 
-h2. Starting Point
+"top":#top
 
-An example can be found in @ProtectedRegionUtil@.
+h2(#intro). Introduction
 
-h2. Defaults
+Code Generators are producing documents with generated content. Repeatedly generating the same files will potentially overwrite changes because code genrators can't distinguish between generated code and manual changed code. Although it might be necessary to perform manual changes. On the other side requirements are changing and code generators emerge over time. These two aspects imply that generated code might change over time while manual changes are needed to be preserved.
 
-Use @ProtectedRegionUtil@ to merge generated and modified contents.
-Use @ProtectedRegionParserFactory@ to create default parsers.
+Xtext Protected Region Support has been created to close this gap. It can be used in conjunction with Xtext/Xtend 2 but it also works with other code generators.
 
-h2. Customization
+In this implementation the _protected region pattern_ is used to protect manual changes. There are other patterns, too, like the _generation gap pattern_. Further reading about the differences can be found here:
 
-Use @DefaultProtectedRegionParser@ to configure custom parsers.
-Implement @IProtectedRegionOracle@ to change the style ofconfigure custom parsers.
+* "C++ Report: Pattern Hatching - Generation Gap. John Vlissides (IBM), 1996":http://www.research.ibm.com/designpatterns/pubs/gg.html
+* "Generation Gap Pattern. Heiko Behrens (Itemis), 2009":http://heikobehrens.net/2009/04/23/generation-gap-pattern/
+* "New Ways Around Generation Gap Pattern. Ekkehard 'Ekke' Gentz, 2009":http://ekkes-corner.blogspot.com/2009/05/new-ways-around-generation-gap-pattern.html
 
-h2. Notes
+"top":#top
 
-* Currently the uniqueness of protected regions is checked per file.
-  But it should be easy to build a layer above and check for global uniqueness.
+h3(#protectedRegions). Protected Regions
 
-A common practice is to
+_Protected Regions_ are special regions within a document which are preserved when a generator overwrites the underlying document. Start and end of a protected region are marked in a special way (e.g. with comments of the underlying language). A protected region has a unique id which is used to match regions of different versions of the same document.
 
-1. collect all protected regions
-2. clean up directories
-3. generate new files and insert protected regions.
+*Example:*
 
-or
+bc.. class GeneratedClass {
 
-1. collect all protected regions
-2. generate new files to a temp-dir and insert protected regions.
-3. on success delete old gen-dir and rename temp-dir to gen-dir
-    
-If protected regions should survive the renaming or moving of a generated file,
-the protected region id's have to be globally unique.
+  String name;
   
-Hint: This will be implemented as layer above this library, in your generator
-      (standalone or mwe2 workflow) + a specific IFileSystemAccess implementation.
+  GeneratedClass(String name) {
+    this.name = name;
+  }
+
+  // changes outside of protected regions will be *overwritten*
+  public String getName() {
+  
+    // PROTECTED REGION ID(GeneratedClass.getName) START
+    
+    // changes inside of protected regions are *protected*
+    return name;
+    
+    // PROTECTED REGION END
+  }
+}
+
+p. "top":#top
+
+h3(#inverseProtectedRegions). Inverse Protected Regions
+
+_Inverse Protected Regions_ (aka _Generated Regions_ aka _Fill-in Regions_) are defined as follows: The content of a document is protected by default in the manner that text won't be overwritten on subsequent generations. Additionally there are regions, which can be marked to be overwritten.
+
+*Example:*
+
+bc.. class GeneratedClass {
+
+  String name;
+  
+  GeneratedClass(String name) {
+    this.name = name;
+  }
+
+  // changes outside of generated regions are *protected*
+  public String getName() {
+  
+    // GENERATED ID(GeneratedClass.getName) START
+    
+    // changes inside of generated regions will be *overwritten*
+    return name;
+    
+    // GENERATED END
+  }
+}
+
+p. "top":#top
+
+h3(#switchableRegions). Switchable Regions
+
+_Switchable Regions_ extend the functionality of Protected Regions (and Inverse Protected Regions) in the way that regions are explicitely _enabled_ to be processed during code generation.
+
+If Protected Regions are enabled, they are protected, otherwise they will be overwritten:
+
+bc.. // PROTECTED REGION ID(GeneratedClass.getName) START
+// region will be overwritten
+// PROTECTED REGION END
+
+// PROTECTED REGION ID(GeneratedClass.getName) ENABLED START
+// region now is protected
+// PROTECTED REGION END
+
+p. If Inverse Protected Regions are enabled, they will be overwritten, otherwise they are protected:
+
+bc.. // GENERATED ID(GeneratedClass.getName) START
+// region is currently protected
+// GENERATED END
+
+// GENERATED ID(GeneratedClass.getName) ENABLED START
+// region now will be overwritten
+// GENERATED END
+
+p. "top":#top
+
+h3(#languageSupport). Language Support
+
+Currently the following programming languages are supported out of the box:
+
+* Clojure
+* Java
+* Ruby
+* Scala
+* XML
+
+%{color:red}Please let us "know":https://github.com/danieldietrich/xtext-protectedregions/issues if there are languages missing.%
+
+p. "top":#top
+
+h2(#usage). Usage
+
+There are two tasks, performed by different roles:
+
+# The developer of a code generator has to process the generated documents to preserve marked regions.
+# The user of a code generator has to enable or disable marked regions, if they are switchable.
+
+"top":#top
+
+h3(#api). API
+
+There is a @RegionParserBuilder@ and a @RegionParserFactory@ to create @IRegionParser@'s. @IRegionParser@'s parse your code, resulting in @IDocument@'s containing @IRegion@'s. The @IRegion@'s reflect the regions state (protected, switchable, etc.). The old and the new generated code has to be parsed and thereafter merged with the help of @RegionUtil@ to obtain an @IDocument@ containing the generated code and the manual changes.
+
+For more information on the API of this classes please see the Javadoc.
+
+*Example:*
+
+bc.. // obtain Java protected region parser
+IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
+
+// parse & merge documents
+IDocument _new = parser.parse(generator.generate("SomeClass.java"));
+IDocument merged = null;
+try {
+  IDocument old = parser.parse(new FileInputStream("./src-gen/SomeClass.java"));
+  merged = RegionUtil.merge(_new, old);
+} catch(FileNoteFoundException x) {
+  merged = _new; // old document does not exist
+}
+
+// save generated file (containing manual changes)
+IOUtils.write(merged, new FileOutputStream("./src-gen/SomeClass.java"));
+
+p. "top":#top
+
+h3(#comments). Comments
+
+Comments are the most important part of the @IRegionParser@ because it is assumed that (protected) region markers are denoted within comments.
+
+If the default parser is configured to parse "protected regions":#protectedRegions, the start notation is @PROTECTED REGION ID(xxx) START@ and the end notation is @PROTECTED REGION END@. The comments containing these markers and the text between them are protected.
+
+If the default parser is configured to parse "inverse protected regions":#inverseProtectedRegions, the start notation is @GENERATED ID(xxx) START@ and the end notation is @GENERATED END@. The comments containing these markers and the text between them are generated.
+
+Additionally the parser can be configured to support "switchable regions":#switchableRegions. By default the @ENABLED@ keyword is used to enable switched regions. In particular the notation is @PROTECTED REGION ID(xxx) ENABLED START@ and accordingly @GENERATED ID(xxx) ENABLED START@.
+
+p. "top":#top
+
+h3(#defaultIDs). Default ID's
+
+IDs are used to identify marked regions. The default parser recognizes region starts that contain unique identifiers (IDs). If an @IRegion@, contained in an @IDocument@ returned by the parser, is marked (as _protected_ or as _generated_), it has an ID that is not @null@. Furthermore the IDs contained in _one_ document have to be unique although it is recommended to generate (project-)globally unique IDs.
+
+By default valid IDs are defined as follows:
+
+* An ID is a concatenation of one or more segments separated by a dot '.'
+* A segment is letter, an underscore '_' or a dollar '$', optionally followed by a sequence of these characters and digits.
+
+*Examples:*
+
+* ID: @_this.is.aValid.$id$._1234@
+* Protected region start: @/* PROTECTED REGION ID(some.unique.identifier) START */@
+* Generated region start: @// GENERATED ID(generate.me) ENABLED START@
+
+p. "top":#top
+
+h2(#customization). Customization
+
+There are various ways to customize the functionality of the protected region support.
+
+"top":#top
+
+h3(#addLanguages). Additional Languages
+
+Additional languages (i.e. _comment flavors_) can be added using the @RegionParserBuilder@.
+
+*Example:*
+
+bc.. IRegionParser javaParser = new RegionParserBuilder()
+  .addComment("/*", "*/")                     // multi line comment flavor (forbid nested comments)
+  .addComment("//")                           // single line comment flavor
+  .setMergeStyle(MergeStyle.PROTECTED_REGION) // use protected regions (instead of generated regions)
+  .setSwitchable(false)                       // protected regions have not to be enabled explicitely
+  .build();                                   // create the IRegionParser as configured above
+
+p. "top":#top
+
+h3(#changeNotation). Change Protected Region Notation
+
+When a different protected region start and end style is needed, a custom @IRegionOracle@ has to be implemented. The @IRegionOracle@ tells the parser if a comment contains a region _start_, _end_, the _id_ of a region start and if a region is _switchable_.
+
+*Example:*
+
+By default protected regions are denoted as follows:
+
+bc.. /* PROTECTED REGION ID(some.id) START */
+
+/* PROTECTED REGION END */
+
+p. Lets change the notation to:
+
+bc.. // code(some.id)-{
+
+// }-code
+
+p. Here is the according @IRegionOracle@ (_simple version without regular expressions_):
+
+bc.. IRegionOracle myOracle = new IRegionOracle() {
+  @Override public boolean isMarkedRegionStart(String s) {
+    return s.startsWith("// code(") && s.endsWith(")-{");
+  }
+  @Override public boolean isMarkedRegionEnd(String s) {
+    return "// }-code".equals(s);
+  }
+  @Override public String getId(String s) {
+      int i = s.indexOf("(");
+      int j = i + 1 + s.substring(i+1).indexOf(")");
+      return (i != -1 && j != -1) ? s.substring(i+1, j).trim() : null;
+  }
+  @Override public boolean isEnabled(String s) {
+    return true;
+  }
+}
+
+p. Finally tell the parser how it recognizes the new protected regions:
+
+@javaParser.setOracle(myOracle);@
+
+Thats it. Now just parse documents as usual:
+
+@IDocument doc = javaParser.parse(new FileInputStream("./src-gen/SomeClass"));@
+
+"top":#top
+
+h3(#changeSwitchable). Change Switchable Regions Behavior
+
+The @IRegionOracle@ tells the @IRegionParser@, if a marked region is enabled. This information is stored in the corresponding @IRegion@, as part of the @IDocument@ the parser generates.
+
+*Example implementation of @IRegionOracle#isEnabled(String)@:*
+
+bc. @Override public isEnabled(String s) {
+  return s.contains("ENABLED");
+}
+
+The @RegionUtil@ merges documents. It interprets the fields of @IRegion@ to decide if a text region is preserved or not. Custom switchable regions behavior is provided by implementing a custom merge function in conjunction with providing a custom @IRegionOracle@ (if needed).
+
+"top":#top

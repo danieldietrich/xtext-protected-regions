@@ -32,7 +32,15 @@ public interface IRegionOracle {
   String getId(String markedRegionStart);
   
   /**
-   * Returns whether a switchable marked region is enabled or not.
+   * Returns whether a marked region is enabled or not.<br>
+   * <strong>Notes:</strong>
+   * <ul>
+   *   <li>Non switchable implementations are always returning true.</li>
+   *   <li>The semantics of enabled marked regions varies.<br>
+   *       To common use cases are {@link RegionUtil#fillIn(IDocument, IDocument)}
+   *       and {@link RegionUtil#merge(IDocument, IDocument)}.
+   *   </li>
+   * </ul>
    * 
    * @param markedRegionStart Guaranteed to be a marked region start.
    * @return true, if the marked region is enabled, false otherwise

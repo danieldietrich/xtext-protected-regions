@@ -5,7 +5,7 @@ package net.danieldietrich.xtext.generator.protectedregions;
  */
 public enum MergeStyle {
 
-  FILL_IN,
+  GENERATED_REGION,
   PROTECTED_REGION
 
 }

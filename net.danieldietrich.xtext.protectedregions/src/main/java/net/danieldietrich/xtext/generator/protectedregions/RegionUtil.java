@@ -3,6 +3,8 @@ package net.danieldietrich.xtext.generator.protectedregions;
 import net.danieldietrich.xtext.generator.protectedregions.IDocument.IRegion;
 
 /**
+ * 
+ * 
  * @author Daniel Dietrich - Initial contribution and API
  */
 public class RegionUtil {
