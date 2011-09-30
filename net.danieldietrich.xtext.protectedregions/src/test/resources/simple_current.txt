@@ -1,0 +1,22 @@
+import java.util.List;
+
+// $(SomeClass.imports)-{
+// custom imports
+// }-$
+
+public class SomeClass {
+
+  // $(SomeClass.attributes)-{
+  // custom attributes
+  // }-$
+
+  SomeClass(List<String> names) {
+  // $(SomeClass.constructor)-{
+  // custom constructor
+  // }-$
+  }
+
+  // $(SomeClass.methods)-{
+  // custom methods
+  // }-$
+}

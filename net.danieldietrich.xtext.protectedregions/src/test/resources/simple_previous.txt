@@ -1,0 +1,22 @@
+// $(SomeClass.imports)-{
+import java.util.*;
+// }-$
+
+public class SomeClass {
+
+  // $(SomeClass.attributes)-{
+  private List<String> names;
+  // }-$
+
+  SomeClass() {
+  // $(SomeClass.constructor)-{
+  names = new ArrayList<String>();
+  // }-$
+  }
+
+  // $(SomeClass.methods)-{
+  public List<String> getNames() {
+    return Collections.unmodifiableList(names);
+  }
+  // }-$
+}

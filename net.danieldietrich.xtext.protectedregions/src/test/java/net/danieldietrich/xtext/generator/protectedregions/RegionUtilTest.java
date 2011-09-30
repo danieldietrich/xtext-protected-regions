@@ -155,4 +155,59 @@ public class RegionUtilTest {
     assertEquals(expectedContents, mergedContents);
   }
   
+  IRegionOracle SIMPLE_ORACLE = new IRegionOracle() {
+    @Override public boolean isMarkedRegionStart(String s) {
+      String _s = s.trim();
+      return _s.startsWith("$(") && _s.endsWith(")-{");
+    }
+    @Override public boolean isMarkedRegionEnd(String s) {
+      return "}-$".equals(s.trim());
+    }
+    @Override public String getId(String s) {
+        int i = s.indexOf("(");
+        int j = i + 1 + s.substring(i+1).indexOf(")");
+        return (i != -1 && j != -1) ? s.substring(i+1, j).trim() : null;
+    }
+    @Override public boolean isEnabled(String s) {
+      return true;
+    }
+  };
+  
+  @Test
+  public void otherRegionNotation() throws FileNotFoundException, IOException {
+    
+    IRegionParser parser = new RegionParserBuilder()
+    .addComment("/*", "*/")
+    .addComment("//")
+    .setMergeStyle(MergeStyle.PROTECTED_REGION)
+    .setSwitchable(false)
+    .build();
+    
+    parser.setOracle(SIMPLE_ORACLE);
+    
+    IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/simple_current.txt"));
+    IDocument previousDoc = parser.parse(new FileInputStream("src/test/resources/simple_previous.txt"));
+    
+    IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
+    String mergedContents = _merged.getContents();
+    String expectedContents = IOUtils.toString(new FileReader("src/test/resources/simple_expected.txt"));
+
+    assertEquals(expectedContents, mergedContents);
+  }
+  
+  @Test
+  public void xmlGenerator() throws FileNotFoundException, IOException {
+    
+    IRegionParser parser = RegionParserFactory.createDefaultXmlParser();
+    
+    IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/xml_current.txt"));
+    IDocument previousDoc = parser.parse(new FileInputStream("src/test/resources/xml_previous.txt"));
+
+    IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
+    String mergedContents = _merged.getContents();
+    String expectedContents = IOUtils.toString(new FileReader("src/test/resources/xml_expected.txt"));
+
+    assertEquals(expectedContents, mergedContents);
+  }
+  
 }

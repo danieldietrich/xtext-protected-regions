@@ -24,8 +24,8 @@ h2(#features). Features
 
 * Protected Regions / Inverse Protected Regions
 * Switchable Regions
-* Multilingualism
-* Extensibility
+* Language independent
+* Customizable
 
 "top":#top
 
@@ -127,6 +127,8 @@ p. "top":#top
 
 h3(#languageSupport). Language Support
 
+The @IRegionParser@ requires the language to be generated to have something like comments or even user specific labels which are prefix unambiguous and have a unambiguous termination.
+
 Currently the following programming languages are supported out of the box:
 
 * Clojure
@@ -135,7 +137,9 @@ Currently the following programming languages are supported out of the box:
 * Scala
 * XML
 
-%{color:red}Please let us "know":https://github.com/danieldietrich/xtext-protectedregions/issues if there are languages missing.%
+In addition the parser is customizable. There is an API to adapt new languages / new types of comments.
+
+%{color:red}Please let us "know":https://github.com/danieldietrich/xtext-protectedregions/issues if you are missing a language.%
 
 p. "top":#top
 
@@ -143,7 +147,7 @@ h2(#usage). Usage
 
 There are two tasks, performed by different roles:
 
-# The developer of a code generator has to process the generated documents to preserve marked regions.
+# The developer of a code generator has to collect protected regions and merge the generated documents to preserve marked regions.
 # The user of a code generator has to enable or disable marked regions, if they are switchable.
 
 "top":#top
@@ -238,18 +242,18 @@ bc.. /* PROTECTED REGION ID(some.id) START */
 
 p. Lets change the notation to:
 
-bc.. // code(some.id)-{
+bc.. // $(some.id)-{
 
-// }-code
+// }-$
 
 p. Here is the according @IRegionOracle@ (_simple version without regular expressions_):
 
 bc.. IRegionOracle myOracle = new IRegionOracle() {
   @Override public boolean isMarkedRegionStart(String s) {
-    return s.startsWith("// code(") && s.endsWith(")-{");
+    return s.trim().startsWith("$(") && s.trim().endsWith(")-{");
   }
   @Override public boolean isMarkedRegionEnd(String s) {
-    return "// }-code".equals(s);
+    return "}-$".equals(s.trim());
   }
   @Override public String getId(String s) {
       int i = s.indexOf("(");

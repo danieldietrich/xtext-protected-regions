@@ -1,0 +1,22 @@
+<!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
+<ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
+  xmlns:g="urn:import:com.google.gwt.user.client.ui">
+  <ui:with field='resources' type='gwt.client.resources.Resources'/>
+  <ui:style>
+    <!-- PROTECTED REGION ID(styles) START -->
+    .red {
+      color: red;
+    }
+    <!-- PROTECTED REGION END -->
+  </ui:style>
+  <g:HTMLPanel>
+    <table cellspacing="0" cellpadding="0">
+      <!-- PROTECTED REGION ID(table.rows) START -->
+      <tr>
+        <td>Name</td>
+        <td><g:TextBox ui:field="name" styleName="{style.red} visibleLength="30" maxLength="100"/></td>
+      </tr>
+      <!-- PROTECTED REGION END -->
+    </table>
+  </g:HTMLPanel>
+</ui:UiBinder>

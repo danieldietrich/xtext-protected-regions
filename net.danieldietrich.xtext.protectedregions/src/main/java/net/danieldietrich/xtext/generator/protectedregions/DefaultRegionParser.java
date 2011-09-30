@@ -90,7 +90,10 @@ class DefaultRegionParser implements IRegionParser {
     
     // subsequentially read regions until end of input reached
     while (!input.endOfDocumentReached()) {
-      result.addRegion(getNextRegion(input));
+      IRegion region = getNextRegion(input);
+      if (region.getText().length() > 0) { // because of technical reasons the first region is empty
+        result.addRegion(region);
+      }
     }
     
     // consider buffered input
@@ -152,7 +155,7 @@ class DefaultRegionParser implements IRegionParser {
       }
       
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
-      isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
+      isMarkedRegionEnd = !isMarkedRegionStart && oracle.isMarkedRegionEnd(comment);
       stateChanged = (!input.isMarkedRegion() && isMarkedRegionStart)
           || (input.isMarkedRegion() && isMarkedRegionEnd);
       
@@ -351,7 +354,7 @@ class DefaultRegionParser implements IRegionParser {
     Input(String document) {
       this.document = document;
     }
-    
+        
     // cursor reached end?
     boolean endOfDocumentReached() {
       return index >= document.length();
