@@ -30,6 +30,7 @@
 					<!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
 					<source>1.6</source>
 					<target>1.6</target>
+					<encoding>UTF-8</encoding> <!-- TODO: does not seem to work -->
 				</configuration>
 			</plugin>
 

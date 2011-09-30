@@ -4,6 +4,7 @@ h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
 * "Features":#features
+* "Installation":#installation
 * "Introduction":#intro
 ** Protected Regions
 ** Inverse Protected Regions
@@ -26,6 +27,34 @@ h2(#features). Features
 * Switchable Regions
 * Language independent
 * Customizable
+
+"top":#top
+
+h2(#installation). Installation
+
+**Prequisites**
+
+To install the project on your local machine the following tools are needed:
+
+* "JDK 6+":http://www.oracle.com/technetwork/java/javase/downloads/index.html
+* "Eclipse":http://www.eclipse.org/downloads/
+* "Git":http://git-scm.com/
+* "Maven":http://maven.apache.org/download.html
+
+**Download Project**
+
+The project has to be cloned to your local git repository:
+
+@git clone git@github.com:danieldietrich/xtext-protectedregions.git@
+
+**Setup Project**
+
+The eclipse project files are generated as follows:
+
+@mvn eclipse:eclipse@
+
+After that the project can be importet into your eclipse workspace.
+Assure that _Project Properties/Resource/Text file encoding_ is set to _UTF-8_.
 
 "top":#top
 
