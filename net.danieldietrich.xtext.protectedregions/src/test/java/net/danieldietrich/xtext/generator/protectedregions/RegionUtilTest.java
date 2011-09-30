@@ -44,7 +44,7 @@ public class RegionUtilTest {
     }
     
     @Test
-    public void idsAreUniquePerFile() throws FileNotFoundException, IOException {
+    public void idsShouldBeUniquePerFile() throws FileNotFoundException, IOException {
       try {
         javaParser.parse(new FileInputStream("src/test/resources/non_unique_ids.txt"));
       } catch(IllegalStateException x) {
@@ -81,7 +81,7 @@ public class RegionUtilTest {
   };
 
   @Test
-  public void scaleHasNestedComments() throws FileNotFoundException, IOException {
+  public void scalaParserShouldReadNestedComments() throws FileNotFoundException, IOException {
     IRegionParser parser = RegionParserFactory.createDefaultScalaParser();
     parser.setOracle(NESTED_COMMENT_ORACLE);
     IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
@@ -90,7 +90,7 @@ public class RegionUtilTest {
   }
 
   @Test
-  public void javaHasntNestedComments() throws FileNotFoundException, IOException {
+  public void javaParserShouldntReadNestedComments() throws FileNotFoundException, IOException {
     IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
     parser.setOracle(NESTED_COMMENT_ORACLE);
     IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
@@ -99,7 +99,7 @@ public class RegionUtilTest {
   }
   
   @Test
-  public void switchedRegions() throws FileNotFoundException, IOException {
+  public void switchedRegionsParserShouldPreserveEnabledRegionsOnly() throws FileNotFoundException, IOException {
 
     IDocument currentDoc = javaParser.parse(new FileInputStream("src/test/resources/switched_current.txt"));
     IDocument previousDoc = javaParser.parse(new FileInputStream("src/test/resources/switched_previous.txt"));
@@ -140,7 +140,7 @@ public class RegionUtilTest {
   };
 
   @Test
-  public void fillIn() throws FileNotFoundException, IOException {
+  public void fillInShouldMatchExpected() throws FileNotFoundException, IOException {
 
     IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
     parser.setOracle(FILL_IN_ORACLE);
@@ -174,7 +174,7 @@ public class RegionUtilTest {
   };
   
   @Test
-  public void otherRegionNotation() throws FileNotFoundException, IOException {
+  public void alternativeRegionNotationsWorkAsWell() throws FileNotFoundException, IOException {
     
     IRegionParser parser = new RegionParserBuilder()
     .addComment("/*", "*/")
@@ -196,7 +196,7 @@ public class RegionUtilTest {
   }
   
   @Test
-  public void xmlGenerator() throws FileNotFoundException, IOException {
+  public void xmlParserShouldMatchExpected() throws FileNotFoundException, IOException {
     
     IRegionParser parser = RegionParserFactory.createDefaultXmlParser();
     
