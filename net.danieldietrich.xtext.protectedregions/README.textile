@@ -43,11 +43,11 @@ In this implementation the _protected region pattern_ is used to protect manual 
 
 "top":#top
 
-h3(#protectedRegions). Protected Regions
+p(#protectedRegions). **Protected Regions**
 
 _Protected Regions_ are special regions within a document which are preserved when a generator overwrites the underlying document. Start and end of a protected region are marked in a special way (e.g. with comments of the underlying language). A protected region has a unique id which is used to match regions of different versions of the same document.
 
-*Example:*
+_*Example:*_
 
 bc.. class GeneratedClass {
 
@@ -71,11 +71,11 @@ bc.. class GeneratedClass {
 
 p. "top":#top
 
-h3(#inverseProtectedRegions). Inverse Protected Regions
+p(#inverseProtectedRegions). **Inverse Protected Regions**
 
 _Inverse Protected Regions_ (aka _Generated Regions_ aka _Fill-in Regions_) are defined as follows: The content of a document is protected by default in the manner that text won't be overwritten on subsequent generations. Additionally there are regions, which can be marked to be overwritten.
 
-*Example:*
+_*Example:*_
 
 bc.. class GeneratedClass {
 
@@ -99,7 +99,7 @@ bc.. class GeneratedClass {
 
 p. "top":#top
 
-h3(#switchableRegions). Switchable Regions
+p(#switchableRegions). **Switchable Regions**
 
 _Switchable Regions_ extend the functionality of Protected Regions (and Inverse Protected Regions) in the way that regions are explicitely _enabled_ to be processed during code generation.
 
@@ -125,7 +125,7 @@ bc.. // GENERATED ID(GeneratedClass.getName) START
 
 p. "top":#top
 
-h3(#languageSupport). Language Support
+p(#languageSupport). **Language Support**
 
 The @IRegionParser@ requires the language to be generated to have something like comments or even user specific labels which are prefix unambiguous and have a unambiguous termination.
 
@@ -154,13 +154,13 @@ There are two tasks, performed by different roles:
 
 "top":#top
 
-h3(#api). API
+p(#api). **API**
 
-There is a @RegionParserBuilder@ and a @RegionParserFactory@ to create @IRegionParser@'s. @IRegionParser@'s parse your code, resulting in @IDocument@'s containing @IRegion@'s. The @IRegion@'s reflect the regions state (protected, switchable, etc.). The old and the new generated code has to be parsed and thereafter merged with the help of @RegionUtil@ to obtain an @IDocument@ containing the generated code and the manual changes.
+There is a @RegionParserBuilder@ and a @RegionParserFactory@ to create @IRegionParser@. The @IRegionParser@ parse your code, resulting in @IDocument@ containing one or more @IRegion@. The @IRegion@ reflect the regions state (protected, switchable, etc.). The old and the new generated code has to be parsed and thereafter merged with the help of @RegionUtil@ to obtain an @IDocument@ containing the generated code and the manual changes.
 
 For more information on the API of this classes please see the Javadoc.
 
-*Example:*
+_*Example:*_
 
 bc.. // obtain Java protected region parser
 IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
@@ -180,7 +180,7 @@ IOUtils.write(merged, new FileOutputStream("./src-gen/SomeClass.java"));
 
 p. "top":#top
 
-h3(#comments). Comments
+p(#comments). **Comments**
 
 Comments are the most important part of the @IRegionParser@ because it is assumed that (protected) region markers are denoted within comments.
 
@@ -192,7 +192,7 @@ Additionally the parser can be configured to support "switchable regions":#switc
 
 p. "top":#top
 
-h3(#defaultIDs). Default ID's
+p(#defaultIDs). **Default ID's**
 
 IDs are used to identify marked regions. The default parser recognizes region starts that contain unique identifiers (IDs). If an @IRegion@, contained in an @IDocument@ returned by the parser, is marked (as _protected_ or as _generated_), it has an ID that is not @null@. Furthermore the IDs contained in _one_ document have to be unique although it is recommended to generate (project-)globally unique IDs.
 
@@ -201,7 +201,7 @@ By default valid IDs are defined as follows:
 * An ID is a concatenation of one or more segments separated by a dot '.'
 * A segment is letter, an underscore '_' or a dollar '$', optionally followed by a sequence of these characters and digits.
 
-*Examples:*
+_*Examples:*_
 
 * ID: @_this.is.aValid.$id$._1234@
 * Protected region start: @/* PROTECTED REGION ID(some.unique.identifier) START */@
@@ -215,11 +215,11 @@ There are various ways to customize the functionality of the protected region su
 
 "top":#top
 
-h3(#addLanguages). Additional Languages
+p(#addLanguages). **Additional Languages**
 
 Additional languages (i.e. _comment flavors_) can be added using the @RegionParserBuilder@.
 
-*Example:*
+_*Example:*_
 
 bc.. IRegionParser javaParser = new RegionParserBuilder()
   .addComment("/*", "*/")                     // multi line comment flavor (forbid nested comments)
@@ -230,11 +230,11 @@ bc.. IRegionParser javaParser = new RegionParserBuilder()
 
 p. "top":#top
 
-h3(#changeNotation). Change Protected Region Notation
+p(#changeNotation). **Change Protected Region Notation**
 
 When a different protected region start and end style is needed, a custom @IRegionOracle@ has to be implemented. The @IRegionOracle@ tells the parser if a comment contains a region _start_, _end_, the _id_ of a region start and if a region is _switchable_.
 
-*Example:*
+_*Example:*_
 
 By default protected regions are denoted as follows:
 
@@ -277,11 +277,11 @@ Thats it. Now just parse documents as usual:
 
 "top":#top
 
-h3(#changeSwitchable). Change Switchable Regions Behavior
+p(#changeSwitchable). **Change Switchable Regions Behavior**
 
 The @IRegionOracle@ tells the @IRegionParser@, if a marked region is enabled. This information is stored in the corresponding @IRegion@, as part of the @IDocument@ the parser generates.
 
-*Example implementation of @IRegionOracle#isEnabled(String)@:*
+_*Example implementation of @IRegionOracle#isEnabled(String)@:*_
 
 bc. @Override public isEnabled(String s) {
   return s.contains("ENABLED");
