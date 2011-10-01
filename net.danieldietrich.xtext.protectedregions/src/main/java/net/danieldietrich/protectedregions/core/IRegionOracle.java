@@ -1,4 +1,4 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API

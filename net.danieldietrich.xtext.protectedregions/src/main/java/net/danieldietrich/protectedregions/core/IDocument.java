@@ -1,4 +1,4 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 /**
  * An IDocument holds IRegions, which are either marked (with an ID) or not marked.

@@ -1,4 +1,4 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 import java.util.regex.Pattern;
 
@@ -11,7 +11,6 @@ public class RegionParserBuilder {
   
   final private DefaultRegionParser parser;
   
-  private MergeStyle mergeStyle = MergeStyle.PROTECTED_REGION;
   private boolean switchable = false;
   
   public RegionParserBuilder() {
@@ -33,8 +32,8 @@ public class RegionParserBuilder {
     return this;
   }
 
-  public RegionParserBuilder setMergeStyle(MergeStyle mergeStyle) {
-    this.mergeStyle = mergeStyle;
+  public RegionParserBuilder setInverse(boolean inverse) {
+    parser.setInverse(inverse);
     return this;
   }
 
@@ -44,7 +43,7 @@ public class RegionParserBuilder {
   }
 
   public IRegionParser build() {
-    parser.setOracle(new Oracle(mergeStyle, switchable));
+    parser.setOracle(new Oracle(parser.isInverse(), switchable));
     return parser;
   }
   
@@ -60,28 +59,11 @@ public class RegionParserBuilder {
     private Pattern start;
     private Pattern end;
     
-    Oracle(MergeStyle mergeStyle, boolean switchable) {
-      
+    Oracle(boolean inverse, boolean switchable) {
       this.switchable = switchable;
-      
-      String label;
-      switch(mergeStyle) {
-        case GENERATED_REGION : {
-          label = "GENERATED";
-          break;
-        }
-        case PROTECTED_REGION : {
-          label = "PROTECTED\\s+REGION";
-          break;
-        }
-        default : {
-          throw new IllegalStateException("Unknown merge style: " + mergeStyle);
-        }
-      }
-      
+      String label = inverse ? "GENERATED" : "PROTECTED\\s+REGION";
       start = Pattern.compile("\\s*" + label + "\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+" + (switchable ? "(ENABLED\\s+)?" : "") + "START\\s*");
       end = Pattern.compile("\\s*" + label + "\\s+END\\s*");
-      
     }
     
     @Override

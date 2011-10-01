@@ -1,11 +1,11 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.danieldietrich.xtext.generator.protectedregions.IDocument.IRegion;
+import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 
 import org.apache.commons.io.IOUtils;
 
@@ -33,6 +33,7 @@ class DefaultRegionParser implements IRegionParser {
   
   private List<CommentType> commentTypes = new ArrayList<CommentType>();
   private IRegionOracle oracle;
+  private boolean inverse = false;
   
   @Override
   public void addComment(String start, String end) {
@@ -102,6 +103,20 @@ class DefaultRegionParser implements IRegionParser {
     }
     
     return result;
+  }
+  
+  @Override
+  public boolean isInverse() {
+    return inverse;
+  }
+  
+  /**
+   * Called by RegionParserBuilder
+   * 
+   * @param inverse
+   */
+  void setInverse(boolean inverse) {
+    this.inverse = inverse;
   }
   
   /**

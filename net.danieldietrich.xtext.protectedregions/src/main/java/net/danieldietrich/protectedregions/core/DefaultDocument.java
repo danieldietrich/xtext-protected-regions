@@ -1,4 +1,4 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 import java.util.ArrayList;
 import java.util.Collections;

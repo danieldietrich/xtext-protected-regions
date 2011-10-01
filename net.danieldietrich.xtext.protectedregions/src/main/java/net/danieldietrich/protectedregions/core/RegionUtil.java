@@ -1,6 +1,8 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
-import net.danieldietrich.xtext.generator.protectedregions.IDocument.IRegion;
+import java.util.Map;
+
+import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API
@@ -11,19 +13,56 @@ public class RegionUtil {
   }
 
   /**
+   * Calls {@link #merge(IDocument, HasMarkedRegions)}.
+   * @param currentDoc A newly generated document.
+   * @param previousDoc An IDocument with previously generated code which probably has manual changes.
+   * @return A new IDocument instance, containing current generated contents merged with previously changed marked regions.
+   */
+  public static IDocument merge(IDocument currentDoc, final IDocument previousDoc) {
+    return merge(currentDoc, new HasMarkedRegions() {
+      @Override
+      public IRegion get(String id) {
+        return previousDoc.getMarkedRegion(id);
+      }
+    });
+  }
+  
+  /**
+   * Calls {@link #merge(IDocument, HasMarkedRegions)}
+   * @param currentDoc A newly generated document.
+   * @param pool An pool of IRegions containing previously generated code which probably has manual changes.
+   * @return A new IDocument instance, containing current generated contents merged with previously changed marked regions.
+   */
+  public static IDocument merge(IDocument currentDoc, final Map<String,IRegion> pool) {
+    return merge(currentDoc, new HasMarkedRegions() {
+      @Override
+      public IRegion get(String id) {
+        return pool.get(id);
+      }
+    });
+  }
+  
+  /**
+   * Interface needed to generalize merge method.
+   */
+  private static interface HasMarkedRegions {
+    IRegion get(String id);
+  }
+  
+  /**
    * Merges newly generated and manually changed files,
    * regarding their marked regions.
    * 
    * @param currentDoc The new generated IDocument, containing no manual code.
-   * @param previousDoc The previously generated IDocument, possibly containing manual code. 
+   * @param hasMarkedRegion An arbitrary source of previously generated IRegions which probably contain manual changes.
    * @return A new IDocument instance, containing current generated contents merged with previously changed marked regions.
    */
-  public static IDocument merge(IDocument currentDoc, IDocument previousDoc) {
+  private static IDocument merge(IDocument currentDoc, HasMarkedRegions hasMarkedRegions) {
     DefaultDocument result = new DefaultDocument();
     for (IRegion generatedRegion : currentDoc.getRegions()) {
       IRegion markedRegion = null;
       if (generatedRegion.isMarkedRegion()) {
-        IRegion previousRegion = previousDoc.getMarkedRegion(generatedRegion.getId());
+        IRegion previousRegion = hasMarkedRegions.get(generatedRegion.getId());
         if (previousRegion != null && previousRegion.isEnabled()) {
           markedRegion = previousRegion;
         }

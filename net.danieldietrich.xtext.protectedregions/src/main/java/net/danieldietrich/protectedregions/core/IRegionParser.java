@@ -1,4 +1,4 @@
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,4 +59,10 @@ public interface IRegionParser {
    */
   IDocument parse(CharSequence in);
   
+  /**
+   * States if this parser parses <em>inverse</em> protected regions.
+   * 
+   * @return true, if this parser parses <em>inverse</em> protected regions, false otherwise.
+   */
+  boolean isInverse();
 }

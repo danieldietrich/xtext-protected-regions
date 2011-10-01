@@ -1,7 +1,7 @@
 /**
  * 
  */
-package net.danieldietrich.xtext.generator.protectedregions;
+package net.danieldietrich.protectedregions.core;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -11,6 +11,13 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.regex.Pattern;
+
+import net.danieldietrich.protectedregions.core.IDocument;
+import net.danieldietrich.protectedregions.core.IRegionOracle;
+import net.danieldietrich.protectedregions.core.IRegionParser;
+import net.danieldietrich.protectedregions.core.RegionParserBuilder;
+import net.danieldietrich.protectedregions.core.RegionParserFactory;
+import net.danieldietrich.protectedregions.core.RegionUtil;
 
 import org.apache.commons.io.IOUtils;
 import org.junit.Before;
@@ -27,7 +34,7 @@ public class RegionUtilTest {
     
     @Before
     public void setup() {
-      javaParser = RegionParserFactory.createJavaParser(MergeStyle.PROTECTED_REGION, true);
+      javaParser = RegionParserFactory.createJavaParser(false, true);
     }
     
     @Test
@@ -179,7 +186,7 @@ public class RegionUtilTest {
     IRegionParser parser = new RegionParserBuilder()
     .addComment("/*", "*/")
     .addComment("//")
-    .setMergeStyle(MergeStyle.PROTECTED_REGION)
+    .setInverse(false)
     .setSwitchable(false)
     .build();
     
