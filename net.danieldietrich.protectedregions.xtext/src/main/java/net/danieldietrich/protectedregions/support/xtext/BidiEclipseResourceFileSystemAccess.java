@@ -1,46 +1,43 @@
 package net.danieldietrich.protectedregions.support.xtext;
 
-import java.io.IOException;
 import java.util.Set;
 
 import net.danieldietrich.protectedregions.support.IPathFilter;
 
-import org.apache.commons.io.IOUtils;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess;
-
-import com.google.inject.Inject;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
 public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSystemAccess implements IBidiFileSystemAccess {
 
-  @Inject IWorkspaceRoot root;
+// TODO
+//  @Inject IWorkspaceRoot root;
 
-  @Override
-  public void setRoot(IWorkspaceRoot root) {
-    super.setRoot(root);
-    this.root = root;
-  }
+// TODO
+//  @Override
+//  public void setRoot(IWorkspaceRoot root) {
+//    super.setRoot(root);
+//    this.root = root;
+//  }
   
   @Override
   public boolean exists(String fileName) {
-    IFile file = root.getFile(new Path(fileName));
-    return file.exists();
+// TODO
+//    IFile file = root.getFile(new Path(fileName));
+//    return file.exists();
+    return false;
   }
   
   @Override
   public CharSequence readFile(String fileName) {
-    IFile file = root.getFile(new Path(fileName));
-    try {
-      return IOUtils.toString(file.getContents());
-    } catch (CoreException e) {
-      throw new IOException("Error reading " + file, e);
-    }
+//    IFile file = root.getFile(new Path(fileName));
+//    try {
+//      return IOUtils.toString(file.getContents());
+//    } catch (CoreException e) {
+//      throw new IOException("Error reading " + file, e);
+//    }
+    return null;
   }
 
   @Override
