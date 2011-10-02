@@ -1,0 +1,8 @@
+h1. Xtext Protected Region Support
+
+*Installation (workaround)*
+
+# @mvn eclipse:eclipse@
+# eclipse: import existing project into workspace
+# eclipse/project references: remove missing plugins
+# eclipse/project references: add project dependency to @net.danieldietrich.protectedregions@
