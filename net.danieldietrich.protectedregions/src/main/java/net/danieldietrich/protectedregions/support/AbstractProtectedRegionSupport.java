@@ -4,11 +4,12 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import net.danieldietrich.protectedregions.core.IDocument;
+import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 import net.danieldietrich.protectedregions.core.IRegionParser;
 import net.danieldietrich.protectedregions.core.RegionUtil;
-import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API
@@ -66,6 +67,8 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
    */
   public static class Builder<T extends AbstractProtectedRegionSupport> implements IBuilder<T> {
     
+    private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
+    
     private final IFileSystemReader reader;
     private final IFactory<T> factory;
     
@@ -112,17 +115,30 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
       if (parsers.isEmpty()) {
         throw new IllegalStateException("#addParser methods have to be called before #read methods.");
       }
+      if (!reader.exists(path)) {
+        return this;
+      }
       if (!reader.hasFiles(path)) {
         throw new IllegalArgumentException("no directory: " + path);
       }
       String canonicalPath = reader.getCanonicalPath(path);
-      if (visitedPaths.contains(canonicalPath)) {
+      if (isVisited(canonicalPath)) {
+        LOGGER.warning("skipping already visited path '" + path + "'.");
         return this;
       }
       internal_read(path, filter);
       visitedPaths.add(canonicalPath);
       addParser_locked = true;
       return this;
+    }
+    
+    private boolean isVisited(String canonicalPath) {
+      for (String path : visitedPaths) {
+        if (canonicalPath.startsWith(path)) {
+          return true;
+        }
+      }
+      return false;
     }
     
     private void internal_read(String path, IPathFilter filter) {
