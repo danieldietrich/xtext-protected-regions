@@ -1,4 +1,4 @@
-h1(#top). Xtext Protected Region Support
+h1(#top). Protected Region Support
 
 h2(#toc). Table of Contents
 

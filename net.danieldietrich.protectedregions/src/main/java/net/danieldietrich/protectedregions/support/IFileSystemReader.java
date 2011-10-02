@@ -10,6 +10,13 @@ import java.util.Set;
 public interface IFileSystemReader {
   
   /**
+   * 
+   * @param fileName
+   * @return
+   */
+  boolean exists(String fileName);
+  
+  /**
    * Read contents of path.
    * @param fileName Path of file.
    * @return
