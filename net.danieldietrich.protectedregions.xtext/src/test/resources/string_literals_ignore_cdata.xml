@@ -1,4 +1,4 @@
 <markup>
-  <![CDATA[ This is not a regular <!-- PROTECTED REGION ID(no.duplicate) ENABLED START --> ]]>
-  <![CDATA[ This is not a regular <!-- PROTECTED REGION ID(no.duplicate) ENABLED START --> ]]>
+  <![CDATA[ This is not a regular <!-- PROTECTED REGION ID(string.literals.ignore.cdata) ENABLED START --> ]]>
+  <![CDATA[ This is not a regular <!-- PROTECTED REGION ID(string.literals.ignore.cdata) ENABLED START --> ]]>
 </markup>

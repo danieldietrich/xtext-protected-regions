@@ -134,6 +134,22 @@ public class ProtectedRegionSupportTest {
     }
   }
   
+  @Test
+  public void commentsInStringLiteralsShouldBeIgnored() { 
+    try {
+      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
+      .addParser(javaParser, ".java")
+      .read("src/test/resources", new IPathFilter() {
+        @Override
+        public boolean accept(String path) {
+          return path.endsWith("string_literals_ignore_comments.java");
+        }})
+      .build();
+    } catch(IllegalStateException x) {
+      assertTrue("Comments in string literals are not ignored. Original message: " + x.getMessage(), false);
+    }
+  }
+  
   // special generator for testing purposes which is able to load specific files
   private static class TestGenerator implements IGenerator {
     public void doGenerate(String fileName, IFileSystemAccess fsa) {
