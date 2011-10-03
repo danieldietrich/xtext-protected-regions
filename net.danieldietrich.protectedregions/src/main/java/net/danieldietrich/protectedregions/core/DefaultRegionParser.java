@@ -150,7 +150,10 @@ class DefaultRegionParser implements IRegionParser {
       }
       
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
-      isMarkedRegionEnd = !isMarkedRegionStart && oracle.isMarkedRegionEnd(comment);
+      isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
+      if (!input.isMarkedRegion() && isMarkedRegionEnd) {
+        throw new IllegalStateException("Detected marked region end without corresponding marked region start.");
+      }
       stateChanged = (!input.isMarkedRegion() && isMarkedRegionStart)
           || (input.isMarkedRegion() && isMarkedRegionEnd);
       

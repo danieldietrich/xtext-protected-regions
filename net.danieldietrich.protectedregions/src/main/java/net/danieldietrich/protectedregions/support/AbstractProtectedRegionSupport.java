@@ -195,7 +195,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
               
               // store current protected region in pool
               if (protectedRegionPool.containsKey(id)) {
-                throw new IllegalStateException("Duplicate protected region id: '" + id + "'. Protected regions have to be globally unique.");
+                throw new IllegalStateException("Duplicate protected region id: '" + id + "'. Protected region ids have to be globally unique.");
               }
               protectedRegionPool.put(id, region);
             }
