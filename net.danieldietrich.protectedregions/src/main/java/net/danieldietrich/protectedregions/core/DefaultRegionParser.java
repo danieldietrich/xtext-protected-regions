@@ -2,7 +2,7 @@ package net.danieldietrich.protectedregions.core;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import net.danieldietrich.protectedregions.core.IDocument.IRegion;
@@ -31,30 +31,16 @@ class DefaultRegionParser implements IRegionParser {
    */
   private static final String[] END_OF_LINE_FLAVORS = new String[] { "\r\n", "\n", "\r",  };
   
-  private List<CommentType> commentTypes = new ArrayList<CommentType>();
-  private IRegionOracle oracle;
-  private boolean inverse = false;
+  private final List<ICommentType> commentTypes;
+  private final IRegionOracle oracle;
+  private final boolean inverse;
   
-  @Override
-  public void addComment(String start, String end) {
-    commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE));
-  }
-
-  @Override
-  public void addNestableComment(String start, String end) {
-    commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE_NESTABLE));
-  }
-
-  @Override
-  public void addComment(String start) {
-    commentTypes.add(new CommentType(start, null, CommentType.Style.SINGLELINE));
-  }
-
-  @Override
-  public void setOracle(IRegionOracle oracle) {
+  DefaultRegionParser(List<ICommentType> commentTypes, IRegionOracle oracle, boolean inverse) {
+    this.commentTypes = commentTypes;
     this.oracle = oracle;
+    this.inverse = inverse;
   }
-
+  
   /**
    * @see #parse(CharSequence)
    */
@@ -110,13 +96,9 @@ class DefaultRegionParser implements IRegionParser {
     return inverse;
   }
   
-  /**
-   * Called by RegionParserBuilder
-   * 
-   * @param inverse
-   */
-  void setInverse(boolean inverse) {
-    this.inverse = inverse;
+  @Override
+  public Iterable<ICommentType> getCommentTypes() {
+    return Collections.unmodifiableCollection(commentTypes);
   }
   
   /**
@@ -145,28 +127,26 @@ class DefaultRegionParser implements IRegionParser {
        * not necessarily a marked region start/end
        * - this will be tested later.
        */
-      CommentType type = getNextCommentType(input);
+      ICommentType commentType = getNextCommentType(input);
       
       // no more comments => last region found (a not marked one)
-      if (type == null) {
+      if (commentType == null) {
         return remainingRegion(input);
       }
 
       // deal with different comment styles
-      switch (type.style) {
-        case MULTILINE : {
-          comment = getMultilineComment(input, type);
-          break;
+      if (commentType.isMultiline()) {
+        if (commentType.isNestable()) {
+          comment = getMultilineNestableComment(input, commentType);
+        } else {
+          comment = getMultilineComment(input, commentType);
         }
-        case MULTILINE_NESTABLE : {
-          comment = getMultilineNestableComment(input, type);
-          break;
+      } else {
+        if (!commentType.isNestable()) {
+          comment = getSinglelineComment(input, commentType);
+        } else {
+          throw new IllegalStateException("Nestable singleline comments do not exist!");
         }
-        case SINGLELINE : {
-          comment = getSinglelineComment(input, type);
-          break;
-        }
-        default : throw new IllegalStateException("Unknown comment type style: " + type.style);
       }
       
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
@@ -221,11 +201,11 @@ class DefaultRegionParser implements IRegionParser {
    * @param input
    * @return
    */
-  private CommentType getNextCommentType(Input input) {
-    CommentType result = null;
+  private ICommentType getNextCommentType(Input input) {
+    ICommentType result = null;
     int lowestIndex = Integer.MAX_VALUE;
-    for (CommentType commentType : commentTypes) {
-      int i = input.indexOf(commentType.start);
+    for (ICommentType commentType : commentTypes) {
+      int i = input.indexOf(commentType.getStart());
       if (i != -1 && i < lowestIndex) { // the first match wins, because of '<'
         lowestIndex = i;
         result = commentType;
@@ -236,7 +216,7 @@ class DefaultRegionParser implements IRegionParser {
       return null;
     } else {
       input.setCommentStart(lowestIndex);
-      input.update(lowestIndex, result.start.length());
+      input.update(lowestIndex, result.getStart().length());
       return result;
     }
   }
@@ -248,12 +228,12 @@ class DefaultRegionParser implements IRegionParser {
    * @param type
    * @return
    */
-  private String getMultilineComment(Input input, CommentType type) {
-    int i = input.indexOf(type.end);
+  private String getMultilineComment(Input input, ICommentType type) {
+    int i = input.indexOf(type.getEnd());
     if (i == -1) {
       throw new IllegalArgumentException("Comment does not end properly: " + input.getStringAtCursor());
     }
-    return input.consume(i, type.end.length()); // text between start and end of comment
+    return input.consume(i, type.getEnd().length()); // text between start and end of comment
   }
   
   /**
@@ -263,27 +243,27 @@ class DefaultRegionParser implements IRegionParser {
    * @param type
    * @return
    */
-  private String getMultilineNestableComment(Input input, CommentType type) {
+  private String getMultilineNestableComment(Input input, ICommentType type) {
     StringBuilder result = new StringBuilder();
     int depth = 1;
     int endIndex;
     do {
-      int startIndex = input.indexOf(type.start);
-      endIndex = input.indexOf(type.end);
+      int startIndex = input.indexOf(type.getStart());
+      endIndex = input.indexOf(type.getEnd());
       if (startIndex != -1 && startIndex < endIndex) {
         depth++;
         // nested comment start strings are part of the comment
-        String part = input.consume(startIndex + type.start.length(), 0);
+        String part = input.consume(startIndex + type.getStart().length(), 0);
         result.append(part);
       } else if (endIndex != -1) {
         depth--;
         String part;
         if (depth == 0) {
           // omit last comment end string
-          part = input.consume(endIndex, type.end.length());
+          part = input.consume(endIndex, type.getEnd().length());
         } else {
           // nested comment end strings are part of the comment
-          part = input.consume(endIndex + type.end.length(), 0);
+          part = input.consume(endIndex + type.getEnd().length(), 0);
         }
         result.append(part);
       } else {
@@ -300,7 +280,7 @@ class DefaultRegionParser implements IRegionParser {
    * @param type
    * @return
    */
-  private String getSinglelineComment(Input input, CommentType type) {
+  private String getSinglelineComment(Input input, ICommentType type) {
     String eol = null;
     int lowestIndex = Integer.MAX_VALUE;
     for (String currentEol : END_OF_LINE_FLAVORS) {
@@ -320,32 +300,6 @@ class DefaultRegionParser implements IRegionParser {
   // --- The following helper classes contain only data
   // --- and are helping to unclutter the code and make
   // --- it more readable.
-  
-  /**
-   * Class for encapsulating comment information:
-   * <ul>
-   *   <li>Start String, e.g. &#47;*</li>
-   *   <li>End String, e.g. *&#47;</li>
-   *   <li>Style, e.g. MULTILINE</li>
-   * </ul>
-   */
-  private static class CommentType {
-    
-    final String start;
-    final String end;
-    final Style style;
-    
-    CommentType(String start, String end, Style style) {
-      this.start = start;
-      this.end = end;
-      this.style = style;
-    }
-    
-    /** Different comment styles/flavors. */
-    static enum Style {
-      MULTILINE, MULTILINE_NESTABLE, SINGLELINE
-    }
-  }
   
   /**
    * Encapsulating the parser input read while parsing.

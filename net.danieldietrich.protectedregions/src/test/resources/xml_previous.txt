@@ -2,7 +2,7 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui">
   <ui:style>
-    <!-- PROTECTED REGION ID(styles) START -->
+    <!-- PROTECTED REGION ID(styles) ENABLED START -->
     .red {
       color: red;
     }
@@ -10,7 +10,7 @@
   </ui:style>
   <g:HTMLPanel>
     <table cellspacing="0" cellpadding="0">
-      <!-- PROTECTED REGION ID(table.rows) START -->
+      <!-- PROTECTED REGION ID(table.rows) ENABLED START -->
       <tr>
         <td>Name</td>
         <td><g:TextBox ui:field="name" styleName="{style.red} visibleLength="30" maxLength="100"/></td>

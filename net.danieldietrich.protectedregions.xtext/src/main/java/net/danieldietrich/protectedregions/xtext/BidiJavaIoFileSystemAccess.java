@@ -1,4 +1,4 @@
-package net.danieldietrich.protectedregions.support.xtext;
+package net.danieldietrich.protectedregions.xtext;
 
 import java.io.File;
 import java.io.IOException;
@@ -39,11 +39,13 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
 
   @Override
   public Set<String> listFiles(String path, IPathFilter filter) {
-    // TODO(@@dd): use filter to retrieve files
     Collection<File> files = FileUtils.listFiles(new File(path), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
     Set<String> result = new HashSet<String>();
     for (File file : files) {
-      result.add(file.getPath());
+      String fileName = file.getPath();
+      if (filter.accept(fileName)) {
+        result.add(fileName);
+      }
     }
     return result;
   }

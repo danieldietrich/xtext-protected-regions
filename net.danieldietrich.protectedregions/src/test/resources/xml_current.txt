@@ -3,12 +3,12 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui">
   <ui:with field='resources' type='gwt.client.resources.Resources'/>
   <ui:style>
-    <!-- PROTECTED REGION ID(styles) START -->
+    <!-- PROTECTED REGION ID(styles) ENABLED START -->
     <!-- PROTECTED REGION END -->
   </ui:style>
   <g:HTMLPanel>
     <table cellspacing="0" cellpadding="0">
-      <!-- PROTECTED REGION ID(table.rows) START -->
+      <!-- PROTECTED REGION ID(table.rows) ENABLED START -->
       <!-- PROTECTED REGION END -->
     </table>
   </g:HTMLPanel>
