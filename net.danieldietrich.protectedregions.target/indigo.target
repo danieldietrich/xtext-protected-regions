@@ -3,13 +3,6 @@
 
 <target name="indigo" sequenceNumber="7">
 <locations>
-<!--
-<location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.apache.commons.io" version="2.0.1.v201105210651"/>
-<unit id="org.apache.commons.io.source" version="2.0.1.v201105210651"/>
-<repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository/"/>
-</location>
--->
 <location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.junit" version="4.8.2.v4_8_2_v20110321-1705"/>
 <unit id="org.junit.source" version="4.8.2.v4_8_2_v20110321-1705"/>
