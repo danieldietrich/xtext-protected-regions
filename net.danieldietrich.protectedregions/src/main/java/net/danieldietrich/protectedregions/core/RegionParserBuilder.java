@@ -13,14 +13,10 @@ import net.danieldietrich.protectedregions.core.IRegionParser.ICommentType;
  */
 public class RegionParserBuilder {
   
-  private final List<ICommentType> commentTypes;
+  private final List<ICommentType> commentTypes = new ArrayList<ICommentType>();
   
   private IRegionOracle oracle = null;
   private boolean inverse = false;
-  
-  public RegionParserBuilder() {
-     commentTypes = new ArrayList<ICommentType>();
-  }
   
   /**
    * Add multiline comment.
