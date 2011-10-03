@@ -26,19 +26,21 @@ import org.junit.Test;
  */
 public class ProtectedRegionSupportTest {
 
-  private IRegionParser javaParser;
-  private IRegionParser htmlParser;
-  private IRegionParser phpParser;
-  private IRegionParser jsParser;
   private IRegionParser cssParser;
+  private IRegionParser htmlParser;
+  private IRegionParser javaParser;
+  private IRegionParser jsParser;
+  private IRegionParser phpParser;
+  private IRegionParser xmlParser;
 
   @Before
   public void setup() {
-    javaParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
-    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").build();
-    phpParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").addComment("#").build();
-    jsParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
     cssParser = new RegionParserBuilder().addComment("/*", "*/").build();
+    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").build();
+    javaParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
+    jsParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
+    phpParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").addComment("#").build();
+    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").build();
   }
   
   @Test
@@ -85,18 +87,50 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void protectedRegionDeclarationsInStringLiteralsShouldBeIgnored() {
+  public void protectedRegionStartInStringLiteralShouldBeIgnored() { 
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
       .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(String path) {
-          return path.endsWith("string_literals.java");
+          return path.endsWith("string_literals_ignore_start.java");
+        }})
+      .build();
+    } catch(IllegalStateException x) {
+      assertTrue("Protected region start in string literal not ignored. Original message: " + x.getMessage(), false);
+    }
+  }
+  
+  @Test
+  public void protectedRegionEndInStringLiteralShouldBeIgnored() { 
+    try {
+      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
+      .addParser(javaParser, ".java")
+      .read("src/test/resources", new IPathFilter() {
+        @Override
+        public boolean accept(String path) {
+          return path.endsWith("string_literals_ignore_end.java");
         }})
       .build();
     } catch(IllegalStateException x) {
       assertTrue("Protected region end in string literal not ignored. Original message: " + x.getMessage(), false);
+    }
+  }
+  
+  @Test
+  public void protectedRegionStartInXmlCDATAShouldBeIgnored() { 
+    try {
+      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
+      .addParser(xmlParser, ".xml")
+      .read("src/test/resources", new IPathFilter() {
+        @Override
+        public boolean accept(String path) {
+          return path.endsWith("string_literals_ignore_cdata.xml");
+        }})
+      .build();
+    } catch(IllegalStateException x) {
+      assertTrue("Protected region end in xml CDATA not ignored. Original message: " + x.getMessage(), false);
     }
   }
   

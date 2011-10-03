@@ -189,7 +189,7 @@ class DefaultRegionParser implements IRegionParser {
    */
   private IRegion remainingRegion(Input input) {
     if (input.isMarkedRegion()) {
-      throw new IllegalStateException("Marked region does not end properly.");
+      throw new IllegalStateException("Marked region does not end properly. ID: " + input.getMarkedRegionId());
     } else {
       return new Region(input.remaining());
     }
