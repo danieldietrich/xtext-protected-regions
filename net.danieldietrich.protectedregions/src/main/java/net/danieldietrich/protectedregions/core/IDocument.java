@@ -8,7 +8,7 @@ package net.danieldietrich.protectedregions.core;
  * @author Daniel Dietrich - Initial contribution and API
  */
 public interface IDocument {
-
+  
   /**
    * An IDocument consists of zero or more IRegions.
    */

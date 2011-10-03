@@ -1,4 +1,4 @@
-package net.danieldietrich.protectedregions.support.xtext;
+package net.danieldietrich.protectedregions.xtext;
 
 import java.util.Set;
 

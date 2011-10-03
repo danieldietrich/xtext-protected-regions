@@ -34,7 +34,7 @@ public class RegionUtilTest {
     
     @Before
     public void setup() {
-      javaParser = RegionParserFactory.createJavaParser(false, true);
+      javaParser = RegionParserFactory.createJavaParser(false);
     }
     
     @Test
@@ -89,8 +89,7 @@ public class RegionUtilTest {
 
   @Test
   public void scalaParserShouldReadNestedComments() throws FileNotFoundException, IOException {
-    IRegionParser parser = RegionParserFactory.createDefaultScalaParser();
-    parser.setOracle(NESTED_COMMENT_ORACLE);
+    IRegionParser parser = RegionParserFactory.createScalaParser(NESTED_COMMENT_ORACLE, false);
     IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
     // Scala does not recognize nested comment-like id's
     assertTrue(doc.getMarkedRegion("1234") != null);
@@ -98,8 +97,7 @@ public class RegionUtilTest {
 
   @Test
   public void javaParserShouldntReadNestedComments() throws FileNotFoundException, IOException {
-    IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
-    parser.setOracle(NESTED_COMMENT_ORACLE);
+    IRegionParser parser = RegionParserFactory.createJavaParser(NESTED_COMMENT_ORACLE, false);
     IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
     // Java does not recognize nested comment-like id's
     assertTrue(doc.getMarkedRegion("1234") == null);
@@ -149,8 +147,7 @@ public class RegionUtilTest {
   @Test
   public void fillInShouldMatchExpected() throws FileNotFoundException, IOException {
 
-    IRegionParser parser = RegionParserFactory.createDefaultJavaParser();
-    parser.setOracle(FILL_IN_ORACLE);
+    IRegionParser parser = RegionParserFactory.createJavaParser(FILL_IN_ORACLE, false);
     
     IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/fill_in_current.txt"));
     IDocument previousDoc = parser.parse(new FileInputStream("src/test/resources/fill_in_previous.txt"));
@@ -187,10 +184,8 @@ public class RegionUtilTest {
     .addComment("/*", "*/")
     .addComment("//")
     .setInverse(false)
-    .setSwitchable(false)
+    .usingOracle(SIMPLE_ORACLE)
     .build();
-    
-    parser.setOracle(SIMPLE_ORACLE);
     
     IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/simple_current.txt"));
     IDocument previousDoc = parser.parse(new FileInputStream("src/test/resources/simple_previous.txt"));
@@ -205,7 +200,7 @@ public class RegionUtilTest {
   @Test
   public void xmlParserShouldMatchExpected() throws FileNotFoundException, IOException {
     
-    IRegionParser parser = RegionParserFactory.createDefaultXmlParser();
+    IRegionParser parser = RegionParserFactory.createXmlParser(false);
     
     IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/xml_current.txt"));
     IDocument previousDoc = parser.parse(new FileInputStream("src/test/resources/xml_previous.txt"));

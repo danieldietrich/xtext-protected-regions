@@ -1,6 +1,10 @@
 package net.danieldietrich.protectedregions.core;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
+
+import net.danieldietrich.protectedregions.core.IRegionParser.ICommentType;
 
 /**
  * IRegionParser Builder, hiding the implementing class from the outside.
@@ -9,60 +13,135 @@ import java.util.regex.Pattern;
  */
 public class RegionParserBuilder {
   
-  final private DefaultRegionParser parser;
+  private final List<ICommentType> commentTypes;
   
-  private boolean switchable = false;
+  private IRegionOracle oracle = null;
+  private boolean inverse = false;
   
   public RegionParserBuilder() {
-    parser = new DefaultRegionParser();
+     commentTypes = new ArrayList<ICommentType>();
   }
   
+  /**
+   * Add multiline comment.
+   * 
+   * @param start Start String of comment
+   * @param end End String of comment
+   * @return this
+   */
   public RegionParserBuilder addComment(String start, String end) {
-    parser.addComment(start, end);
-    return this;
-  }
-  
-  public RegionParserBuilder addNestableComment(String start, String end) {
-    parser.addNestableComment(start, end);
+    commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE));
     return this;
   }
 
-  public RegionParserBuilder addComment(String start) {
-    parser.addComment(start);
+  /**
+   * Add nestable multiline comment.
+   * 
+   * @param start
+   * @param end
+   * @return this
+   */
+  public RegionParserBuilder addNestableComment(String start, String end) {
+    commentTypes.add(new CommentType(start, end, CommentType.Style.MULTILINE_NESTABLE));
     return this;
   }
+
+  /**
+   * Add singleline comment. A singleline comment ends with the
+   * end of a line, namely newline '\n', '\r\n', '\r' or EOF.
+   * 
+   * @param start Start String of comment
+   * @return this
+   */
+  public RegionParserBuilder addComment(String start) {
+    commentTypes.add(new CommentType(start, null, CommentType.Style.SINGLELINE));
+    return this;
+  }
+
+  /**
+   * The parser asks the IRegionOracle if comments
+   * are valid marked region starts/ends.
+   * 
+   * @param oracle A specific IRegionOracle
+   */
+  public RegionParserBuilder usingOracle(IRegionOracle oracle) {
+    this.oracle = oracle;
+    return this;
+  }
+
 
   public RegionParserBuilder setInverse(boolean inverse) {
-    parser.setInverse(inverse);
-    return this;
-  }
-
-  public RegionParserBuilder setSwitchable(boolean switchable) {
-    this.switchable = switchable;
+    this.inverse = inverse;
     return this;
   }
 
   public IRegionParser build() {
-    parser.setOracle(new Oracle(parser.isInverse(), switchable));
-    return parser;
+    if (oracle == null) {
+      oracle = new DefaultOracle(inverse);
+    }
+    IRegionParser result = new DefaultRegionParser(commentTypes, oracle, inverse);
+    return result;
+  }
+  
+  /**
+   * Class for encapsulating comment information:
+   * <ul>
+   *   <li>Start String, e.g. &#47;*</li>
+   *   <li>End String, e.g. *&#47;</li>
+   *   <li>Style, e.g. MULTILINE</li>
+   * </ul>
+   */
+  private static class CommentType implements ICommentType {
+    
+    final String start;
+    final String end;
+    final Style style;
+    
+    CommentType(String start, String end, Style style) {
+      this.start = start;
+      this.end = end;
+      this.style = style;
+    }
+    
+    /** Different comment styles/flavors. */
+    static enum Style {
+      MULTILINE, MULTILINE_NESTABLE, SINGLELINE
+    }
+
+    @Override
+    public boolean isMultiline() {
+      return !Style.SINGLELINE.equals(style); // null case included
+    }
+
+    @Override
+    public boolean isNestable() {
+      return Style.MULTILINE_NESTABLE.equals(style); // null case included
+    }
+
+    @Override
+    public String getStart() {
+      return start;
+    }
+
+    @Override
+    public String getEnd() {
+      return end;
+    }
   }
   
   /**
    * Default IRegionOracle
    */
-  private static class Oracle implements IRegionOracle {
+  private static class DefaultOracle implements IRegionOracle {
 
     private static final String ID = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*";
-    
-    private final boolean switchable;
     
     private Pattern start;
     private Pattern end;
     
-    Oracle(boolean inverse, boolean switchable) {
-      this.switchable = switchable;
+    DefaultOracle(boolean inverse) {
       String label = inverse ? "GENERATED" : "PROTECTED\\s+REGION";
-      start = Pattern.compile("\\s*" + label + "\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+" + (switchable ? "(ENABLED\\s+)?" : "") + "START\\s*");
+      start = Pattern.compile("\\s*" + label + "\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(ENABLED\\s+)?START\\s*");
       end = Pattern.compile("\\s*" + label + "\\s+END\\s*");
     }
     
@@ -85,9 +164,7 @@ public class RegionParserBuilder {
 
     @Override
     public boolean isEnabled(String markedRegionStart) {
-      return switchable ? markedRegionStart.contains("ENABLED") : true;
+      return markedRegionStart.contains("ENABLED");
     }
-
   }
-
 }

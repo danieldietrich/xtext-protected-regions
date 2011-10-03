@@ -69,6 +69,13 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     
     private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
     
+    private static final IPathFilter ACCEPT_ALL_FILTER = new IPathFilter() {
+      @Override
+      public boolean accept(String path) {
+        return true;
+      }
+    };
+    
     private final IFileSystemReader reader;
     private final IFactory<T> factory;
     
@@ -91,16 +98,23 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 
     @Override
     public Builder<T> addParser(IRegionParser parser, String... fileExtensions) {
+      if (fileExtensions == null || fileExtensions.length == 0) {
+        throw new IllegalArgumentException("File extensions cannot be null or empty.");
+      }
       addParser(parser, new FileExtensionFilter(fileExtensions));
       return this;
     }
 
     @Override
     public Builder<T> addParser(IRegionParser parser, IPathFilter filter) {
+      if (parser == null) {
+        throw new IllegalArgumentException("Parser cannot be null.");
+      }
       if (addParser_locked) {
         throw new IllegalStateException("#addParser methods are not allowed to be called after a #read method has been called.");
       }
-      parsers.put(filter, parser);
+      IPathFilter parserFilter = (filter == null) ? ACCEPT_ALL_FILTER : filter;
+      parsers.put(parserFilter, parser);
       return this;
     }
 
@@ -143,10 +157,14 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     
     private void internal_read(String path, IPathFilter filter) {
       
+      Set<String> visitedRegions = new HashSet<String>();
+      
       // get all files within the current directory
       Iterable<String> files = (filter == null) ? reader.listFiles(path) : reader.listFiles(path, filter);
       for (String file : files) {
 
+        visitedRegions.clear();
+        
         // all parsers have the chance to parse the file 
         for (IPathFilter parserFilter : parsers.keySet()) {
           
@@ -168,11 +186,17 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
               
               // get unique id
               String id = region.getId();
+              
+              // check if region already visited. this happens if two parsers have the same comment starts(!)
+              if (visitedRegions.contains(id)) {
+                continue;
+              }
+              visitedRegions.add(id);
+              
+              // store current protected region in pool
               if (protectedRegionPool.containsKey(id)) {
                 throw new IllegalStateException("Duplicate protected region id: '" + id + "'. Protected regions have to be globally unique.");
               }
-              
-              // store current protected region in pool
               protectedRegionPool.put(id, region);
             }
           }

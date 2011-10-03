@@ -1,77 +1,95 @@
 package net.danieldietrich.protectedregions.core;
 
+
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
 public class RegionParserFactory {
 
-  private static final boolean DEFAULT_INVERSE = false;
-  private static final boolean DEFAULT_SWITCHABLE = false;
-  
   private RegionParserFactory() {
   }
 
   // Clojure
-  public static IRegionParser createDefaultClojureParser() {
-    return createClojureParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createClojureParser() {
+    return createClojureParser(null, false);
   }
-  public static IRegionParser createClojureParser(boolean inverse, boolean switchable) {
+  public static IRegionParser createClojureParser(boolean inverse) {
+    return createClojureParser(null, inverse);
+  }
+  public static IRegionParser createClojureParser(IRegionOracle oracle, boolean inverse) {
     return new RegionParserBuilder().addComment(";")
-        .setInverse(inverse).setSwitchable(switchable).build();
+        .setInverse(inverse).usingOracle(oracle).build();
   }
 
   // Java
-  public static IRegionParser createDefaultJavaParser() {
-    return createJavaParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createJavaParser() {
+    return createJavaParser(null, false);
   }
-  public static IRegionParser createJavaParser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createJavaParser(boolean inverse) {
+    return createJavaParser(null, inverse);
+  }
+  public static IRegionParser createJavaParser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addComment("/*", "*/").addComment("//")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
 
   // Ruby
-  public static IRegionParser createDefaultRubyParser() {
-    return createClojureParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createRubyParser() {
+    return createClojureParser(null, false);
   }
-  public static IRegionParser createRubyParser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createRubyParser(boolean inverse) {
+    return createRubyParser(null, inverse);
+  }
+  public static IRegionParser createRubyParser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addComment("#")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
 
   // Scala
-  public static IRegionParser createDefaultScalaParser() {
-    return createScalaParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createScalaParser() {
+    return createScalaParser(null, false);
   }
-  public static IRegionParser createScalaParser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createScalaParser(boolean inverse) {
+    return createScalaParser(null, inverse);
+  }
+  public static IRegionParser createScalaParser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addNestableComment("/*", "*/").addComment("//")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
 
   // Xml
-  public static IRegionParser createDefaultXmlParser() {
-    return createXmlParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createXmlParser() {
+    return createXmlParser(null, false);
   }
-  public static IRegionParser createXmlParser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createXmlParser(boolean inverse) {
+    return createXmlParser(null, inverse);
+  }
+  public static IRegionParser createXmlParser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addComment("<!--", "-->")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
   
   // Xtend2
-  public static IRegionParser createDefaultXtend2Parser() {
-    return createJavaParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createXtend2Parser() {
+    return createJavaParser(null, false);
   }
-  public static IRegionParser createXtend2Parser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createXtend2Parser(boolean inverse) {
+    return createXtend2Parser(null, inverse);
+  }
+  public static IRegionParser createXtend2Parser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addComment("/*", "*/").addComment("//")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
 
   // Xtext
-  public static IRegionParser createDefaultXtextParser() {
-    return createJavaParser(DEFAULT_INVERSE, DEFAULT_SWITCHABLE);
+  public static IRegionParser createXtextParser() {
+    return createJavaParser(null, false);
   }
-  public static IRegionParser createXtextParser(boolean mergeStyle, boolean switchable) {
+  public static IRegionParser createXtextParser(boolean inverse) {
+    return createXtextParser(null, inverse);
+  }
+  public static IRegionParser createXtextParser(IRegionOracle oracle, boolean mergeStyle) {
     return new RegionParserBuilder().addComment("/*", "*/").addComment("//")
-        .setInverse(mergeStyle).setSwitchable(switchable).build();
+        .setInverse(mergeStyle).usingOracle(oracle).build();
   }
-
 }

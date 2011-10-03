@@ -15,6 +15,12 @@
 			<url>http://danieldietrich.net/</url>
 		</developer>
 	</developers>
+  <contributors>
+    <contributor>
+      <name>Hendy Irawan</name>
+      <url>http://eclipsedriven.blogspot.com/</url>
+    </contributor>
+  </contributors>
 
 	<build>
 		<plugins>
