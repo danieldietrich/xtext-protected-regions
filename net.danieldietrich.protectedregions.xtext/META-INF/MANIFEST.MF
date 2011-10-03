@@ -1,0 +1,11 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: net.danieldietrich.protectedregions.xtext
+Bundle-Vendor: Daniel Dietrich
+Bundle-Version: 1.0.0.qualifier
+Bundle-SymbolicName: net.danieldietrich.protectedregions; singleton:=true
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Import-Package: org.apache.commons.io,
+ org.junit;version="4.8.2"
+Require-Bundle: org.eclipse.xtext.builder;bundle-version="2.0.1"
