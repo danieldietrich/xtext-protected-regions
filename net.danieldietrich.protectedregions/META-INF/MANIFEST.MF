@@ -1,10 +1,14 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: net.danieldietrich.protectedregions
+Bundle-Name: Protected Regions
 Bundle-Vendor: Daniel Dietrich
 Bundle-Version: 1.0.0.qualifier
 Bundle-SymbolicName: net.danieldietrich.protectedregions; singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: org.apache.commons.io,
- org.junit;version="4.8.2"
+ org.hamcrest;version="1.1.0";resolution:=optional,
+ org.hamcrest.core;version="1.1.0";resolution:=optional,
+ org.junit;version="4.8.2";resolution:=optional
+Export-Package: net.danieldietrich.protectedregions.core,
+ net.danieldietrich.protectedregions.support;uses:="net.danieldietrich.protectedregions.core"
