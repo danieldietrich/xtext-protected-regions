@@ -1,5 +1,6 @@
 package net.danieldietrich.protectedregions.support;
 
+import java.net.URI;
 import java.util.Map;
 
 import net.danieldietrich.protectedregions.core.IRegionParser;
@@ -17,8 +18,10 @@ public interface IProtectedRegionSupport {
    * @param contents generated contents
    * @return merged contents
    */
-  CharSequence mergeProtectedRegions(String fileName, CharSequence contents);
-  void setParsers(Map<IPathFilter,IRegionParser> parsers);
+  CharSequence mergeProtectedRegions(URI fileName, CharSequence contents);
+
+  void setParsers(Map<IPathFilter, IRegionParser> parsers);
+
   void setProtectedRegionPool(Map<String,IRegion> protectedRegionPool);
   
   /**
@@ -46,10 +49,15 @@ public interface IProtectedRegionSupport {
    */
   static interface IBuilder<T extends IProtectedRegionSupport> {
     IBuilder<T> addParser(IRegionParser parser);
+
     IBuilder<T> addParser(IRegionParser parser, String... fileExtensions);
+
     IBuilder<T> addParser(IRegionParser parser, IPathFilter filter);
-    IBuilder<T> read(String path);
-    IBuilder<T> read(String path, IPathFilter filter);
+
+    IBuilder<T> read(URI path);
+
+    IBuilder<T> read(URI path, IPathFilter filter);
+
     T build();
   }
 }

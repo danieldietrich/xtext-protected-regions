@@ -1,5 +1,7 @@
 package net.danieldietrich.protectedregions.support;
 
+import java.io.IOException;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -25,7 +27,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
   }
   
   @Override
-  public CharSequence mergeProtectedRegions(String fileName, CharSequence contents) {
+  public CharSequence mergeProtectedRegions(URI fileName, CharSequence contents) {
     IDocument document = null;
     for (IPathFilter filter : parsers.keySet()) {
       if (!filter.accept(fileName)) {
@@ -39,11 +41,13 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
         document = parser.parse(document.getContents());
       }
       if (parser.isInverse()) {
-        CharSequence input = reader.readFile(fileName);
-        if (input == null) {
-          continue;
-        }
-        document = RegionUtil.fillIn(document, parser.parse(input));
+        CharSequence input;
+		try {
+			input = reader.readFile(fileName);
+	        document = RegionUtil.fillIn(document, parser.parse(input));
+		} catch (Exception e) {
+			// TODO: Should log as WARNING here
+		}
       } else {
         document = RegionUtil.merge(document, protectedRegionPool);
       }
@@ -71,7 +75,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     
     private static final IPathFilter ACCEPT_ALL_FILTER = new IPathFilter() {
       @Override
-      public boolean accept(String path) {
+      public boolean accept(URI path) {
         return true;
       }
     };
@@ -119,13 +123,13 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     }
 
     @Override
-    public Builder<T> read(String path) {
+    public Builder<T> read(URI path) {
       read(path, null);
       return this;
     }
     
     @Override
-    public Builder<T> read(String path, IPathFilter filter) {
+    public Builder<T> read(URI path, IPathFilter filter) {
       if (parsers.isEmpty()) {
         throw new IllegalStateException("#addParser methods have to be called before #read methods.");
       }
@@ -155,13 +159,13 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
       return false;
     }
     
-    private void internal_read(String path, IPathFilter filter) {
+    private void internal_read(URI path, IPathFilter filter) {
       
       Set<String> visitedRegions = new HashSet<String>();
       
       // get all files within the current directory
-      Iterable<String> files = (filter == null) ? reader.listFiles(path) : reader.listFiles(path, filter);
-      for (String file : files) {
+      Iterable<URI> files = (filter == null) ? reader.listFiles(path) : reader.listFiles(path, filter);
+      for (URI file : files) {
 
         visitedRegions.clear();
         
@@ -175,31 +179,38 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 
           // parse file
           IRegionParser parser = parsers.get(parserFilter);
-          CharSequence input = reader.readFile(file);
-          IDocument document = parser.parse(input);
-          
-          // add protected regions to pool
-          for (IRegion region : document.getRegions()) {
-            
-            // process protected regions only
-            if (region.isMarkedRegion()) {
+          CharSequence input;
+          try {
+            input = reader.readFile(file);
+            IDocument document = parser.parse(input);
+
+            // add protected regions to pool
+            for (IRegion region : document.getRegions()) {
               
-              // get unique id
-              String id = region.getId();
-              
-              // check if region already visited. this happens if two parsers have the same comment starts(!)
-              if (visitedRegions.contains(id)) {
-                continue;
+              // process protected regions only
+              if (region.isMarkedRegion()) {
+                
+                // get unique id
+                String id = region.getId();
+                
+                // check if region already visited. this happens if two parsers have the same comment starts(!)
+                if (visitedRegions.contains(id)) {
+                  continue;
+                }
+                visitedRegions.add(id);
+                
+                // store current protected region in pool
+                if (protectedRegionPool.containsKey(id)) {
+                  throw new IllegalStateException("Duplicate protected region id: '" + id + "'. Protected region ids have to be globally unique.");
+                }
+                protectedRegionPool.put(id, region);
               }
-              visitedRegions.add(id);
-              
-              // store current protected region in pool
-              if (protectedRegionPool.containsKey(id)) {
-                throw new IllegalStateException("Duplicate protected region id: '" + id + "'. Protected region ids have to be globally unique.");
-              }
-              protectedRegionPool.put(id, region);
             }
+
+          } catch (IOException e) {
+            // TODO should log warning here
           }
+
         }
       }
     }
@@ -221,7 +232,8 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
         this.fileExtensions = fileExtensions;
       }
       @Override
-      public boolean accept(String path) {
+      public boolean accept(URI uri) {
+        String path = uri.getPath();
         for (String fileExtension : fileExtensions) {
           if (path.endsWith(fileExtension)) {
             return true;

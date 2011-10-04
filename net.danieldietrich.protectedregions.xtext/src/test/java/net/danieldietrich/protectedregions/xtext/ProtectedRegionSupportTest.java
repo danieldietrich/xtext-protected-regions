@@ -5,6 +5,8 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -53,10 +55,10 @@ public class ProtectedRegionSupportTest {
       .addParser(phpParser, ".html")
       .addParser(jsParser, ".html")
       .addParser(cssParser, ".html")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         @Override
-        public boolean accept(String path) {
-          return path.endsWith("_previous.html");
+        public boolean accept(URI uri) {
+          return uri.getPath().endsWith("_previous.html");
         }})
       .build();
 
@@ -69,14 +71,15 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void nonUniqueIdsShouldBeGloballyDetected() {
+  public void nonUniqueIdsShouldBeGloballyDetected() throws URISyntaxException {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         private final Pattern PATTERN = Pattern.compile(".*\\/duplicate_id_\\d.java");
         @Override
-        public boolean accept(String path) {
+        public boolean accept(URI uri) {
+          String path = uri.getPath();
           return PATTERN.matcher(path).matches();
         }})
       .build();
@@ -87,14 +90,14 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void protectedRegionStartInStringLiteralShouldBeIgnored() { 
+  public void protectedRegionStartInStringLiteralShouldBeIgnored() throws URISyntaxException { 
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         @Override
-        public boolean accept(String path) {
-          return path.endsWith("string_literals_ignore_start.java");
+        public boolean accept(URI uri) {
+          return uri.getPath().endsWith("string_literals_ignore_start.java");
         }})
       .build();
     } catch(IllegalStateException x) {
@@ -103,14 +106,14 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void protectedRegionEndInStringLiteralShouldBeIgnored() { 
+  public void protectedRegionEndInStringLiteralShouldBeIgnored() throws URISyntaxException { 
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         @Override
-        public boolean accept(String path) {
-          return path.endsWith("string_literals_ignore_end.java");
+        public boolean accept(URI uri) {
+          return uri.getPath().endsWith("string_literals_ignore_end.java");
         }})
       .build();
     } catch(IllegalStateException x) {
@@ -119,14 +122,14 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void protectedRegionStartInXmlCDATAShouldBeIgnored() { 
+  public void protectedRegionStartInXmlCDATAShouldBeIgnored() throws URISyntaxException { 
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(xmlParser, ".xml")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         @Override
-        public boolean accept(String path) {
-          return path.endsWith("string_literals_ignore_cdata.xml");
+        public boolean accept(URI uri) {
+          return uri.getPath().endsWith("string_literals_ignore_cdata.xml");
         }})
       .build();
     } catch(IllegalStateException x) {
@@ -135,14 +138,14 @@ public class ProtectedRegionSupportTest {
   }
   
   @Test
-  public void commentsInStringLiteralsShouldBeIgnored() { 
+  public void commentsInStringLiteralsShouldBeIgnored() throws URISyntaxException { 
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
+      .read(new URI("src/test/resources"), new IPathFilter() {
         @Override
-        public boolean accept(String path) {
-          return path.endsWith("string_literals_ignore_comments.java");
+        public boolean accept(URI uri) {
+          return uri.getPath().endsWith("string_literals_ignore_comments.java");
         }})
       .build();
     } catch(IllegalStateException x) {

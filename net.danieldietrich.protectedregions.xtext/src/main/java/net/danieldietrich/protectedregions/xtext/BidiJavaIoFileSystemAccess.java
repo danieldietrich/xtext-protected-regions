@@ -2,11 +2,13 @@ package net.danieldietrich.protectedregions.xtext;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.danieldietrich.protectedregions.support.IFileSystemReader;
 import net.danieldietrich.protectedregions.support.IPathFilter;
 
 import org.apache.commons.io.FileUtils;
@@ -15,70 +17,72 @@ import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API
+ * @author Hendy Irawan
  */
-public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implements IBidiFileSystemAccess {
+public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess
+		implements IBidiFileSystemAccess, IFileSystemReader {
+
+	@Override
+	public boolean exists(URI uri) {
+		return new File(uri).exists();
+	}
+
+	@Override
+	public CharSequence readFile(URI uri) throws IllegalArgumentException, IOException {
+		final File file = new File(uri);
+		return FileUtils.readFileToString(file);
+	}
+
+	@Override
+	public Set<URI> listFiles(URI path) {
+		return listFiles(path, TRUE_PATH_FILTER);
+	}
+
+	@Override
+	public Set<URI> listFiles(URI path, IPathFilter filter) {
+		Collection<File> files = FileUtils.listFiles(new File(path),
+				TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+		Set<URI> result = new HashSet<URI>();
+		for (File file : files) {
+			URI uri = file.toURI();
+			if (filter.accept(uri)) {
+				result.add(uri);
+			}
+		}
+		return result;
+	}
+
+	@Override
+	public boolean hasFiles(URI uri) {
+		return new File(uri).isDirectory();
+	}
+
+	@Override
+	public boolean isFile(URI uri) {
+		return new File(uri).isFile();
+	}
 
   @Override
-  public boolean exists(String fileName) {
-    return new File(fileName).exists();
-  }
-  
-  @Override
-  public CharSequence readFile(String fileName) {
+  public String getCanonicalPath(URI uri) {
     try {
-      return FileUtils.readFileToString(new File(fileName));
+      return new File(uri).getCanonicalPath();
     } catch (IOException e) {
-      throw new RuntimeException("error reading file " + fileName);
+      // TODO should log WARNING
+      return null;
     }
   }
 
-  @Override
-  public Set<String> listFiles(String path) {
-    return listFiles(path, TRUE_PATH_FILTER);
-  }
+	@Override
+	public URI getUri(String relativePath, String slot) {
+		Map<String, String> pathes = getPathes();
+		return new File(pathes.get(slot) + "/" + relativePath).toURI();
+	}
 
-  @Override
-  public Set<String> listFiles(String path, IPathFilter filter) {
-    Collection<File> files = FileUtils.listFiles(new File(path), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
-    Set<String> result = new HashSet<String>();
-    for (File file : files) {
-      String fileName = file.getPath();
-      if (filter.accept(fileName)) {
-        result.add(fileName);
-      }
-    }
-    return result;
-  }
+	private static final IPathFilter TRUE_PATH_FILTER = new IPathFilter() {
+		@Override
+		public boolean accept(URI path) {
+			return true;
+		}
+	};
 
-  @Override
-  public boolean hasFiles(String path) {
-    return new File(path).isDirectory();
-  }
-
-  @Override
-  public boolean isFile(String path) {
-    return new File(path).isFile();
-  }
-
-  @Override
-  public String getCanonicalPath(String path) {
-    try {
-      return new File(path).getCanonicalPath();
-    } catch (IOException e) {
-      throw new RuntimeException("cannot determine canonical path of " + path);
-    }
-  }
-
-  @Override
-  public String getPath(String relativePath, String slot) {
-    Map<String, String> pathes = getPathes();
-    return toSystemFileName(pathes.get(slot) + "/" + relativePath);
-  }
-  
-  private static final IPathFilter TRUE_PATH_FILTER = new IPathFilter() {
-    @Override
-    public boolean accept(String path) {
-      return true;
-    }
-  };
 }

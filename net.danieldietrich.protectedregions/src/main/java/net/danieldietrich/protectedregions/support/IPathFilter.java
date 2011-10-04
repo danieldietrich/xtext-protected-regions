@@ -1,5 +1,7 @@
 package net.danieldietrich.protectedregions.support;
 
+import java.net.URI;
+
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
@@ -10,6 +12,6 @@ public interface IPathFilter {
    * @param path
    * @return true, if path is accepted, false otherwise.
    */
-  boolean accept(String path);
+  boolean accept(URI path);
   
 }

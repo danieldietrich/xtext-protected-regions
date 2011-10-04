@@ -1,5 +1,7 @@
 package net.danieldietrich.protectedregions.xtext;
 
+import java.net.URI;
+
 import net.danieldietrich.protectedregions.support.AbstractProtectedRegionSupport;
 
 import org.eclipse.xtext.generator.IFileSystemAccess;
@@ -23,7 +25,7 @@ public class ProtectedRegionSupport extends AbstractProtectedRegionSupport imple
 
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
-    String path = delegate.getPath(fileName, slot);
+    URI path = delegate.getUri(fileName, slot);
     CharSequence mergedContents = mergeProtectedRegions(path, contents);
     delegate.generateFile(fileName, slot, mergedContents);
   }
