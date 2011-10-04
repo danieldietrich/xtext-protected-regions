@@ -1,14 +1,18 @@
-**Prequisites**
+# Xtext Protected Region Support
+
+## Installation
+
+### Prequisites
 
 Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 * EGit - Git Team Provider
 * Maven Integration for Eclipse (m2e)
 
-**Get a local copy of xtext-protectedregions from GitHub**
+### Get a local copy of xtext-protectedregions from GitHub
 
 ```git clone git@github.com:danieldietrich/xtext-protectedregions.git```
 
-**Setup Eclipse Workspace**
+### Setup Eclipse Workspace
 
 * In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 * Open _indigo.target_ (located in _net.danieldietrich.protectedregions.target_) and select _Set as Target Platform_ (upper right corner).
