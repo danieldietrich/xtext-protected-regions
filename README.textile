@@ -11,5 +11,5 @@ Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 **Setup Eclipse Workspace**
 
 * In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
-* Open ```indigo.target``` (located in ```net.danieldietrich.protectedregions.target```) and select ```Set as Target Platform``` (upper right corner).
+* Open _indigo.target_ (located in _net.danieldietrich.protectedregions.target_) and select _Set as Target Platform_ (upper right corner).
 * To connect the projects with the local git repository select Team / Share Project / Git / Use or create repository in parent folder of project and select/add the local xtext-protectedregions repository from/to the list.
