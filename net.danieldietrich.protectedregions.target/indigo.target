@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde version="3.6"?>
 
-<target name="indigo" sequenceNumber="7">
+<target name="indigo" sequenceNumber="9">
 <locations>
 <location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.junit" version="4.8.2.v4_8_2_v20110321-1705"/>
-<unit id="org.junit.source" version="4.8.2.v4_8_2_v20110321-1705"/>
+<unit id="org.eclipse.emf.sdk.feature.group" version="2.7.0.v20110606-0949"/>
+<repository location="http://download.eclipse.org/releases/indigo/201106220900"/>
+</location>
+<location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.apache.commons.io" version="2.0.1.v201105210651"/>
 <unit id="org.apache.commons.io.source" version="2.0.1.v201105210651"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository/"/>
@@ -13,10 +15,6 @@
 <location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
 <unit id="org.eclipse.xtext.sdk.feature.group" version="2.0.1.v201108020636"/>
 <repository location="http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/"/>
-</location>
-<location includeAllPlatforms="false" includeMode="planner" includeSource="true" type="InstallableUnit">
-<unit id="org.eclipse.emf.sdk.feature.group" version="2.7.0.v20110606-0949"/>
-<repository location="http://download.eclipse.org/releases/indigo/201106220900"/>
 </location>
 </locations>
 </target>
