@@ -1,6 +1,6 @@
 object HelloWorld {
   def main(args: Array[String]) {
-    /* PROTECTED REGION /*1234*/ START */
+    /* PROTECTED REGION /*1234*/ ENABLED START */
     println("Hello, world!")
     // PROTECTED REGION END
   }

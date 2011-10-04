@@ -97,10 +97,12 @@ public class RegionUtilTest {
 
   @Test
   public void javaParserShouldntReadNestedComments() throws FileNotFoundException, IOException {
-    IRegionParser parser = RegionParserFactory.createJavaParser(NESTED_COMMENT_ORACLE, false);
-    IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
-    // Java does not recognize nested comment-like id's
-    assertTrue(doc.getMarkedRegion("1234") == null);
+    try {
+      IRegionParser parser = RegionParserFactory.createJavaParser(NESTED_COMMENT_ORACLE, false);
+      parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
+    } catch(IllegalStateException x) {
+      assertTrue("Detected marked region end without corresponding marked region start.".equals(x.getMessage())); 
+    }
   }
   
   @Test
