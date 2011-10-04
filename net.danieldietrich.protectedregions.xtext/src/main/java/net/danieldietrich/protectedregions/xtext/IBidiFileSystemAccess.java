@@ -5,7 +5,7 @@ import net.danieldietrich.protectedregions.support.IFileSystemReader;
 import org.eclipse.xtext.generator.IFileSystemAccess;
 
 /**
- * Bidirectional FileSystemAccess
+ * Bidirectional {@link IFileSystemAccess}.
  * 
  * @author Daniel Dietrich - Initial contribution and API
  */
