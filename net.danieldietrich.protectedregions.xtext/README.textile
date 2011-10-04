@@ -6,3 +6,7 @@ h1. Xtext Protected Region Support
 # eclipse: import existing project into workspace
 # eclipse/project references: remove missing plugins
 # eclipse/project references: add project dependency to @net.danieldietrich.protectedregions@
+
+h2. Bidi FileSystemAccess
+
+Xtext FileSystemAccess interface (@IBiFileSystemAccess@) and implementations with extended read operations, useful for implementing protected region support.
