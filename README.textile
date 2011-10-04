@@ -2,7 +2,7 @@
 
 Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 * EGit - Git Team Provider
-* Maven Integration for Eclipse (m2e) (via Marketplace).
+* Maven Integration for Eclipse (m2e)
 
 **Get a local copy of xtext-protectedregions from GitHub**
 
