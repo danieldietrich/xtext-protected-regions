@@ -17,6 +17,7 @@
 <unit id="com.google.inject.source" version="2.0.0.v201105231817"/>
 <unit id="org.apache.commons.io" version="2.0.1.v201105210651"/>
 <unit id="org.apache.commons.io.source" version="2.0.1.v201105210651"/>
+<unit id="ch.qos.logback.classic" version="0.9.27.v20110224-1110"/>
 <repository location="http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository/"/>
 </location>
 </locations>

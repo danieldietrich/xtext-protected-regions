@@ -6,18 +6,21 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import net.danieldietrich.protectedregions.core.IDocument;
 import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 import net.danieldietrich.protectedregions.core.IRegionParser;
 import net.danieldietrich.protectedregions.core.RegionUtil;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
 public abstract class AbstractProtectedRegionSupport implements IProtectedRegionSupport {
 
+  private transient final Logger logger = LoggerFactory.getLogger(AbstractProtectedRegionSupport.class);
   private IFileSystemReader reader;
   private Map<IPathFilter,IRegionParser> parsers;
   private Map<String,IRegion> protectedRegionPool;
@@ -46,7 +49,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 			input = reader.readFile(fileName);
 	        document = RegionUtil.fillIn(document, parser.parse(input));
 		} catch (Exception e) {
-			// TODO: Should log as WARNING here
+		  logger.warn("Cannot read {}", fileName);
 		}
       } else {
         document = RegionUtil.merge(document, protectedRegionPool);
@@ -71,7 +74,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
    */
   public static class Builder<T extends AbstractProtectedRegionSupport> implements IBuilder<T> {
     
-    private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
+    private transient final Logger logger = LoggerFactory.getLogger(Builder.class);
     
     private static final IPathFilter ACCEPT_ALL_FILTER = new IPathFilter() {
       @Override
@@ -142,7 +145,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
       }
       String canonicalPath = reader.getCanonicalPath(uri);
       if (isVisited(canonicalPath)) {
-        LOGGER.warning("skipping already visited path '" + path + "'.");
+        logger.warn("skipping already visited path '{}'.", path);
         return this;
       }
       internal_read(uri, filter);
@@ -209,7 +212,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
             }
 
           } catch (IOException e) {
-            // TODO should log warning here
+            logger.warn("Cannot read {}", file);
           }
 
         }
