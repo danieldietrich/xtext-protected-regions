@@ -1,6 +1,7 @@
 package net.danieldietrich.protectedregions.xtext;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileReader;
@@ -55,7 +56,7 @@ public class ProtectedRegionSupportTest {
       .addParser(phpParser, ".html")
       .addParser(jsParser, ".html")
       .addParser(cssParser, ".html")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("_previous.html");
@@ -75,7 +76,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         private final Pattern PATTERN = Pattern.compile(".*\\/duplicate_id_\\d.java");
         @Override
         public boolean accept(URI uri) {
@@ -94,7 +95,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_start.java");
@@ -110,7 +111,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_end.java");
@@ -126,7 +127,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(xmlParser, ".xml")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_cdata.xml");
@@ -142,7 +143,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read(new URI("src/test/resources"), new IPathFilter() {
+      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_comments.java");

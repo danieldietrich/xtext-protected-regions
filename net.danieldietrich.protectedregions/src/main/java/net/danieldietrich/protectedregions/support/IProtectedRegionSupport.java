@@ -54,9 +54,9 @@ public interface IProtectedRegionSupport {
 
     IBuilder<T> addParser(IRegionParser parser, IPathFilter filter);
 
-    IBuilder<T> read(URI path);
+    IBuilder<T> read(String path, String slot);
 
-    IBuilder<T> read(URI path, IPathFilter filter);
+    IBuilder<T> read(String path, String slot, IPathFilter filter);
 
     T build();
   }

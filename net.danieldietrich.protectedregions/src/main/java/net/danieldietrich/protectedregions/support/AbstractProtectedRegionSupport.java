@@ -123,28 +123,29 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     }
 
     @Override
-    public Builder<T> read(URI path) {
-      read(path, null);
+    public Builder<T> read(String path, String slot) {
+      read(path, slot, null);
       return this;
     }
     
     @Override
-    public Builder<T> read(URI path, IPathFilter filter) {
+    public Builder<T> read(String path, String slot, IPathFilter filter) {
       if (parsers.isEmpty()) {
         throw new IllegalStateException("#addParser methods have to be called before #read methods.");
       }
-      if (!reader.exists(path)) {
+      final URI uri = reader.getUri(path, slot);
+      if (!reader.exists(uri)) {
         return this;
       }
-      if (!reader.hasFiles(path)) {
+      if (!reader.hasFiles(uri)) {
         throw new IllegalArgumentException("no directory: " + path);
       }
-      String canonicalPath = reader.getCanonicalPath(path);
+      String canonicalPath = reader.getCanonicalPath(uri);
       if (isVisited(canonicalPath)) {
         LOGGER.warning("skipping already visited path '" + path + "'.");
         return this;
       }
-      internal_read(path, filter);
+      internal_read(uri, filter);
       visitedPaths.add(canonicalPath);
       addParser_locked = true;
       return this;
