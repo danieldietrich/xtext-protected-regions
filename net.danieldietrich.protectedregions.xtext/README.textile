@@ -20,13 +20,32 @@ Import-Package: net.danieldietrich.protectedregions.core,
  net.danieldietrich.protectedregions.support,
  net.danieldietrich.protectedregions.xtext
 
-Configure Guice to inject @BidiJavaIoFileSystemAccess@ as a @JavaIoFileSystemAccess@ in your @RuntimeModule@ class. Example:
+Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class. Example:
 
 bc.. 
 public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRuntimeModule {
 
-	public Class<? extends JavaIoFileSystemAccess> bindJavaIoFileSystemAccess() {
-		return BidiJavaIoFileSystemAccess.class;
+	@Provides
+	public JavaIoFileSystemAccess createJavaIoFileSystemAccess() {
+    	JavaIoFileSystemAccess fsa = new JavaIoWrapper(new IProtectedRegionSupportFactory() {
+			
+			@Override
+			public ProtectedRegionSupport createProtectedRegionSupport(
+					IBidiFileSystemAccess delegate) {
+			    ProtectedRegionSupport prs = new ProtectedRegionSupport.Builder(delegate)
+			    	.addParser(RegionParserFactory.createJavaParser(), ".java")
+			    	.addParser(RegionParserFactory.createXmlParser(), ".xml")
+			    	.read("", IFileSystemAccess.DEFAULT_OUTPUT)
+			    	.build();
+			    return prs;
+			}
+			
+			@Override
+			public IBidiFileSystemAccess createFileSystemAccess() {
+				return new BidiJavaIoFileSystemAccess();
+			}
+		});
+    	return fsa;
 	}
 	
 }
@@ -43,21 +62,15 @@ import net.danieldietrich.protectedregions.core.RegionParserFactory
 ...
 
 IFileSystemAccess fsa
+Model model
 
 override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 	
-	val bfsa = fsa as IBidiFileSystemAccess
-
-    this.fsa = new ProtectedRegionSupport$Builder(bfsa)
-    	.addParser(RegionParserFactory::createJavaParser, ".java")
-    	.addParser(RegionParserFactory::createXmlParser, ".xml")
-    	.read("", IFileSystemAccess::DEFAULT_OUTPUT)
-    	.build
-
-	var model = resource.contents.get(0) as Model
-	model = resource.contents.get(0) as Model
+	this.fsa = fsa
+	this.model = resource.contents.get(0) as Model
 	
 	...
 
+	// Look ma! Portable generators! No "proprietary" APIs, simply Xtext!
 	fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
 }
