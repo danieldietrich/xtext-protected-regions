@@ -189,8 +189,6 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
       Iterable<URI> files = (filter == null) ? reader.listFiles(path) : reader.listFiles(path, filter);
       logger.debug("Path {} has {} files", path, Iterables.size(files));
       for (URI file : files) {
-        logger.debug("Parsing {}", file);
-
         visitedRegions.clear();
         
         // all parsers have the chance to parse the file 
@@ -203,11 +201,12 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 
           // parse file
           IRegionParser parser = parsers.get(parserFilter);
+          logger.debug("{} is parsing {}", parser, file);
           CharSequence input;
           try {
             input = reader.readFile(file);
             IDocument document = parser.parse(input);
-            logger.debug("Parser {} found {} regions in {} : ", new Object[] { parser, Iterables.size(document.getRegions()),  file, document.getRegions() });
+            logger.debug("{} found {} regions in {} : {}", new Object[] { parser, Iterables.size(document.getRegions()), file, document.getRegions() });
 
             // add protected regions to pool
             for (IRegion region : document.getRegions()) {
