@@ -254,7 +254,8 @@ bc.. IRegionParser javaParser = new RegionParserBuilder()
   .addComment("/*", "*/")                     // multi line comment flavor (forbid nested comments)
   .addComment("//")                           // single line comment flavor
   .setInverse(false)                          // use generated regions (instead of protected regions)
-  .usingOracle(customOracle)                  // custom oracle recognizing marked regions
+  .ignoreCData('"', '\\')                     // define character data sections to be ignored
+  .useOracle(customOracle)                    // custom oracle recognizing marked regions
   .build();                                   // create the IRegionParser as configured above
 
 p. "top":#top
