@@ -126,6 +126,18 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
     }
 
     @Override
+    public Builder<T> read(String path) {
+      read(path, null, null);
+      return this;
+    }
+    
+    @Override
+    public Builder<T> read(String path, IPathFilter filter) {
+      read(path, null, filter);
+      return this;
+    }
+    
+    @Override
     public Builder<T> read(String path, String slot) {
       read(path, slot, null);
       return this;

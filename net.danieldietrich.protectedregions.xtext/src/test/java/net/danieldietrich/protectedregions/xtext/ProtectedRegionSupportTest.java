@@ -50,13 +50,12 @@ public class ProtectedRegionSupportTest {
   public void mergeOfMultilanguageFilesShouldMatchExpected() throws Exception {
     
     TestFileSystemAccess delegate = new TestFileSystemAccess();
-    
     IFileSystemAccess fsa = new ProtectedRegionSupport.Builder(delegate)
       .addParser(htmlParser, ".html")
       .addParser(phpParser, ".html")
       .addParser(jsParser, ".html")
       .addParser(cssParser, ".html")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("_previous.html");
@@ -76,7 +75,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", new IPathFilter() {
         private final Pattern PATTERN = Pattern.compile(".*\\/duplicate_id_\\d.java");
         @Override
         public boolean accept(URI uri) {
@@ -95,7 +94,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_start.java");
@@ -111,7 +110,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_end.java");
@@ -127,7 +126,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(xmlParser, ".xml")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_cdata.xml");
@@ -143,7 +142,7 @@ public class ProtectedRegionSupportTest {
     try {
       new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
       .addParser(javaParser, ".java")
-      .read("src/test/resources", IFileSystemAccess.DEFAULT_OUTPUT, new IPathFilter() {
+      .read("src/test/resources", null, new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
           return uri.getPath().endsWith("string_literals_ignore_comments.java");
@@ -174,6 +173,9 @@ public class ProtectedRegionSupportTest {
   // special in-memory IBidiFileSystemAccess for testing purposes
   private static class TestFileSystemAccess extends BidiJavaIoFileSystemAccess {
     private Map<String,CharSequence> results = new HashMap<String,CharSequence>();
+    public TestFileSystemAccess() {
+      this.setOutputPath("."); // initialize default slot(!)
+    }
     @Override
     public void generateFile(String fileName, String slot, CharSequence contents) {
       results.put(slot+"/"+fileName, contents);

@@ -80,7 +80,11 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess
   @Override
   public URI getUri(String relativePath, String slot) {
     Map<String, String> pathes = getPathes();
-    return new File(pathes.get(slot) + "/" + relativePath).toURI();
+    String slotPath = pathes.get((slot == null) ? DEFAULT_OUTPUT : slot);
+    if (slotPath == null) {
+      throw new IllegalStateException("Slot " + slot + " not found. No slots initialized? Call AbstractFileSystemAccess.setOutputPath(...).");
+    }
+    return new File(slotPath + "/" + relativePath).toURI();
   }
 
   private static final IPathFilter TRUE_PATH_FILTER = new IPathFilter() {
