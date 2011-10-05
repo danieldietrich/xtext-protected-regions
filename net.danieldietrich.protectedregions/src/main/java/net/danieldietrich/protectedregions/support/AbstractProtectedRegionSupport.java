@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import net.danieldietrich.protectedregions.core.IDocument;
@@ -56,7 +57,10 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 		  logger.warn("Cannot read {}", fileName);
 		}
       } else {
-        logger.debug("protectedRegionPool contains {} IDs: {}", protectedRegionPool.size(), protectedRegionPool.keySet());
+        logger.debug("Pool contains {} regions: {}", protectedRegionPool.size(), protectedRegionPool.keySet());
+        for (Entry<String, IRegion> region : protectedRegionPool.entrySet()) {
+          logger.trace("Pool {} = {}", region.getKey(), region.getValue().getText());
+        }
         document = RegionUtil.merge(document, protectedRegionPool);
         logger.debug("Merged document has {} regions: {}", Iterables.size(document.getRegions()), document.getRegions());
       }
@@ -222,6 +226,8 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
                   continue;
                 }
                 visitedRegions.add(id);
+                
+                logger.trace("Put Pool {} = {}", id, region.getText());
                 
                 // store current protected region in pool
                 if (protectedRegionPool.containsKey(id)) {
