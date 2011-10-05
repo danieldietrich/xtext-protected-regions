@@ -39,6 +39,11 @@ public class ProtectedRegionSupport extends AbstractProtectedRegionSupport imple
     delegate.deleteFile(fileName);
   }
   
+  public void setOutputPath(String outputName, String path) {
+    logger.debug("Set output {} = {}", outputName, path);
+    delegate.setOutputPath(outputName, path);
+}
+
   public static class Builder extends AbstractProtectedRegionSupport.Builder<ProtectedRegionSupport> {
     public Builder(final IBidiFileSystemAccess reader) {
       super(reader, new IFactory<ProtectedRegionSupport>() {

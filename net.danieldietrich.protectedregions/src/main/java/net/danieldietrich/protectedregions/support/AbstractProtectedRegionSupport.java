@@ -56,6 +56,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 		  logger.warn("Cannot read {}", fileName);
 		}
       } else {
+        logger.debug("protectedRegionPool contains {} IDs: {}", protectedRegionPool.size(), protectedRegionPool.keySet());
         document = RegionUtil.merge(document, protectedRegionPool);
         logger.debug("Merged document has {} regions: {}", Iterables.size(document.getRegions()), document.getRegions());
       }
@@ -186,7 +187,9 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
       
       // get all files within the current directory
       Iterable<URI> files = (filter == null) ? reader.listFiles(path) : reader.listFiles(path, filter);
+      logger.debug("Path {} has {} files", path, Iterables.size(files));
       for (URI file : files) {
+        logger.debug("Parsing {}", file);
 
         visitedRegions.clear();
         
