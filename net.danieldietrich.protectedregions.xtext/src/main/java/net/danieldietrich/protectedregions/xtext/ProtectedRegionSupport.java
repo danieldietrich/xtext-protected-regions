@@ -21,15 +21,6 @@ public class ProtectedRegionSupport extends AbstractProtectedRegionSupport imple
     this.delegate = delegate;
   }
 
-  /**
-   * Helper method to workaround Xtend's inability to instantiate static inner classes. :-(
-   * @param delegate
-   * @return
-   */
-  public static Builder createBuilder(IBidiFileSystemAccess delegate) {
-    return new Builder(delegate);
-  }
-  
   @Override
   public void generateFile(String fileName, CharSequence contents) {
     generateFile(fileName, DEFAULT_OUTPUT, contents);
