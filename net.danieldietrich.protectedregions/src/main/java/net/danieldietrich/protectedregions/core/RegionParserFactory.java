@@ -18,8 +18,8 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createClojureParser(IRegionOracle oracle, boolean inverse) {
-    return new RegionParserBuilder().addComment(";").setInverse(inverse).useOracle(oracle)
-        .build();
+    return new RegionParserBuilder().addComment(";")/* TODO(@@dd):.ignore(...) */.setInverse(
+        inverse).useOracle(oracle).build();
   }
 
   // Java
@@ -32,8 +32,8 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createJavaParser(IRegionOracle oracle, boolean mergeStyle) {
-    return new RegionParserBuilder().addComment("/*", "*/").addComment("//").setInverse(mergeStyle)
-        .useOracle(oracle).build();
+    return new RegionParserBuilder().addComment("/*", "*/").addComment("//").ignoreCData('"', '\\')
+        .setInverse(mergeStyle).useOracle(oracle).build();
   }
 
   // Ruby
@@ -46,8 +46,8 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createRubyParser(IRegionOracle oracle, boolean mergeStyle) {
-    return new RegionParserBuilder().addComment("#").setInverse(mergeStyle).useOracle(oracle)
-        .build();
+    return new RegionParserBuilder().addComment("#")/* TODO(@@dd):.ignore(...) */.setInverse(
+        mergeStyle).useOracle(oracle).build();
   }
 
   // Scala
@@ -60,8 +60,8 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createScalaParser(IRegionOracle oracle, boolean mergeStyle) {
-    return new RegionParserBuilder().addNestableComment("/*", "*/").addComment("//").setInverse(
-        mergeStyle).useOracle(oracle).build();
+    return new RegionParserBuilder().addNestableComment("/*", "*/").addComment("//")
+        /*TODO(@@dd):.ignore(...)*/.setInverse(mergeStyle).useOracle(oracle).build();
   }
 
   // Xml
@@ -88,8 +88,8 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createXtend2Parser(IRegionOracle oracle, boolean mergeStyle) {
-    return new RegionParserBuilder().addComment("/*", "*/").addComment("//").setInverse(mergeStyle)
-        .useOracle(oracle).build();
+    return new RegionParserBuilder().addComment("/*", "*/").addComment("//")/*TODO(@@dd):.ignore(...)*/
+        .setInverse(mergeStyle).useOracle(oracle).build();
   }
 
   // Xtext
@@ -102,7 +102,7 @@ public class RegionParserFactory {
   }
 
   public static IRegionParser createXtextParser(IRegionOracle oracle, boolean mergeStyle) {
-    return new RegionParserBuilder().addComment("/*", "*/").addComment("//").setInverse(mergeStyle)
-        .useOracle(oracle).build();
+    return new RegionParserBuilder().addComment("/*", "*/").addComment("//")/*TODO(@@dd):.ignore(...)*/
+        .setInverse(mergeStyle).useOracle(oracle).build();
   }
 }

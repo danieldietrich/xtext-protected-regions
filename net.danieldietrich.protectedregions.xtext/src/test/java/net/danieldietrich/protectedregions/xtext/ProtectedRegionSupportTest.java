@@ -38,12 +38,12 @@ public class ProtectedRegionSupportTest {
 
   @Before
   public void setup() {
-    cssParser = new RegionParserBuilder().addComment("/*", "*/").build();
-    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").build();
-    javaParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
-    jsParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").build();
-    phpParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").addComment("#").build();
-    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").build();
+    cssParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.build();
+    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").build();
+    javaParser = new RegionParserBuilder().addComment("/*", "*/").ignoreCData('"', '\\').addComment("//").build();
+    jsParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.addComment("//").build();
+    phpParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.addComment("//").addComment("#").build();
+    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").build();
   }
   
   @Test
