@@ -42,6 +42,12 @@ public interface IRegionParser {
   Iterable<ICommentType> getCommentTypes();
   
   /**
+   * Returns ICDataTypes of this parser.
+   * @return
+   */
+  Iterable<ICDataType> getCDataTypes();
+  
+  /**
    * Denotes comment types (multiline, singleline, nestable).
    */
   static interface ICommentType {
@@ -51,5 +57,14 @@ public interface IRegionParser {
     /** always null, if singleline comment */
     String getEnd();
   }
-
+  
+  /**
+   * Denotes character data types (like String literals or Xml's CDATA section).
+   */
+  static interface ICDataType {
+    String getStart();
+    String getEnd();
+    boolean isEscapable();
+    String getEscapeString();
+  }
 }

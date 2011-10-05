@@ -186,7 +186,7 @@ public class RegionUtilTest {
     .addComment("/*", "*/")
     .addComment("//")
     .setInverse(false)
-    .usingOracle(SIMPLE_ORACLE)
+    .useOracle(SIMPLE_ORACLE)
     .build();
     
     IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/simple_current.txt"));
