@@ -15,6 +15,8 @@ import net.danieldietrich.protectedregions.core.RegionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.collect.Iterables;
+
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
@@ -43,6 +45,8 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
         // parse document again with different parser
         document = parser.parse(document.getContents());
       }
+      logger.debug("Source document has {} regions: {}", Iterables.size(document.getRegions()), document.getRegions());
+      
       if (parser.isInverse()) {
         CharSequence input;
 		try {
@@ -53,6 +57,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
 		}
       } else {
         document = RegionUtil.merge(document, protectedRegionPool);
+        logger.debug("Merged document has {} regions: {}", Iterables.size(document.getRegions()), document.getRegions());
       }
     }
     return (document == null) ? contents : document.getContents();

@@ -5,12 +5,15 @@ import java.net.URI;
 import net.danieldietrich.protectedregions.support.AbstractProtectedRegionSupport;
 
 import org.eclipse.xtext.generator.IFileSystemAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
 public class ProtectedRegionSupport extends AbstractProtectedRegionSupport implements IFileSystemAccess {
 
+  private final transient Logger logger = LoggerFactory.getLogger(ProtectedRegionSupport.class);
   private final IBidiFileSystemAccess delegate;
   
   private ProtectedRegionSupport(IBidiFileSystemAccess delegate) {
@@ -35,6 +38,7 @@ public class ProtectedRegionSupport extends AbstractProtectedRegionSupport imple
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
     URI path = delegate.getUri(fileName, slot);
+    logger.debug("Merging {} at {}, URI={}", new Object[] { fileName, slot, path });
     CharSequence mergedContents = mergeProtectedRegions(path, contents);
     delegate.generateFile(fileName, slot, mergedContents);
   }

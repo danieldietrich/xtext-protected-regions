@@ -527,6 +527,11 @@ class DefaultRegionParser implements IRegionParser {
     }
 
     @Override
+    public String toString() {
+      return id;
+    }
+    
+    @Override
     public boolean isMarkedRegion() {
       return id != null;
     }
