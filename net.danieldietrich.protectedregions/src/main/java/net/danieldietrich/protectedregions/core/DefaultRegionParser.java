@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import net.danieldietrich.protectedregions.core.IDocument.IRegion;
 
@@ -160,8 +162,9 @@ class DefaultRegionParser implements IRegionParser {
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
       isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
       if (!input.isMarkedRegion() && isMarkedRegionEnd) {
+        String near = comment;
         throw new IllegalStateException(
-            "Detected marked region end without corresponding marked region start.");
+            "Detected marked region end without corresponding marked region start at line " + input.line + " near ["+ near +"].");
       }
       stateChanged =
           (!input.isMarkedRegion() && isMarkedRegionStart)
@@ -412,6 +415,8 @@ class DefaultRegionParser implements IRegionParser {
     boolean markedRegionEnabled;
     int marker = 0;
     int index = 0;
+    int line = 1; // line number, start at 1. useful to pinpoint parser errors
+    int column = 1; // column number, start at 1. useful to pinpoint parser errors
 
     // Take care of comment starts because of marked region end comments,
     // which are not part of marked regions.
@@ -448,6 +453,15 @@ class DefaultRegionParser implements IRegionParser {
     // read document part, moving cursor
     String consume(int endIndex, int additionalChars) {
       String result = document.substring(index, endIndex);
+
+      // calculate line number
+      // TODO: Use a more efficient algorithm
+      String documentToCursor = document.substring(0, index);
+      Pattern pattern = Pattern.compile("(\\r\\n|\\n|\\r)");
+      Matcher matcher = pattern.matcher(documentToCursor);
+      line = 1; // reset
+      while (matcher.find()) line++;
+      
       index = endIndex + additionalChars;
       return result;
     }

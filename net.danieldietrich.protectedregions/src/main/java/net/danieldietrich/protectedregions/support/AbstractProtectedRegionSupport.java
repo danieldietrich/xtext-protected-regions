@@ -209,7 +209,12 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
           CharSequence input;
           try {
             input = reader.readFile(file);
-            IDocument document = parser.parse(input);
+            IDocument document;
+            try {
+              document = parser.parse(input);
+            } catch (Exception ex) {
+              throw new RuntimeException(parser + " failed parsing " + file, ex);
+            }
             logger.debug("{} found {} regions in {} : {}", new Object[] { parser, Iterables.size(document.getRegions()), file, document.getRegions() });
 
             // add protected regions to pool
