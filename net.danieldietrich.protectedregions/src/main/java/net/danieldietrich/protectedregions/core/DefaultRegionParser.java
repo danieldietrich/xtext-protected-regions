@@ -34,19 +34,26 @@ class DefaultRegionParser implements IRegionParser {
    */
   private static final String[] END_OF_LINE_FLAVORS = new String[] {"\r\n", "\n", "\r"};
 
+  private final String name;
   private final List<ICommentType> commentTypes;
   private final List<ICDataType> cdataTypes;
   private final IRegionOracle oracle;
   private final boolean inverse;
 
-  DefaultRegionParser(List<ICommentType> commentTypes, List<ICDataType> cdataTypes,
+  DefaultRegionParser(String name, List<ICommentType> commentTypes, List<ICDataType> cdataTypes,
       IRegionOracle oracle, boolean inverse) {
+    this.name = name;
     this.commentTypes = commentTypes;
     this.cdataTypes = cdataTypes;
     this.oracle = oracle;
     this.inverse = inverse;
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+  
   /**
    * @see #parse(CharSequence)
    */

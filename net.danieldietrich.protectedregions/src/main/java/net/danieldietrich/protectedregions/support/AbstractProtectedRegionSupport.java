@@ -207,6 +207,7 @@ public abstract class AbstractProtectedRegionSupport implements IProtectedRegion
           try {
             input = reader.readFile(file);
             IDocument document = parser.parse(input);
+            logger.debug("Parser {} found {} regions in {} : ", new Object[] { parser, Iterables.size(document.getRegions()),  file, document.getRegions() });
 
             // add protected regions to pool
             for (IRegion region : document.getRegions()) {

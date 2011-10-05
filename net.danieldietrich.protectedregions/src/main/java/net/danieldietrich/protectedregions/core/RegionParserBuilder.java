@@ -17,9 +17,15 @@ public class RegionParserBuilder {
   private final List<ICommentType> commentTypes = new ArrayList<ICommentType>();
   private final List<ICDataType> cdataTypes = new ArrayList<ICDataType>();
 
+  private String name = "unnamed";
   private IRegionOracle oracle = null;
   private boolean inverse = false;
 
+  public RegionParserBuilder name(String name) {
+    this.name = name;
+    return this;
+  }
+  
   /**
    * Add multiline comment.
    * 
@@ -115,7 +121,7 @@ public class RegionParserBuilder {
     if (oracle == null) {
       oracle = new DefaultOracle(inverse);
     }
-    IRegionParser result = new DefaultRegionParser(commentTypes, cdataTypes, oracle, inverse);
+    IRegionParser result = new DefaultRegionParser(name, commentTypes, cdataTypes, oracle, inverse);
     return result;
   }
 
