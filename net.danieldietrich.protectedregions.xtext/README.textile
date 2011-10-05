@@ -10,3 +10,54 @@ h1. Xtext Protected Region Support
 h2. Bidi FileSystemAccess
 
 Xtext FileSystemAccess interface (@IBiFileSystemAccess@) and implementations with extended read operations, useful for implementing protected region support.
+
+h2. Usage
+
+Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
+
+bc. 
+Import-Package: net.danieldietrich.protectedregions.core,
+ net.danieldietrich.protectedregions.support,
+ net.danieldietrich.protectedregions.xtext
+
+Configure Guice to inject @BidiJavaIoFileSystemAccess@ as a @JavaIoFileSystemAccess@ in your @RuntimeModule@ class. Example:
+
+bc.. 
+public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRuntimeModule {
+
+	public Class<? extends JavaIoFileSystemAccess> bindJavaIoFileSystemAccess() {
+		return BidiJavaIoFileSystemAccess.class;
+	}
+	
+}
+
+p. Use it in your generator:
+
+bc.. 
+import net.danieldietrich.xtext.bifsa.IBiFileSystemAccess
+import net.danieldietrich.xtext.generator.protectedregions.RegionParserFactory
+import net.danieldietrich.protectedregions.xtext.IBidiFileSystemAccess
+import net.danieldietrich.protectedregions.xtext.ProtectedRegionSupport
+import net.danieldietrich.protectedregions.core.RegionParserFactory
+
+...
+
+IFileSystemAccess fsa
+
+override void doGenerate(Resource resource, IFileSystemAccess fsa) {
+	
+	val bfsa = fsa as IBidiFileSystemAccess
+
+    this.fsa = new ProtectedRegionSupport$Builder(bfsa)
+    	.addParser(RegionParserFactory::createJavaParser, ".java")
+    	.addParser(RegionParserFactory::createXmlParser, ".xml")
+    	.read("", IFileSystemAccess::DEFAULT_OUTPUT)
+    	.build
+
+	var model = resource.contents.get(0) as Model
+	model = resource.contents.get(0) as Model
+	
+	...
+
+	fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
+}
