@@ -23,6 +23,12 @@ Import-Package: net.danieldietrich.protectedregions.core,
 Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class. Example:
 
 bc.. 
+import net.danieldietrich.xtext.bifsa.IBiFileSystemAccess
+import net.danieldietrich.xtext.generator.protectedregions.RegionParserFactory
+import net.danieldietrich.protectedregions.xtext.IBidiFileSystemAccess
+import net.danieldietrich.protectedregions.xtext.ProtectedRegionSupport
+import net.danieldietrich.protectedregions.core.RegionParserFactory
+
 public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRuntimeModule {
 
 	@Provides
@@ -53,14 +59,6 @@ public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRun
 p. Use it in your generator:
 
 bc.. 
-import net.danieldietrich.xtext.bifsa.IBiFileSystemAccess
-import net.danieldietrich.xtext.generator.protectedregions.RegionParserFactory
-import net.danieldietrich.protectedregions.xtext.IBidiFileSystemAccess
-import net.danieldietrich.protectedregions.xtext.ProtectedRegionSupport
-import net.danieldietrich.protectedregions.core.RegionParserFactory
-
-...
-
 IFileSystemAccess fsa
 Model model
 
