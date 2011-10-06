@@ -55,7 +55,7 @@ class DefaultRegionParser implements IRegionParser {
   public String toString() {
     return name;
   }
-  
+
   /**
    * @see #parse(CharSequence)
    */
@@ -162,9 +162,10 @@ class DefaultRegionParser implements IRegionParser {
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
       isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
       if (!input.isMarkedRegion() && isMarkedRegionEnd) {
-        String near = comment;
+        Input.Cursor cursor = input.getCursor();
         throw new IllegalStateException(
-            "Detected marked region end without corresponding marked region start at line " + input.line + " near ["+ near +"].");
+            "Detected marked region end without corresponding marked region start at line "
+                + cursor.line + ", column " + cursor.column + ", near [" + comment + "].");
       }
       stateChanged =
           (!input.isMarkedRegion() && isMarkedRegionStart)
@@ -253,33 +254,37 @@ class DefaultRegionParser implements IRegionParser {
       }
     }
   }
-  
+
   /**
    * Assuming that the start of a character data was already found, the end is searched here.
+   * 
    * 
    * @param input
    * @param cdata
    */
   private void findEndOfCharacterData(Input input, IndexOfObject<ICDataType> cdata) {
     input.update(cdata.index, cdata.object.getStart().length());
-    while(true) {
-      int indexOfEscapeString = (cdata.object != null) ? input.indexOf(cdata.object.getEscapeString()) : -1;
-      int indexOfCDataEnd = (cdata.object != null) ? input.indexOf(cdata.object.getEnd()) : -1;
+    String end = cdata.object.getEnd();
+    String escapeString = cdata.object.getEscapeString();
+    while (true) {
+      int indexOfEscapeString = (escapeString != null) ? input.indexOf(escapeString) : -1;
+      int indexOfCDataEnd = input.indexOf(end);
       if (indexOfEscapeString == -1) {
         if (indexOfCDataEnd == -1) {
-          throw new IllegalStateException("Character data end '" + cdata.object.getEnd() + "' not found");
+          Input.Cursor cursor = input.getCursor();
+          throw new IllegalStateException("Character data end '" + end + "' not found at line " + cursor.line + ", column " + cursor.column);
         } else {
-          input.update(indexOfCDataEnd, cdata.object.getEnd().length());
+          input.update(indexOfCDataEnd, end.length());
           break;
         }
       } else {
-        // lenth of escape string + length of escaped character = 2
+        // length of escape string + length of escaped character = 2
         input.update(indexOfEscapeString, 2);
         // continue finding end of current character data
       }
     }
   }
-  
+
   /**
    * Update Input and return new comment type (possibly null).
    * 
@@ -306,7 +311,7 @@ class DefaultRegionParser implements IRegionParser {
    * 
    * @param input
    * @param strings
-   * @return
+   * @return IndexOfObject<T>, guaranteed not to be null
    */
   private <T> IndexOfObject<T> findLowestIndex(Input input, InnerIterator<T, String> strings) {
     T object = null;
@@ -415,8 +420,7 @@ class DefaultRegionParser implements IRegionParser {
     boolean markedRegionEnabled;
     int marker = 0;
     int index = 0;
-    int line = 1; // line number, start at 1. useful to pinpoint parser errors
-    int column = 1; // column number, start at 1. useful to pinpoint parser errors
+    int lastIndex = 0;
 
     // Take care of comment starts because of marked region end comments,
     // which are not part of marked regions.
@@ -453,15 +457,7 @@ class DefaultRegionParser implements IRegionParser {
     // read document part, moving cursor
     String consume(int endIndex, int additionalChars) {
       String result = document.substring(index, endIndex);
-
-      // calculate line number
-      // TODO: Use a more efficient algorithm
-      String documentToCursor = document.substring(0, index);
-      Pattern pattern = Pattern.compile("(\\r\\n|\\n|\\r)");
-      Matcher matcher = pattern.matcher(documentToCursor);
-      line = 1; // reset
-      while (matcher.find()) line++;
-      
+      lastIndex = index; // save last index for calculating cursor (@see #getCursor())
       index = endIndex + additionalChars;
       return result;
     }
@@ -517,6 +513,32 @@ class DefaultRegionParser implements IRegionParser {
     void noCommentFound() {
       commentStart = -1;
     }
+
+    private static final Pattern EOL = Pattern.compile("(\\r\\n|\\n|\\r)");
+
+    Cursor getCursor() {
+      // calculate line & column number. performance should be ok, because it is not called
+      // continuously.
+      String documentToCursor = document.substring(0, lastIndex);
+      Matcher matcher = EOL.matcher(documentToCursor);
+      int line = 1; // reset
+      while (matcher.find()) {
+        line++;
+      }
+      int eol = Math.max(documentToCursor.lastIndexOf("\r"), documentToCursor.lastIndexOf("\n"));
+      int column = documentToCursor.length() - ((eol == -1) ? 0 : eol);
+      return new Cursor(line, column);
+    }
+
+    static class Cursor {
+      final int line;
+      final int column;
+
+      Cursor(int line, int column) {
+        this.line = line;
+        this.column = column;
+      }
+    }
   }
 
   /**
@@ -551,7 +573,7 @@ class DefaultRegionParser implements IRegionParser {
     public String toString() {
       return id;
     }
-    
+
     @Override
     public boolean isMarkedRegion() {
       return id != null;
@@ -618,7 +640,7 @@ class DefaultRegionParser implements IRegionParser {
    * Encapsulates an index of a specific String.
    */
   private static class IndexOfObject<T> {
-    
+
     final int index;
     final T object;
 

@@ -101,7 +101,7 @@ public class RegionUtilTest {
       IRegionParser parser = RegionParserFactory.createJavaParser(NESTED_COMMENT_ORACLE, false);
       parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
     } catch(IllegalStateException x) {
-      assertTrue("Detected marked region end without corresponding marked region start.".equals(x.getMessage())); 
+      assertTrue(x.getMessage(), "Detected marked region end without corresponding marked region start at line 5, column 7, near [ PROTECTED REGION END].".equals(x.getMessage())); 
     }
   }
   
