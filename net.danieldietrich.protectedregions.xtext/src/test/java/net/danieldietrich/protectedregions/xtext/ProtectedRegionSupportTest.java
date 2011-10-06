@@ -39,12 +39,12 @@ public class ProtectedRegionSupportTest {
   @Before
   public void setup() {
     // TODO(@@dd): css has escaped double qoutes in strings, html/xml not. that's currently not considered here when combining parsers(!)
-    cssParser = new RegionParserBuilder().addComment("/*", "*/").ignoreCData('"', '\\').build();
-    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
-    javaParser = new RegionParserBuilder().addComment("/*", "*/").ignoreCData('"', '\\').addComment("//").build();
-    jsParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
-    phpParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").addComment("#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
-    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
+    cssParser = new RegionParserBuilder().name("css").addComment("/*", "*/").ignoreCData('"', '\\').build();
+    htmlParser = new RegionParserBuilder().name("html").addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
+    javaParser = new RegionParserBuilder().name("java").addComment("/*", "*/").ignoreCData('"', '\\').addComment("//").build();
+    jsParser = new RegionParserBuilder().name("js").addComment("/*", "*/").addComment("//").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
+    phpParser = new RegionParserBuilder().name("php").addComment("/*", "*/").addComment("//").addComment("#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
+    xmlParser = new RegionParserBuilder().name("xml").addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
   }
   
   @Test
