@@ -6,7 +6,8 @@ package net.danieldietrich.protectedregions.xtext;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.xtext.generator.AbstractFileSystemAccess;
+import net.danieldietrich.protectedregions.xtext.ProtectedRegionSupport.Builder;
+
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,40 +22,40 @@ import org.slf4j.LoggerFactory;
 public class JavaIoWrapper extends JavaIoFileSystemAccess {
 
   private final transient Logger logger = LoggerFactory.getLogger(JavaIoWrapper.class); 
-  IProtectedRegionSupportFactory prsFactory;
+  IProtectedRegionSupportConfigurer prsFactory;
   ProtectedRegionSupport prs;
   
-  public JavaIoWrapper(IProtectedRegionSupportFactory prsFactory) {
-    this.prsFactory = prsFactory;
+  public JavaIoWrapper(IProtectedRegionSupportConfigurer prsConfigurer) {
+    this.prsFactory = prsConfigurer;
+  }
+
+  /**
+   * Creates and configures an inner {@link ProtectedRegionSupport} if not yet initialized.
+   */
+  protected void prepareInner() {
+    if (prs == null) {
+      Map<String, String> pathes = getPathes();
+      logger.debug("Creating ProtectedRegionSupport with slots: {}", pathes);
+      IBidiFileSystemAccess delegate = new BidiJavaIoFileSystemAccess();
+      for (Entry<String, String> path : pathes.entrySet()) {
+        delegate.setOutputPath(path.getKey(), path.getValue());
+      }
+      Builder builder = new ProtectedRegionSupport.Builder(delegate);
+      prsFactory.configure(builder);
+      this.prs = builder.build();
+    }
   }
   
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
-    if (prs == null) {
-      Map<String, String> pathes = getPathes();
-      logger.debug("Creating ProtectedRegionSupport with slots: {}", pathes);
-      IBidiFileSystemAccess delegate = prsFactory.createFileSystemAccess();
-      for (Entry<String, String> path : pathes.entrySet()) {
-        delegate.setOutputPath(path.getKey(), path.getValue());
-      }
-      this.prs = prsFactory.createProtectedRegionSupport(delegate);
-    }
+    prepareInner();
     prs.generateFile(fileName, slot, contents);
   }
   
   @Override
   public void deleteFile(String fileName) {
+    prepareInner();
     prs.deleteFile(fileName);
   }
-
-//  @Override
-//  public void setOutputPath(String path) {
-//    prs.setOutputPath(DEFAULT_OUTPUT, path);
-//  }
-//  
-//  @Override
-//  public void setOutputPath(String outputName, String path) {
-//    prs.setOutputPath(outputName, path);
-//  }
 
 }

@@ -33,23 +33,15 @@ public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRun
 
 	@Provides
 	public JavaIoFileSystemAccess createJavaIoFileSystemAccess() {
-    	JavaIoFileSystemAccess fsa = new JavaIoWrapper(new IProtectedRegionSupportFactory() {
+    	JavaIoFileSystemAccess fsa = new JavaIoWrapper(new IProtectedRegionSupportConfigurer() {
 			
 			@Override
-			public ProtectedRegionSupport createProtectedRegionSupport(
-					IBidiFileSystemAccess delegate) {
-			    ProtectedRegionSupport prs = new ProtectedRegionSupport.Builder(delegate)
-			    	.addParser(RegionParserFactory.createJavaParser(), ".java")
+			public void configure(ProtectedRegionSupport.Builder builder) {
+			    builder.addParser(RegionParserFactory.createJavaParser(), ".java")
 			    	.addParser(RegionParserFactory.createXmlParser(), ".xml")
-			    	.read("", IFileSystemAccess.DEFAULT_OUTPUT)
-			    	.build();
-			    return prs;
+			    	.read("", IFileSystemAccess.DEFAULT_OUTPUT);
 			}
 			
-			@Override
-			public IBidiFileSystemAccess createFileSystemAccess() {
-				return new BidiJavaIoFileSystemAccess();
-			}
 		});
     	return fsa;
 	}
