@@ -38,12 +38,13 @@ public class ProtectedRegionSupportTest {
 
   @Before
   public void setup() {
-    cssParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.build();
-    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").build();
+    // TODO(@@dd): css has escaped double qoutes in strings, html/xml not. that's currently not considered here when combining parsers(!)
+    cssParser = new RegionParserBuilder().addComment("/*", "*/").ignoreCData('"', '\\').build();
+    htmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
     javaParser = new RegionParserBuilder().addComment("/*", "*/").ignoreCData('"', '\\').addComment("//").build();
-    jsParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.addComment("//").build();
-    phpParser = new RegionParserBuilder().addComment("/*", "*/")/*TODO(@@dd):.ignore(...)*/.addComment("//").addComment("#").build();
-    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").build();
+    jsParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
+    phpParser = new RegionParserBuilder().addComment("/*", "*/").addComment("//").addComment("#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
+    xmlParser = new RegionParserBuilder().addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
   }
   
   @Test
@@ -58,7 +59,7 @@ public class ProtectedRegionSupportTest {
       .read("src/test/resources", new IPathFilter() {
         @Override
         public boolean accept(URI uri) {
-          return uri.getPath().endsWith("_previous.html");
+          return uri.getPath().endsWith("multilang_previous.html");
         }})
       .build();
 
@@ -173,11 +174,21 @@ public class ProtectedRegionSupportTest {
   // special in-memory IBidiFileSystemAccess for testing purposes
   private static class TestFileSystemAccess extends BidiJavaIoFileSystemAccess {
     private Map<String,CharSequence> results = new HashMap<String,CharSequence>();
+    private boolean read = false;
     public TestFileSystemAccess() {
       this.setOutputPath("."); // initialize default slot(!)
     }
     @Override
+    public CharSequence readFile(URI uri) throws IOException {
+      CharSequence result = super.readFile(uri);
+      read = true;
+      return result;
+    }
+    @Override
     public void generateFile(String fileName, String slot, CharSequence contents) {
+      if (!read) {
+        throw new IllegalStateException("No input files read so far. This indicates, that the code of BidiXxxFileSystemAccess (/impl of IFileSystemReader) is broken.");
+      }
       results.put(slot+"/"+fileName, contents);
     }
     Map<String,CharSequence> getResults() { return results; }
