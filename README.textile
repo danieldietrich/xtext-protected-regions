@@ -5,8 +5,8 @@ h2(#toc). Table of Contents
 * "Table of Contents":#toc
 * "Installtion":#installation
 ** "Prequisites":#prequisites
-** Download
-** Setup Eclipse Workspace
+** "Download":#download
+** "Setup Eclipse Workspace":#workspace
 * "Documentation":#documentation
 
 "top":#top
@@ -21,7 +21,7 @@ Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 
 "top":#top
 
-h3. Download Project
+h3(#download). Download Project
 
 To get a local copy of xtext-protectedregions you have to clone it from GitHub
 
@@ -29,7 +29,7 @@ To get a local copy of xtext-protectedregions you have to clone it from GitHub
 
 "top":#top
 
-h3. Setup Eclipse Workspace
+h3(#workspace). Setup Eclipse Workspace
 
 * In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 * Open _indigo.target_ (located in _net.danieldietrich.protectedregions.target_) and select _Set as Target Platform_ (upper right corner).
