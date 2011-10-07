@@ -320,3 +320,7 @@ bc. @Override public isEnabled(String s) {
 The @RegionUtil@ merges documents. It interprets the fields of @IRegion@ to decide if a text region is preserved or not. Custom switchable regions behavior is provided by implementing a custom merge function in conjunction with providing a custom @IRegionOracle@ (if needed).
 
 "top":#top
+
+h3. Sample Project
+
+Checkout "Saentity Project at GitHub":https://github.com/soluvas/saentity.
