@@ -21,7 +21,7 @@ Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 
 "top":#top
 
-h3(#download). Download Project
+h3(#download). Download
 
 To get a local copy of xtext-protectedregions you have to clone it from GitHub:
 
