@@ -15,7 +15,15 @@ h2(#installation). Installation
 
 h3(#prequisites). Prequisites
 
-Install _Eclipse Indigo_ and the following plugins (via Marketplace):
+The following software should be installed to your system:
+
+* "JDK 6+":http://www.oracle.com/technetwork/java/javase/downloads/index.html (The only feature used of v6 is the @Override annotation with interface implementations.)
+* "Eclipse":http://www.eclipse.org/downloads/ (The JEE version is fine.)
+* "Git":http://git-scm.com/
+* "Maven":http://maven.apache.org/download.html
+
+Please installing the following plugins (via Marketplace) with _Eclipse (Indigo)_:
+
 * EGit - Git Team Provider
 * Maven Integration for Eclipse (m2e)
 
