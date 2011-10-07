@@ -3,7 +3,6 @@ package net.danieldietrich.protectedregions.xtext;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URI;
@@ -15,8 +14,9 @@ import java.util.regex.Pattern;
 import net.danieldietrich.protectedregions.core.IRegionParser;
 import net.danieldietrich.protectedregions.core.RegionParserBuilder;
 import net.danieldietrich.protectedregions.support.IPathFilter;
+import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
+import net.danieldietrich.protectedregions.support.ProtectedRegionSupport;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.generator.IFileSystemAccess;
@@ -29,6 +29,8 @@ import org.junit.Test;
  */
 public class ProtectedRegionSupportTest {
 
+  private TestGenerator testGenerator;
+
   private IRegionParser cssParser;
   private IRegionParser htmlParser;
   private IRegionParser javaParser;
@@ -38,160 +40,228 @@ public class ProtectedRegionSupportTest {
 
   @Before
   public void setup() {
-    // TODO(@@dd): css has escaped double qoutes in strings, html/xml not. that's currently not considered here when combining parsers(!)
-    cssParser = new RegionParserBuilder().name("css").addComment("/*", "*/").ignoreCData('"', '\\').build();
-    htmlParser = new RegionParserBuilder().name("html").addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
-    javaParser = new RegionParserBuilder().name("java").addComment("/*", "*/").ignoreCData('"', '\\').addComment("//").build();
-    jsParser = new RegionParserBuilder().name("js").addComment("/*", "*/").addComment("//").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
-    phpParser = new RegionParserBuilder().name("php").addComment("/*", "*/").addComment("//").addComment("#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
-    xmlParser = new RegionParserBuilder().name("xml").addComment("<!--", "-->").ignoreCData("<![CDATA[", "]]>").ignoreCData('"', '\'').build();
+
+    testGenerator = new TestGenerator();
+
+    // TODO(@@dd): css has escaped double quotes in strings, html/xml not. that's currently not
+    // considered here when combining parsers(!)
+    cssParser =
+        new RegionParserBuilder().name("css").addComment("/*", "*/").ignoreCData('"', '\\').build();
+    htmlParser =
+        new RegionParserBuilder().name("html").addComment("<!--", "-->").ignoreCData("<![CDATA[",
+            "]]>").ignoreCData('"').ignoreCData('\'').build();
+    javaParser =
+        new RegionParserBuilder().name("java").addComment("/*", "*/").ignoreCData('"', '\\')
+            .addComment("//").build();
+    jsParser =
+        new RegionParserBuilder().name("js").addComment("/*", "*/").addComment("//").ignoreCData(
+            '"', '\\').ignoreCData('\'', '\\').build();
+    phpParser =
+        new RegionParserBuilder().name("php").addComment("/*", "*/").addComment("//").addComment(
+            "#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
+    xmlParser =
+        new RegionParserBuilder().name("xml").addComment("<!--", "-->").ignoreCData("<![CDATA[",
+            "]]>").ignoreCData('"').ignoreCData('\'').build();
   }
-  
+
   @Test
   public void mergeOfMultilanguageFilesShouldMatchExpected() throws Exception {
-    
-    TestFileSystemAccess delegate = new TestFileSystemAccess();
-    IFileSystemAccess fsa = new ProtectedRegionSupport.Builder(delegate)
-      .addParser(htmlParser, ".html")
-      .addParser(phpParser, ".html")
-      .addParser(jsParser, ".html")
-      .addParser(cssParser, ".html")
-      .read("src/test/resources", new IPathFilter() {
-        @Override
-        public boolean accept(URI uri) {
-          return uri.getPath().endsWith("multilang_previous.html");
-        }})
-      .build();
 
-    new TestGenerator().doGenerate("src/test/resources/multilang_current.html", fsa);
-    
-    String mergedContents = delegate.getResults().values().iterator().next().toString();
-    String expectedContents = IOUtils.toString(new FileReader("src/test/resources/multilang_expected.html"));
-    
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(htmlParser, ".html");
+    support.addParser(phpParser, ".html");
+    support.addParser(jsParser, ".html");
+    support.addParser(cssParser, ".html");
+
+    // create FileSystemAccess, which reads protected regions when calling setOuputPath(...)
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new EndsWithFilter("multilang_previous.html"));
+    fsa.setOutputPath("src/test/resources");
+
+    // start generator (writing via fsa.generateFile(...))
+    testGenerator.doGenerate("src/test/resources/multilang_current.html", fsa);
+
+    // test results
+    String mergedContents = fsa.getSingleResult();
+    String expectedContents =
+        IOUtils.toString(new FileReader("src/test/resources/multilang_expected.html"));
+
     assertEquals(expectedContents, mergedContents);
   }
-  
+
   @Test
-  public void nonUniqueIdsShouldBeGloballyDetected() throws URISyntaxException {
+  public void nonUniqueIdsShouldBeGloballyDetected() throws Exception {
+
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(javaParser, ".java");
+
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new PatternFilter(".*\\/duplicate_id_\\d.java"));
+
     try {
-      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
-      .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
-        private final Pattern PATTERN = Pattern.compile(".*\\/duplicate_id_\\d.java");
-        @Override
-        public boolean accept(URI uri) {
-          String path = uri.getPath();
-          return PATTERN.matcher(path).matches();
-        }})
-      .build();
+      fsa.setOutputPath("src/test/resources");
       assertTrue("Duplicate id not recognized", false);
-    } catch(IllegalStateException x) {
-      assertTrue("Other exception catched as expected: " + x.getMessage(), "Duplicate protected region id: 'duplicate'. Protected region ids have to be globally unique.".equals(x.getMessage()));
+    } catch (IllegalStateException x) {
+      assertTrue("Other exception catched as expected: " + x.getMessage(),
+          "Duplicate protected region id: 'duplicate'. Protected region ids have to be globally unique."
+              .equals(x.getMessage()));
     }
   }
-  
+
   @Test
-  public void protectedRegionStartInStringLiteralShouldBeIgnored() throws URISyntaxException { 
+  public void protectedRegionStartInStringLiteralShouldBeIgnored() throws Exception {
+
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(javaParser, ".java");
+
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new EndsWithFilter("string_literals_ignore_start.java"));
+
     try {
-      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
-      .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
-        @Override
-        public boolean accept(URI uri) {
-          return uri.getPath().endsWith("string_literals_ignore_start.java");
-        }})
-      .build();
-    } catch(IllegalStateException x) {
-      assertTrue("Protected region start in string literal not ignored. Original message: " + x.getMessage(), false);
+      fsa.setOutputPath("src/test/resources");
+    } catch (IllegalStateException x) {
+      assertTrue("Protected region start in string literal not ignored. Original message: "
+          + x.getMessage(), false);
     }
   }
-  
+
   @Test
-  public void protectedRegionEndInStringLiteralShouldBeIgnored() throws URISyntaxException { 
+  public void protectedRegionEndInStringLiteralShouldBeIgnored() throws Exception {
+
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(javaParser, ".java");
+
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new EndsWithFilter("string_literals_ignore_end.java"));
+
     try {
-      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
-      .addParser(javaParser, ".java")
-      .read("src/test/resources", new IPathFilter() {
-        @Override
-        public boolean accept(URI uri) {
-          return uri.getPath().endsWith("string_literals_ignore_end.java");
-        }})
-      .build();
-    } catch(IllegalStateException x) {
-      assertTrue("Protected region end in string literal not ignored. Original message: " + x.getMessage(), false);
+      fsa.setOutputPath("src/test/resources");
+    } catch (IllegalStateException x) {
+      assertTrue("Protected region end in string literal not ignored. Original message: "
+          + x.getMessage(), false);
     }
   }
-  
+
   @Test
-  public void protectedRegionStartInXmlCDATAShouldBeIgnored() throws URISyntaxException { 
+  public void protectedRegionStartInXmlCDATAShouldBeIgnored() throws Exception {
+
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(xmlParser, ".xml");
+
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new EndsWithFilter("string_literals_ignore_cdata.xml"));
+
     try {
-      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
-      .addParser(xmlParser, ".xml")
-      .read("src/test/resources", new IPathFilter() {
-        @Override
-        public boolean accept(URI uri) {
-          return uri.getPath().endsWith("string_literals_ignore_cdata.xml");
-        }})
-      .build();
-    } catch(IllegalStateException x) {
-      assertTrue("Protected region end in xml CDATA not ignored. Original message: " + x.getMessage(), false);
+      fsa.setOutputPath("src/test/resources");
+    } catch (IllegalStateException x) {
+      assertTrue("Protected region end in xml CDATA not ignored. Original message: "
+          + x.getMessage(), false);
     }
   }
-  
+
   @Test
-  public void commentsInStringLiteralsShouldBeIgnored() throws URISyntaxException { 
+  public void commentsInStringLiteralsShouldBeIgnored() throws URISyntaxException {
+    
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(javaParser, ".java");
+
+    TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+    fsa.setFilter(new EndsWithFilter("string_literals_ignore_comments.java"));
+    
     try {
-      new ProtectedRegionSupport.Builder(new TestFileSystemAccess())
-      .addParser(javaParser, ".java")
-      .read("src/test/resources", null, new IPathFilter() {
-        @Override
-        public boolean accept(URI uri) {
-          return uri.getPath().endsWith("string_literals_ignore_comments.java");
-        }})
-      .build();
-    } catch(IllegalStateException x) {
-      assertTrue("Comments in string literals are not ignored. Original message: " + x.getMessage(), false);
+      fsa.setOutputPath("src/test/resources");
+    } catch (IllegalStateException x) {
+      assertTrue(
+          "Comments in string literals are not ignored. Original message: " + x.getMessage(), false);
     }
   }
-  
-  // special generator for testing purposes which is able to load specific files
-  private static class TestGenerator implements IGenerator {
-    public void doGenerate(String fileName, IFileSystemAccess fsa) {
-      CharSequence in = null;
-      try {
-        in = FileUtils.readFileToString(new File(fileName));
-      } catch (IOException e) {
-        throw new RuntimeException("error reading file " + fileName);
-      }
-      fsa.generateFile(fileName, in);
-    }
+
+  /**
+   * A Generator taking a (String) fileName instead of a Resource as argument.
+   */
+  static class TestGenerator implements IGenerator {
     @Override
-    public void doGenerate(Resource resource, IFileSystemAccess fsa) {
-      throw new RuntimeException("Please call doGenerate(String, IFileSystemAccess) instead.");
+    public void doGenerate(Resource input, IFileSystemAccess fsa) {
+      throw new IllegalStateException("Call #doGenerate(String, IFileSystemAccess) instead.");
+    }
+
+    public void doGenerate(String fileName, IFileSystemAccess fsa) throws IOException {
+      // simulating current generated file by reading an existing file
+      String current = IOUtils.toString(new FileReader(fileName));
+      fsa.generateFile(fileName, current);
     }
   }
-  
-  // special in-memory IBidiFileSystemAccess for testing purposes
-  private static class TestFileSystemAccess extends BidiJavaIoFileSystemAccess {
-    private Map<String,CharSequence> results = new HashMap<String,CharSequence>();
-    private boolean read = false;
-    public TestFileSystemAccess() {
-      this.setOutputPath("."); // initialize default slot(!)
+
+  /**
+   * Writes files to an in-memory Map of fileName => Contents.
+   */
+  static class TestableBidiJavaIoFileSystemAccess extends BidiJavaIoFileSystemAccess {
+
+    private Map<String, String> results = new HashMap<String, String>();
+
+    public TestableBidiJavaIoFileSystemAccess(IProtectedRegionSupport support) {
+      super(support);
     }
+
     @Override
-    public CharSequence readFile(URI uri) throws IOException {
-      CharSequence result = super.readFile(uri);
-      read = true;
-      return result;
+    public void generateFile(String fileName, CharSequence contents) {
+      String mergedContents =
+          getSupport().mergeRegions(this, fileName, DEFAULT_OUTPUT, contents).toString();
+      results.put(fileName, mergedContents);
     }
+
     @Override
     public void generateFile(String fileName, String slot, CharSequence contents) {
-      if (!read) {
-        throw new IllegalStateException("No input files read so far. This indicates, that the code of BidiXxxFileSystemAccess (/impl of IFileSystemReader) is broken.");
-      }
-      results.put(slot+"/"+fileName, contents);
+      String mergedContents = getSupport().mergeRegions(this, fileName, slot, contents).toString();
+      results.put(fileName, mergedContents);
     }
-    Map<String,CharSequence> getResults() { return results; }
+
+    public Map<String, String> getResults() {
+      return results;
+    }
+
+    public String getSingleResult() {
+      if (results.size() == 0) {
+        throw new IllegalStateException("result is empty");
+      }
+      if (results.size() > 1) {
+        throw new IllegalStateException("not a single result");
+      }
+      return results.values().iterator().next();
+    }
   }
-  
+
+  /**
+   * Filter checking if a path ends with a name.
+   */
+  static class EndsWithFilter implements IPathFilter {
+
+    private String name;
+
+    EndsWithFilter(String name) {
+      this.name = name;
+    }
+
+    @Override
+    public boolean accept(URI path) {
+      return path.getPath().endsWith(name);
+    }
+  }
+
+  /**
+   * Filter checking if a pattern matches a path.
+   */
+  static class PatternFilter implements IPathFilter {
+
+    private final Pattern pattern;
+
+    PatternFilter(String pattern) {
+      this.pattern = Pattern.compile(pattern);
+    }
+
+    @Override
+    public boolean accept(URI path) {
+      return pattern.matcher(path.getPath()).matches();
+    }
+  }
 }

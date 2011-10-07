@@ -11,13 +11,34 @@ import java.util.Set;
  * @author Hendy Irawan
  */
 public interface IFileSystemReader {
+
+  /**
+   * Returns an IPathFilter accepting paths read by this IFileSystemReader.
+   * 
+   * @return
+   */
+  IPathFilter getFilter();
   
   /**
-   * Returns the actual URI path.
+   * Set the IPathFilter accepting paths read by this IFileSystemReader.
    * 
-   * Since a FileSystemAccess may be implemented on top of virtual filesystems
-   * (e.g. platform:/), so this return a URI (e.g. file:///) rather than just
-   * a filesystem path.
+   * @param filter
+   */
+  void setFilter(IPathFilter filter);
+  
+  /**
+   * Returns the uri representation of the given path.
+   * 
+   * @param relativePath
+   * @return
+   */
+  URI getUri(String path);
+  
+  /**
+   * Returns the URI path.
+   * 
+   * Since a FileSystemAccess may be implemented on top of virtual filesystems (e.g. platform:/), so
+   * this return a URI (e.g. file:///) rather than just a filesystem path.
    * 
    * @param relativePath
    * @param slot
@@ -26,52 +47,48 @@ public interface IFileSystemReader {
   URI getUri(String relativePath, String slot);
 
   /**
-	 * Check if file exists.
-	 * 
-	 * @param uri
-	 * @return
-	 */
-	boolean exists(URI uri);
-
-	  /**
-	 * Read contents of path.
-	 * 
-	 * @param fileName
-	 *            Path of file.
-	 * @return
-	 * @throws IOException if error occurs or if !isFile(path) == true
-	 */
-	CharSequence readFile(URI uri) throws IOException;
+   * Check if file exists.
+   * 
+   * @param uri
+   * @return
+   */
+  boolean exists(URI uri);
 
   /**
-   * Calls #listFiles(path, (IPathFilter) null).
-   * @see #listFiles(String, IPathFilter)
+   * Read contents of path.
+   * 
+   * @param fileName Path of file.
+   * @return
+   * @throws IOException if error occurs or if !isFile(path) == true
    */
-  Set<URI> listFiles(URI path);
+  CharSequence readFile(URI uri) throws IOException;
 
   /**
    * Traverses path and returns <b>all</b> files contained in the whole subtree.
+   * 
    * @param path a path containing files
-   * @param filter filter, which accepts files
-   * @return All files within all sub-paths of path, where isFile(element) == true, for all elements of the result
+   * @return All files within all sub-paths of path, where isFile(element) == true, for all elements
+   *         of the result
    * @throws IllegalArgumentException if !hasFiles(String path) == true
    */
   Set<URI> listFiles(URI path, IPathFilter filter);
-  
+
   /**
    * Checks, if path contains files.
+   * 
    * @param URI A URI.
    * @return true, if path has files, false otherwise.
    */
   boolean hasFiles(URI uri);
-  
+
   /**
    * Checks, if path contains readable data.
+   * 
    * @param uri A path URI
    * @return true, if path is file, false otherwise.
    */
   boolean isFile(URI uri);
-  
+
   /**
    * Returns a unique representation of a path. The meaning of this path if filesystem-specific.
    * 

@@ -3,9 +3,12 @@ package net.danieldietrich.protectedregions.xtext;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Map;
 import java.util.Set;
 
+import net.danieldietrich.protectedregions.support.IFileSystemReader;
 import net.danieldietrich.protectedregions.support.IPathFilter;
+import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.core.resources.IFile;
@@ -20,78 +23,126 @@ import com.google.inject.Inject;
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
-public class BidiEclipseResourceFileSystemAccess extends
-		EclipseResourceFileSystemAccess implements IBidiFileSystemAccess {
+public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSystemAccess implements
+    IFileSystemReader {
 
-	@Inject
-	IWorkspaceRoot root;
+  @Inject
+  IWorkspaceRoot root;
 
-	@Override
-	public void setRoot(IWorkspaceRoot root) {
-		super.setRoot(root);
-		this.root = root;
-	}
-	
-	protected IFile getFile(URI uri) {
-		return root.getFile(new Path(uri.getPath()));
-	}
+  private final IProtectedRegionSupport support;
+  private IPathFilter filter;
 
-	@Override
-	public CharSequence readFile(URI uri) throws IOException {
-		IFile file = getFile(uri);
-		try {
-			return IOUtils.toString(file.getContents());
-		} catch (CoreException e) {
-			throw new IOException("Error reading " + file, e);
-		}
-	}
+  public BidiEclipseResourceFileSystemAccess(IProtectedRegionSupport support) {
+    this.support = support;
+  }
+  
+  protected IProtectedRegionSupport getSupport() {
+    return support;
+  }
+  
+  @Override
+  public void setOutputPath(String path) {
+    super.setOutputPath(path);
+    support.readRegions(this, path);
+  }
 
-	@Override
-	public Set<URI> listFiles(URI path) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public void setOutputPath(String path, String slot) {
+    super.setOutputPath(path, slot);
+    support.readRegions(this, path);
+  }
 
-	@Override
-	public Set<URI> listFiles(URI path, IPathFilter filter) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+  @Override
+  public void generateFile(String fileName, CharSequence contents) {
+    CharSequence mergedContents = support.mergeRegions(this, fileName, DEFAULT_OUTPUT, contents);
+    super.generateFile(fileName, mergedContents);
+  }
 
-	@Override
-	public boolean hasFiles(URI path) {
-		IFile file = getFile(path);
-		return file.getType() !=  IResource.FILE;
-	}
+  @Override
+  public void generateFile(String fileName, String slot, CharSequence contents) {
+    CharSequence mergedContents = support.mergeRegions(this, fileName, slot, contents);
+    super.generateFile(fileName, slot, mergedContents);
+  }
+  
+  @Override
+  public void setRoot(IWorkspaceRoot root) {
+    super.setRoot(root);
+    this.root = root;
+  }
 
-	@Override
-	public boolean isFile(URI path) {
-		IFile file = getFile(path);
-		return file.getType() ==  IResource.FILE;
-	}
+  protected IFile getFile(URI uri) {
+    return root.getFile(new Path(uri.getPath()));
+  }
 
-	/**
-	 * Return absolute path relative to workspace.
-	 */
-	@Override
-	public String getCanonicalPath(URI path) {
-		IFile file = getFile(path);
-		return file.getFullPath().toString();
-	}
+  @Override
+  public IPathFilter getFilter() {
+    return filter;
+  }
+  
+  @Override
+  public void setFilter(IPathFilter filter) {
+    this.filter = filter;
+  }
+  
+  @Override
+  public CharSequence readFile(URI uri) throws IOException {
+    IFile file = getFile(uri);
+    try {
+      return IOUtils.toString(file.getContents());
+    } catch (CoreException e) {
+      throw new IOException("Error reading " + file, e);
+    }
+  }
 
-	/**
-	 * Returns relative URI.
-	 */
-	@Override
-	public URI getUri(String fileName, String slot) {
-		File f = new File(fileName);
-		return f.toURI();
-	}
+  @Override
+  public Set<URI> listFiles(URI path, IPathFilter filter) {
+    // TODO Auto-generated method stub
+    return null;
+  }
 
-	@Override
-	public boolean exists(URI uri) {
-		IFile file = getFile(uri);
-		return file.exists();
-	}
+  @Override
+  public boolean hasFiles(URI path) {
+    IFile file = getFile(path);
+    return file.getType() != IResource.FILE;
+  }
+
+  @Override
+  public boolean isFile(URI path) {
+    IFile file = getFile(path);
+    return file.getType() == IResource.FILE;
+  }
+
+  /**
+   * Return absolute path relative to workspace.
+   */
+  @Override
+  public String getCanonicalPath(URI path) {
+    IFile file = getFile(path);
+    return file.getFullPath().toString();
+  }
+
+  @Override
+  public URI getUri(String path) {
+    return new File(path).toURI();
+  }
+  
+  @Override
+  public URI getUri(String relativePath, String slot) {
+    Map<String, String> pathes = getPathes();
+    if (pathes.size() == 0) {
+      throw new IllegalStateException("No slots initialized!? Call #setOutputPath(...)");
+    }
+    String slotPath = pathes.get((slot == null) ? DEFAULT_OUTPUT : slot);
+    if (slotPath == null) {
+      throw new IllegalStateException("Slot " + slot + " not found.");
+    }
+    return new File(slotPath + "/" + relativePath).toURI();
+  }
+
+  @Override
+  public boolean exists(URI uri) {
+    IFile file = getFile(uri);
+    return file.exists();
+  }
 
 }

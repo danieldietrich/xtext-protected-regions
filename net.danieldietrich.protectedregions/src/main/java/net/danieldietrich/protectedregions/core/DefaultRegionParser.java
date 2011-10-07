@@ -162,10 +162,10 @@ class DefaultRegionParser implements IRegionParser {
       isMarkedRegionStart = oracle.isMarkedRegionStart(comment);
       isMarkedRegionEnd = oracle.isMarkedRegionEnd(comment);
       if (!input.isMarkedRegion() && isMarkedRegionEnd) {
-        Input.Cursor cursor = input.getCursor();
+        Input.Between between = input.getPosition();
         throw new IllegalStateException(
-            "Detected marked region end without corresponding marked region start at line "
-                + cursor.line + ", column " + cursor.column + ", near [" + comment + "].");
+            "Detected marked region end without corresponding marked region start " + between
+                + ", near [" + comment + "].");
       }
       stateChanged =
           (!input.isMarkedRegion() && isMarkedRegionStart)
@@ -271,8 +271,8 @@ class DefaultRegionParser implements IRegionParser {
       int indexOfCDataEnd = input.indexOf(end);
       if (indexOfEscapeString == -1) {
         if (indexOfCDataEnd == -1) {
-          Input.Cursor cursor = input.getCursor();
-          throw new IllegalStateException("Character data end '" + end + "' not found at line " + cursor.line + ", column " + cursor.column);
+          Input.Between between = input.getPosition();
+          throw new IllegalStateException("Character data end '" + end + "' not found " + between);
         } else {
           input.update(indexOfCDataEnd, end.length());
           break;
@@ -516,17 +516,22 @@ class DefaultRegionParser implements IRegionParser {
 
     private static final Pattern EOL = Pattern.compile("(\\r\\n|\\n|\\r)");
 
-    Cursor getCursor() {
+    Between getPosition() {
+      return new Between(internal_getCursor(lastIndex), internal_getCursor(index));
+    }
+
+    private Cursor internal_getCursor(int idx) {
       // calculate line & column number. performance should be ok, because it is not called
       // continuously.
-      String documentToCursor = document.substring(0, lastIndex);
+      String documentToCursor = document.substring(0, idx);
       Matcher matcher = EOL.matcher(documentToCursor);
       int line = 1; // reset
       while (matcher.find()) {
         line++;
       }
       int eol = Math.max(documentToCursor.lastIndexOf("\r"), documentToCursor.lastIndexOf("\n"));
-      int column = documentToCursor.length() - ((eol == -1) ? 0 : eol);
+      int len = documentToCursor.length();
+      int column = (len == 0) ? 1 : (len - ((eol == -1) ? 0 : eol));
       return new Cursor(line, column);
     }
 
@@ -537,6 +542,28 @@ class DefaultRegionParser implements IRegionParser {
       Cursor(int line, int column) {
         this.line = line;
         this.column = column;
+      }
+
+      @Override
+      public String toString() {
+        return new StringBuilder("(").append(line).append(",").append(column).append(")")
+            .toString();
+      }
+    }
+
+    static class Between {
+      final Cursor start;
+      final Cursor end;
+
+      Between(Cursor start, Cursor end) {
+        this.start = start;
+        this.end = end;
+      }
+
+      @Override
+      public String toString() {
+        return new StringBuilder("between ").append(start.toString()).append(" and ").append(
+            end.toString()).toString();
       }
     }
   }

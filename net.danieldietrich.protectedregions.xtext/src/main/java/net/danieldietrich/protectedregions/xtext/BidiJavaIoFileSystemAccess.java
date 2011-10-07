@@ -10,6 +10,7 @@ import java.util.Set;
 
 import net.danieldietrich.protectedregions.support.IFileSystemReader;
 import net.danieldietrich.protectedregions.support.IPathFilter;
+import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -21,37 +22,74 @@ import org.slf4j.LoggerFactory;
  * @author Daniel Dietrich - Initial contribution and API
  * @author Hendy Irawan
  */
-public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess
-    implements IBidiFileSystemAccess, IFileSystemReader {
+public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implements IFileSystemReader {
 
   private transient Logger logger = LoggerFactory.getLogger(BidiJavaIoFileSystemAccess.class);
+
+  private final IProtectedRegionSupport support;
+  private IPathFilter filter;
+
+  public BidiJavaIoFileSystemAccess(IProtectedRegionSupport support) {
+    this.support = support;
+  }
   
+  protected IProtectedRegionSupport getSupport() {
+    return support;
+  }
+  
+  @Override
+  public void setOutputPath(String path) {
+    super.setOutputPath(path);
+    support.readRegions(this, path);
+  }
+
+  @Override
+  public void setOutputPath(String path, String slot) {
+    super.setOutputPath(path, slot);
+    support.readRegions(this, path);
+  }
+
+  @Override
+  public void generateFile(String fileName, CharSequence contents) {
+    CharSequence mergedContents = support.mergeRegions(this, fileName, DEFAULT_OUTPUT, contents);
+    super.generateFile(fileName, mergedContents);
+  }
+
+  @Override
+  public void generateFile(String fileName, String slot, CharSequence contents) {
+    CharSequence mergedContents = support.mergeRegions(this, fileName, slot, contents);
+    super.generateFile(fileName, slot, mergedContents);
+  }
+
+  @Override
+  public IPathFilter getFilter() {
+    return filter;
+  }
+  
+  @Override
+  public void setFilter(IPathFilter filter) {
+    this.filter = filter;
+  }
+
   @Override
   public boolean exists(URI uri) {
     return new File(uri).exists();
   }
 
   @Override
-  public CharSequence readFile(URI uri) throws IllegalArgumentException,
-      IOException {
+  public CharSequence readFile(URI uri) throws IllegalArgumentException, IOException {
     final File file = new File(uri);
     return FileUtils.readFileToString(file);
   }
 
   @Override
-  public Set<URI> listFiles(URI path) {
-    return listFiles(path, TRUE_PATH_FILTER);
-  }
-
-  @Override
   public Set<URI> listFiles(URI path, IPathFilter filter) {
-    Collection<File> files = FileUtils.listFiles(new File(path),
-        TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+    Collection<File> files =
+        FileUtils.listFiles(new File(path), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
     Set<URI> result = new HashSet<URI>();
     for (File file : files) {
-      URI uri = file.toURI();
-      if (filter.accept(uri)) {
-        result.add(uri);
+      if (filter.accept(file.toURI())) {
+        result.add(file.toURI());
       }
     }
     return result;
@@ -72,11 +110,16 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess
     try {
       return new File(uri).getCanonicalPath();
     } catch (IOException e) {
-       logger.warn("Cannot get canonical path for {}", uri);
-       return null;
+      logger.warn("Cannot get canonical path for {}.", uri);
+      return uri.getRawPath();
     }
   }
-
+  
+  @Override
+  public URI getUri(String path) {
+    return new File(path).toURI();
+  }
+  
   @Override
   public URI getUri(String relativePath, String slot) {
     Map<String, String> pathes = getPathes();
@@ -89,12 +132,5 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess
     }
     return new File(slotPath + "/" + relativePath).toURI();
   }
-
-  private static final IPathFilter TRUE_PATH_FILTER = new IPathFilter() {
-    @Override
-    public boolean accept(URI path) {
-      return true;
-    }
-  };
 
 }
