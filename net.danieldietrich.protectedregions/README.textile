@@ -4,9 +4,8 @@ h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
 * "Features":#features
-* "Installation":#installation
 * "Introduction":#intro
-** "Protected Regions":#protectedRegions
+** Protected Regions
 ** Inverse Protected Regions
 ** Switchable Regions
 ** Language Support
@@ -30,34 +29,6 @@ h2(#features). Features
 
 "top":#top
 
-h2(#installation). Installation
-
-**Prequisites**
-
-To install the project on your local machine the following tools are needed:
-
-* "JDK 6+":http://www.oracle.com/technetwork/java/javase/downloads/index.html
-* "Eclipse":http://www.eclipse.org/downloads/
-* "Git":http://git-scm.com/
-* "Maven":http://maven.apache.org/download.html
-
-**Download Project**
-
-The project has to be cloned to your local git repository:
-
-bc. git clone git@github.com:danieldietrich/xtext-protectedregions.git
-
-**Setup Project**
-
-The eclipse project files are generated as follows:
-
-@mvn eclipse:eclipse@
-
-After that the project can be importet into your eclipse workspace.
-Assure that _Project Properties/Resource/Text file encoding_ is set to _UTF-8_.
-
-"top":#top
-
 h2(#intro). Introduction
 
 Code Generators are producing documents with generated content. Repeatedly generating the same files will potentially overwrite changes because code genrators can't distinguish between generated code and manual changed code. Although it might be necessary to perform manual changes. On the other side requirements are changing and code generators emerge over time. These two aspects imply that generated code might change over time while manual changes are needed to be preserved.
@@ -72,7 +43,7 @@ In this implementation the _protected region pattern_ is used to protect manual 
 
 "top":#top
 
-h3(#protectedRegions). Protected Regions
+**Protected Regions**
 
 _Protected Regions_ are special regions within a document which are preserved when a generator overwrites the underlying document. Start and end of a protected region are marked in a special way (e.g. with comments of the underlying language). A protected region has a unique id which is used to match regions of different versions of the same document.
 
