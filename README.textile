@@ -41,7 +41,7 @@ h2(#documentation). Documentation
 
 Further documentation of the subprojects can be found here:
 
-* "Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile
-* "Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
+* "Protected Region Support - Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile
+* "Protected Region Support - Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
 
 "top":#top
