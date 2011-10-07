@@ -3,17 +3,17 @@ h1(#top). Xtext Protected Region Support
 h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
-** Prequisites
+* "Installtion":#installation
+** "Prequisites":#prequisites
 ** Download
 ** Setup Eclipse Workspace
-* "Installtion":#installation
 * "Documentation":#documentation
 
 "top":#top
 
 h2(#installation). Installation
 
-h3. Prequisites
+h3(#prequisites). Prequisites
 
 Install _Eclipse Indigo_ and the following plugins (via Marketplace):
 * EGit - Git Team Provider
