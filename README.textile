@@ -3,11 +3,20 @@ h1(#top). Xtext Protected Region Support
 h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
+* "Documentation":#documentation
 * "Installtion":#installation
 ** "Prequisites":#prequisites
 ** "Download":#download
 ** "Setup Eclipse Workspace":#workspace
-* "Documentation":#documentation
+
+"top":#top
+
+h2(#documentation). Documentation
+
+Further documentation of the subprojects can be found here:
+
+* "Protected Region Support - Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile
+* "Protected Region Support - Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
 
 "top":#top
 
@@ -42,14 +51,5 @@ h3(#workspace). Setup Eclipse Workspace
 * In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 * Open _indigo.target_ (located in _net.danieldietrich.protectedregions.target_) and select _Set as Target Platform_ (upper right corner).
 * To connect the projects with the local git repository select Team / Share Project / Git / Use or create repository in parent folder of project and select/add the local xtext-protectedregions repository from/to the list.
-
-"top":#top
-
-h2(#documentation). Documentation
-
-Further documentation of the subprojects can be found here:
-
-* "Protected Region Support - Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile
-* "Protected Region Support - Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
 
 "top":#top
