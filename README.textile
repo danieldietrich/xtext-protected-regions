@@ -25,7 +25,7 @@ h3(#download). Download Project
 
 To get a local copy of xtext-protectedregions you have to clone it from GitHub:
 
-    git clone git@github.com:danieldietrich/xtext-protectedregions.git
+```git clone git@github.com:danieldietrich/xtext-protectedregions.git```
 
 "top":#top
 
