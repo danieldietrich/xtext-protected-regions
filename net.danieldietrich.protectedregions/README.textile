@@ -6,7 +6,7 @@ h2(#toc). Table of Contents
 * "Features":#features
 * "Installation":#installation
 * "Introduction":#intro
-** Protected Regions
+** "Protected Regions":#protectedRegions
 ** Inverse Protected Regions
 ** Switchable Regions
 ** Language Support
@@ -72,7 +72,7 @@ In this implementation the _protected region pattern_ is used to protect manual 
 
 "top":#top
 
-**Protected Regions**
+h3(#protectedRegions). Protected Regions
 
 _Protected Regions_ are special regions within a document which are preserved when a generator overwrites the underlying document. Start and end of a protected region are marked in a special way (e.g. with comments of the underlying language). A protected region has a unique id which is used to match regions of different versions of the same document.
 
