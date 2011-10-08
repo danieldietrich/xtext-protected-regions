@@ -6,6 +6,7 @@ h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
 * "Features":#features
+* "Limitations":#limitations
 * "Introduction":#intro
 ** Protected Regions
 ** Inverse Protected Regions
@@ -24,10 +25,21 @@ h2(#toc). Table of Contents
 
 h2(#features). Features
 
-* Protected Regions / Inverse Protected Regions
-* Switchable Regions
-* Language independent
-* Customizable
+* *Protected Regions / Inverse Protected Regions* _Apply what fits best for your use case_
+* *Switchable Regions* _Enable or disable regions_ 
+* *Language independent* _Many languages shipped, add others with just one line of code_
+* *Embedded languages* _Handle different notations in one document_
+* *Unambiguous* _Ignore Character Data like Strings or CDATA_
+* *Customizable* _Change notation/syntax of regions. Change behavior of switchable regions._
+
+"top":#top
+
+h2(#limitations). Limitations
+
+With respect to protected regions there are a few limitations: 
+
+* *Homogeneity* _Cannot parse one file with a 'normal' and an inverse parser at one time_
+* *Language agnostic* _There may be (artificial) border cases, where multiple embedded languages in one document cause trouble_
 
 "top":#top
 
