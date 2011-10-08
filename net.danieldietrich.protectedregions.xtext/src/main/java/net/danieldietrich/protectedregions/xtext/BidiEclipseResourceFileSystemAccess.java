@@ -105,7 +105,7 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
   @Override
   public Set<URI> listFiles(URI path) {
     // TODO Auto-generated method stub
-    return null;
+    throw new UnsupportedOperationException("Not yet implemented.");
   }
 
   @Override
