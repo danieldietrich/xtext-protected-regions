@@ -1,4 +1,6 @@
-h1(#top). Protected Region Support
+h1(#top). Protected Region Support - Core
+
+The _Core_ documentation is addressed to developers who want to adapt protected region support to existing generator frameworks. The core API is of general purpose. If you want to use the protected region support in conjunction with _Xtext_, please refer to the document "Protected Region Support - Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile.
 
 h2(#toc). Table of Contents
 
@@ -132,7 +134,11 @@ The @IRegionParser@ requires the language to be generated to have something like
 Currently the following programming languages are supported out of the box:
 
 * Clojure
+* CSS
+* HTML
 * Java
+* JavaScript
+* PHP
 * Ruby
 * Scala
 * XML

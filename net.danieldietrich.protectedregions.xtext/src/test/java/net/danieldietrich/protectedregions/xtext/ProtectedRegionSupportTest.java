@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import net.danieldietrich.protectedregions.core.IRegionParser;
-import net.danieldietrich.protectedregions.core.RegionParserBuilder;
+import net.danieldietrich.protectedregions.core.RegionParserFactory;
 import net.danieldietrich.protectedregions.support.IPathFilter;
 import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 import net.danieldietrich.protectedregions.support.ProtectedRegionSupport;
@@ -41,32 +41,26 @@ public class ProtectedRegionSupportTest {
   @Before
   public void setup() {
 
+    // generator
     testGenerator = new TestGenerator();
 
-    // TODO(@@dd): css has escaped double quotes in strings, html/xml not. that's currently not
-    // considered here when combining parsers(!)
-    cssParser =
-        new RegionParserBuilder().name("css").addComment("/*", "*/").ignoreCData('"', '\\').build();
-    htmlParser =
-        new RegionParserBuilder().name("html").addComment("<!--", "-->").ignoreCData("<![CDATA[",
-            "]]>").ignoreCData('"').ignoreCData('\'').build();
-    javaParser =
-        new RegionParserBuilder().name("java").addComment("/*", "*/").ignoreCData('"', '\\')
-            .addComment("//").build();
-    jsParser =
-        new RegionParserBuilder().name("js").addComment("/*", "*/").addComment("//").ignoreCData(
-            '"', '\\').ignoreCData('\'', '\\').build();
-    phpParser =
-        new RegionParserBuilder().name("php").addComment("/*", "*/").addComment("//").addComment(
-            "#").ignoreCData('"', '\\').ignoreCData('\'', '\\').build();
-    xmlParser =
-        new RegionParserBuilder().name("xml").addComment("<!--", "-->").ignoreCData("<![CDATA[",
-            "]]>").ignoreCData('"').ignoreCData('\'').build();
+    // parsers
+    cssParser = RegionParserFactory.createCssParser();
+    htmlParser = RegionParserFactory.createHtmlParser();
+    javaParser = RegionParserFactory.createJavaParser();
+    jsParser = RegionParserFactory.createJavaScriptParser();
+    phpParser = RegionParserFactory.createPhpParser();
+    xmlParser = RegionParserFactory.createXmlParser();
+
   }
 
   @Test
   public void mergeOfMultilanguageFilesShouldMatchExpected() throws Exception {
 
+    /*
+     * css has escaped double quotes in strings, html/xml not. that's currently not considered here
+     * when combining parsers(!)
+     */
     IProtectedRegionSupport support = new ProtectedRegionSupport();
     support.addParser(htmlParser, ".html");
     support.addParser(phpParser, ".html");
@@ -161,13 +155,13 @@ public class ProtectedRegionSupportTest {
 
   @Test
   public void commentsInStringLiteralsShouldBeIgnored() throws URISyntaxException {
-    
+
     IProtectedRegionSupport support = new ProtectedRegionSupport();
     support.addParser(javaParser, ".java");
 
     TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
     fsa.setFilter(new EndsWithFilter("string_literals_ignore_comments.java"));
-    
+
     try {
       fsa.setOutputPath("src/test/resources");
     } catch (IllegalStateException x) {

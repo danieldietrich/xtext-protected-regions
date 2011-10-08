@@ -1,0 +1,7 @@
+public class SomeClass {
+
+  final String ignored = " /* PROTECTED REGION ID(no.id) ENABLED START */ ";
+
+  /* PROTECTED REGION END */
+  
+}

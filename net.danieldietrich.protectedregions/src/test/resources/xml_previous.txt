@@ -13,7 +13,7 @@
       <!-- PROTECTED REGION ID(table.rows) ENABLED START -->
       <tr>
         <td>Name</td>
-        <td><g:TextBox ui:field="name" styleName="{style.red} visibleLength="30" maxLength="100"/></td>
+        <td><g:TextBox ui:field="name" styleName="{style.red}" visibleLength="30" maxLength="100"/></td>
       </tr>
       <!-- PROTECTED REGION END -->
     </table>

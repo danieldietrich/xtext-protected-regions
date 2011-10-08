@@ -1,4 +1,4 @@
-h1. Xtext Protected Region Support
+h1. Protected Region Support - Xtext Extension
 
 h2. Bidi FileSystemAccess
 
