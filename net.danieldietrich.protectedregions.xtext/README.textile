@@ -10,6 +10,9 @@ h2(#toc). Table of Contents
 ** "Plugin Configuration":#pluginConfig
 ** "Runtime Module Configuration":#runtimeModuleConfig
 ** "Portable Generators":#portableGenerators
+** "Generator Configuration":#generatorConfiguration
+*** "MWE2 Workflow":#mwe2Workflow
+*** "Standalone Generator":#standaloneGenerator
 
 "top":#top
 
@@ -17,10 +20,8 @@ h2(#motivation). Motivation
 
 Lets assume you're already familiar with "Xtext":http://www.xtext.org. Then your existing IGenerator implementation likely will look like this:
 
-bc.. void doGenerate(Resource input, IFileSystemAccess fsa) {
-
-  // define where to write the code
-  fsa.setOutputPath(path, slot);
+bc.. 
+void doGenerate(Resource input, IFileSystemAccess fsa) {
 
   // negleting iteration of input here
   CharSequence generatedCode = compile(...);
@@ -66,17 +67,42 @@ public class MyRuntimeModule extends AbstractMyRuntimeModule {
 }
 p. "top":#top
 
-h3(#portableGenerators). Portable Generators:
+h3(#portableGenerators). Portable Generators
 
 Your existing generator remains untouched.
 
 bc.. 
 override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 
-  fsa.setOutputPath(...); // now loads protected regions in the background(!)
-  
   // Look ma! Portable generators! No "proprietary" APIs, simply Xtext!
   fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
 
 }
 p. "top":#top
+
+h3(#generatorConfiguration). Generator Configuration
+
+Depending on whether you are using a MWE2 workflow or a standalone generator you might also want to modify the output path(s):
+
+h4(#mwe2Workflow). MWE2 Workflow
+
+With MWE2 workflows, output paths are declared like this:
+
+bc. 
+Workflow {
+  // ...
+  component = org.eclipse.xtext.generator.GeneratorComponent {
+    // ...
+    outlet = {
+      path = targetDir
+    }
+  }
+}
+
+h4(#standaloneGenerator). Standalone Generator
+
+Assuming that @fsa@ is an implementation of @AbstractFileSystemAccess@ (like @JavaIoFileSystemAccess@), output paths are configured as follows:
+
+bc. fsa.setOutputPath(...); // triggers loading protected regions in the background(!)
+
+"top":#top
