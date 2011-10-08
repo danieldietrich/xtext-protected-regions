@@ -1,59 +1,81 @@
-h1. Protected Region Support - Xtext Extension
+h1(#top). Protected Region Support - Xtext Extension
 
-h2. Bidi FileSystemAccess
+The _Xtext Extension_ documentation is addressed to developers who want to benefit of protected region support in conjunction with Xtext.
 
-Xtext FileSystemAccess interface (@IBiFileSystemAccess@) and implementations with extended read operations, useful for implementing protected region support.
+h2(#toc). Table of Contents
 
-h2. Usage
+* "Table of Contents":#toc
+* "Motivation":#motivation
+* "Usage":#usage
+** "Plugin Configuration":#pluginConfig
+** "Runtime Module Configuration":#runtimeModuleConfig
+** "Portable Generators":#portableGenerators
+
+"top":#top
+
+h2(#motivation). Motivation
+
+Lets assume you're already familiar with "Xtext":http://www.xtext.org. Then your existing IGenerator implementation likely will look like this:
+
+bc.. void doGenerate(Resource input, IFileSystemAccess fsa) {
+
+  // define where to write the code
+  fsa.setOutputPath(path, slot);
+
+  // negleting iteration of input here
+  CharSequence generatedCode = compile(...);
+  
+  // write generated code to file system
+  fsa.generateFile(fileName, slot, generatedCode);
+  
+}
+p. where @generatedCode@ is a CharSequence containing your generated code. *The goal is to preserve manual changes of the previously generated code*. These changes are denoted in so called "protected regions":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile#intro.
+
+"top":#top
+
+h2(#usage). Usage
+
+h3(#pluginConfig). Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
 
 bc. 
 Import-Package: net.danieldietrich.protectedregions.core,
- net.danieldietrich.protectedregions.support,
- net.danieldietrich.protectedregions.xtext
+  net.danieldietrich.protectedregions.support,
+  net.danieldietrich.protectedregions.xtext
 
-Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class. Example:
+"top":#top
+
+h3(#runtimeModuleConfig). Runtime Module Configuration
+
+Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class.
+
+*Example:*
 
 bc.. 
-import net.danieldietrich.xtext.bifsa.IBiFileSystemAccess
-import net.danieldietrich.xtext.generator.protectedregions.RegionParserFactory
-import net.danieldietrich.protectedregions.xtext.IBidiFileSystemAccess
-import net.danieldietrich.protectedregions.xtext.ProtectedRegionSupport
-import net.danieldietrich.protectedregions.core.RegionParserFactory
+public class MyRuntimeModule extends AbstractMyRuntimeModule {
 
-public class GlprotoRuntimeModule extends com.soluvas.glproto.AbstractGlprotoRuntimeModule {
+  @Provides
+  public JavaIoFileSystemAccess createJavaIoFileSystemAccess(IProtectedRegionSupport support) {
+    IProtectedRegionSupport support = new ProtectedRegionSupport();
+    support.addParser(RegionParserFactory.createJavaParser(), ".java");
+    return new BidiJavaIoFileSystemAccess(support);
+  }
 
-	@Provides
-	public JavaIoFileSystemAccess createJavaIoFileSystemAccess() {
-    	JavaIoFileSystemAccess fsa = new JavaIoWrapper(new IProtectedRegionSupportConfigurer() {
-			
-			@Override
-			public void configure(ProtectedRegionSupport.Builder builder) {
-			    builder.addParser(RegionParserFactory.createJavaParser(), ".java")
-			    	.addParser(RegionParserFactory.createXmlParser(), ".xml")
-			    	.read("", IFileSystemAccess.DEFAULT_OUTPUT);
-			}
-			
-		});
-    	return fsa;
-	}
-	
 }
+p. "top":#top
 
-p. Use it in your generator:
+h3(#portableGenerators). Portable Generators:
+
+Your existing generator remains untouched.
 
 bc.. 
-IFileSystemAccess fsa
-Model model
-
 override void doGenerate(Resource resource, IFileSystemAccess fsa) {
-	
-	this.fsa = fsa
-	this.model = resource.contents.get(0) as Model
-	
-	...
 
-	// Look ma! Portable generators! No "proprietary" APIs, simply Xtext!
-	fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
+  fsa.setOutputPath(...); // now loads protected regions in the background(!)
+  
+  // Look ma! Portable generators! No "proprietary" APIs, simply Xtext!
+  fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
+
 }
+p. "top":#top
