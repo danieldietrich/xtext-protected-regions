@@ -59,21 +59,21 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
   }
 
    @Override
-  public void readRegions(IFileSystemReader reader, String path) {
+  public void readRegions(IFileSystemReader reader, String slot) {
     if (parsers.isEmpty()) {
       throw new IllegalStateException("#addParser methods have to be called before #read methods.");
     }
-    final URI uri = reader.getUri(path);
+    URI uri = reader.getUri("", slot);
     if (!reader.exists(uri)) {
       logger.warn("path does not exist: {}", uri.getPath());
       return;
     }
     if (!reader.hasFiles(uri)) {
-      throw new IllegalArgumentException("no directory: " + path);
+      throw new IllegalArgumentException("no directory: " + uri);
     }
     String canonicalPath = reader.getCanonicalPath(uri);
     if (isVisited(canonicalPath)) {
-      logger.warn("skipping already visited path '{}'.", path);
+      logger.warn("skipping already visited path '{}'.", uri);
       return;
     }
     internal_read(reader, uri);

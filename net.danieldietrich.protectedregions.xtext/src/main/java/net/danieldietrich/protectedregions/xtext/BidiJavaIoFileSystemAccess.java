@@ -39,14 +39,14 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   
   @Override
   public void setOutputPath(String path) {
-    super.setOutputPath(path);
-    support.readRegions(this, path);
+    setOutputPath(DEFAULT_OUTPUT, path);
   }
 
   @Override
-  public void setOutputPath(String path, String slot) {
-    super.setOutputPath(path, slot);
-    support.readRegions(this, path);
+  public void setOutputPath(String outputName, String path) {
+    super.setOutputPath(outputName, path);
+    logger.info("Adding slot {} at {}", path, outputName);
+    support.readRegions(this, outputName);
   }
 
   @Override
@@ -116,8 +116,8 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   }
   
   @Override
-  public URI getUri(String path) {
-    return new File(path).toURI();
+  public URI getUri(String relativePath) {
+    return getUri(relativePath, DEFAULT_OUTPUT);
   }
   
   @Override

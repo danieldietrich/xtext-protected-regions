@@ -27,18 +27,18 @@ public interface IFileSystemReader {
   void setFilter(IPathFilter filter);
   
   /**
-   * Returns the uri representation of the given path.
+   * Returns the resolved URI path of the given relative path on the {@link IFileSystemAccess#DEFAULT_OUTPUT} slot.
    * 
    * @param relativePath
    * @return
    */
-  URI getUri(String path);
+  URI getUri(String relativePath);
   
   /**
    * Returns the URI path.
    * 
    * Since a FileSystemAccess may be implemented on top of virtual filesystems (e.g. platform:/), so
-   * this return a URI (e.g. file:///) rather than just a filesystem path.
+   * this returns a URI (e.g. file:/ or platform:/) rather than just a filesystem path.
    * 
    * @param relativePath
    * @param slot

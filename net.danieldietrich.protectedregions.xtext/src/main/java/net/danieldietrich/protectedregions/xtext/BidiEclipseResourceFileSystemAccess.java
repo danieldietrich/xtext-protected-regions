@@ -17,6 +17,8 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.google.inject.Inject;
 
@@ -25,6 +27,8 @@ import com.google.inject.Inject;
  */
 public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSystemAccess implements
     IFileSystemReader {
+
+  private transient Logger logger = LoggerFactory.getLogger(BidiEclipseResourceFileSystemAccess.class);
 
   @Inject
   IWorkspaceRoot root;
@@ -42,14 +46,14 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
   
   @Override
   public void setOutputPath(String path) {
-    super.setOutputPath(path);
-    support.readRegions(this, path);
+    setOutputPath(DEFAULT_OUTPUT, path);
   }
 
   @Override
-  public void setOutputPath(String path, String slot) {
-    super.setOutputPath(path, slot);
-    support.readRegions(this, path);
+  public void setOutputPath(String outputName, String path) {
+    super.setOutputPath(outputName, path);
+    logger.info("Adding slot {} at {}", path, outputName);
+    support.readRegions(this, outputName);
   }
 
   @Override
