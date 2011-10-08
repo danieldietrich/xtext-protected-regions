@@ -51,12 +51,14 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
 
   @Override
   public void generateFile(String fileName, CharSequence contents) {
+    logger.debug("Generating {} at {}", fileName, DEFAULT_OUTPUT);
     CharSequence mergedContents = support.mergeRegions(this, fileName, DEFAULT_OUTPUT, contents);
     super.generateFile(fileName, mergedContents);
   }
 
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
+    logger.debug("Generating {} at {}", fileName, slot);
     CharSequence mergedContents = support.mergeRegions(this, fileName, slot, contents);
     super.generateFile(fileName, slot, mergedContents);
   }
