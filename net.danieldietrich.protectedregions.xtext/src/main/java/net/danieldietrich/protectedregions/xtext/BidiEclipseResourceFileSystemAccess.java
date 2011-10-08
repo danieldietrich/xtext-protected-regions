@@ -1,8 +1,10 @@
 package net.danieldietrich.protectedregions.xtext;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -12,6 +14,7 @@ import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 
 import org.apache.commons.io.IOUtils;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +23,9 @@ import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.google.common.base.Function;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Sets;
 import com.google.inject.Inject;
 
 /**
@@ -58,12 +64,16 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
 
   @Override
   public void generateFile(String fileName, CharSequence contents) {
+    URI uri = getUri(fileName);
+    logger.debug("Generating {} at {} => {}", new Object[] { fileName, DEFAULT_OUTPUT, uri});
     CharSequence mergedContents = support.mergeRegions(this, fileName, DEFAULT_OUTPUT, contents);
     super.generateFile(fileName, mergedContents);
   }
 
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
+    URI uri = getUri(fileName, slot);
+    logger.debug("Generating {} at {} => {}", new Object[] { fileName, slot, uri });
     CharSequence mergedContents = support.mergeRegions(this, fileName, slot, contents);
     super.generateFile(fileName, slot, mergedContents);
   }
@@ -100,8 +110,26 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
 
   @Override
   public Set<URI> listFiles(URI path) {
-    // TODO Auto-generated method stub
-    return null;
+    final IFolder folder = root.getFolder(new Path(path.getPath()));
+    try {
+      List<URI> memberList = Lists.transform( Arrays.asList(folder.members()), new Function<IResource, URI>() {
+
+        @Override
+        public URI apply(IResource from) {
+          try {
+            return new URI("eclipse", from.getFullPath().toString(), null);
+          } catch (URISyntaxException e) {
+            logger.error("Cannot get URI for {} in {}", from, folder);
+            throw new RuntimeException("Cannot get URI for " + from + " in " + folder, e);
+          }
+        }
+        
+      });
+      return Sets.newHashSet(memberList);
+    } catch (CoreException e) {
+      logger.error("Error listing files in {}", folder);
+      throw new RuntimeException("Error listing files in " + folder, e);
+    }
   }
 
   @Override
@@ -126,8 +154,8 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
   }
 
   @Override
-  public URI getUri(String path) {
-    return new File(path).toURI();
+  public URI getUri(String relativePath) {
+    return getUri(relativePath, DEFAULT_OUTPUT);
   }
   
   @Override
@@ -140,7 +168,11 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
     if (slotPath == null) {
       throw new IllegalStateException("Slot " + slot + " not found.");
     }
-    return new File(slotPath + "/" + relativePath).toURI();
+    try {
+      return new URI("eclipse", slotPath + "/" + relativePath, null);
+    } catch (URISyntaxException e) {
+      throw new RuntimeException("Cannot get URI for " + relativePath + " at " + slot, e);
+    }
   }
 
   @Override
