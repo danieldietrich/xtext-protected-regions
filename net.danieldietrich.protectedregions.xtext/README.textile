@@ -59,6 +59,7 @@ public class MyRuntimeModule extends AbstractMyRuntimeModule {
   public JavaIoFileSystemAccess createJavaIoFileSystemAccess(IProtectedRegionSupport support) {
     IProtectedRegionSupport support = new ProtectedRegionSupport();
     support.addParser(RegionParserFactory.createJavaParser(), ".java");
+    // support.setFilter(...); // (optional)
     return new BidiJavaIoFileSystemAccess(support);
   }
 

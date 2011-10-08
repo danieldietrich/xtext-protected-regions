@@ -94,7 +94,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
     Set<String> visitedRegions = new HashSet<String>();
 
     // get all files within the current directory
-    Iterable<URI> files = reader.listFiles(path, reader.getFilter());
+    Iterable<URI> files = reader.listFiles(path);
     logger.debug("Path {} has {} files matching the readers filter.", path, Iterables.size(files));
     for (URI file : files) {
       visitedRegions.clear();

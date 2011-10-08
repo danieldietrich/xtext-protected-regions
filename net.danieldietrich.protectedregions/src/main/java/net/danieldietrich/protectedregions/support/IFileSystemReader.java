@@ -71,7 +71,7 @@ public interface IFileSystemReader {
    *         of the result
    * @throws IllegalArgumentException if !hasFiles(String path) == true
    */
-  Set<URI> listFiles(URI path, IPathFilter filter);
+  Set<URI> listFiles(URI path);
 
   /**
    * Checks, if path contains files.

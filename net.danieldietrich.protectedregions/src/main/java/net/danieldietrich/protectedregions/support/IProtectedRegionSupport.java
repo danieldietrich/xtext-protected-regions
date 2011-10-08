@@ -16,7 +16,7 @@ public interface IProtectedRegionSupport {
 
   /** read protected regions using parsers added before */
   void readRegions(IFileSystemReader reader, String relativePath);
-  void clearRegions();
+  void clearRegions(); // makes an instance reusable
 
   /** merge protected regions read before into contents */
   CharSequence mergeRegions(IFileSystemReader reader, String fileName, String slot,

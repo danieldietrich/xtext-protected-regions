@@ -83,12 +83,12 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   }
 
   @Override
-  public Set<URI> listFiles(URI path, IPathFilter filter) {
+  public Set<URI> listFiles(URI path) {
     Collection<File> files =
         FileUtils.listFiles(new File(path), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
     Set<URI> result = new HashSet<URI>();
     for (File file : files) {
-      if (filter.accept(file.toURI())) {
+      if (filter == null || filter.accept(file.toURI())) {
         result.add(file.toURI());
       }
     }

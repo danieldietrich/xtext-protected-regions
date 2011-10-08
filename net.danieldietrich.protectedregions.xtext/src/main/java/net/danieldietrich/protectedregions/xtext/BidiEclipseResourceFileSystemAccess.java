@@ -95,7 +95,7 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
   }
 
   @Override
-  public Set<URI> listFiles(URI path, IPathFilter filter) {
+  public Set<URI> listFiles(URI path) {
     // TODO Auto-generated method stub
     return null;
   }
