@@ -106,7 +106,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
         
         // check, if the current file makes it through the filter of the parser
         if (!parserFilter.accept(file)) {
-          logger.debug("Parser {} is skipping {}.", parser, file.getPath());
+          logger.trace("Parser {} skips {}.", parser, file.getPath());
           continue; // next parser
         }
 
