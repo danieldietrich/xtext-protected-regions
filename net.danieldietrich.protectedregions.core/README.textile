@@ -1,4 +1,4 @@
-h1(#top). Protected Region Support - Core
+h1(#top). Protected Regions - Core
 
 The _Core_ documentation is addressed to developers who want to adapt protected region support to existing generator frameworks. The core API is of general purpose. If you want to use the protected region support in conjunction with _Xtext_, please refer to the document "Protected Region Support - Xtext Extension":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile.
 

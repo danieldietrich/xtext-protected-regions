@@ -4,79 +4,98 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>net.danieldietrich.protectedregions</groupId>
-	<artifactId>net.danieldietrich.protectedregions.parent</artifactId>
+	<artifactId>net.danieldietrich.protectedregions</artifactId>
 	<version>1.0.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>net.danieldietrich.protectedregions Parent</name>
+	<name>Protected Regions</name>
+	<description>Protected Regions</description>
 
 	<properties>
-		<!-- as of 4 Oct 2011, if you have trouble "Unresolveable build extension" with Tycho and m2e/PDE, here's a workaround:
-		1. Change the tycho-version to 0.12.0
-		2. Let m2e install the Tycho Configurator and restart Eclipse
-		3. Change tycho-version back to 0.13.0
-		-->
+		<!-- as of 4 Oct 2011, if you have trouble "Unresolveable build extension" 
+			with Tycho and m2e/PDE, here's a workaround: 1. Change the tycho-version 
+			to 0.12.0 2. Let m2e install the Tycho Configurator and restart Eclipse 3. 
+			Change tycho-version back to 0.13.0 -->
 		<tycho-version>0.13.0</tycho-version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
 	<modules>
-		<module>net.danieldietrich.protectedregions.target</module>
-		<module>net.danieldietrich.protectedregions</module>
+		<module>net.danieldietrich.protectedregions.core</module>
 		<module>net.danieldietrich.protectedregions.xtext</module>
 	</modules>
 
+	<repositories>
+		<repository>
+			<id>indigo</id>
+			<url>http://download.eclipse.org/releases/indigo/201106220900</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>tools</id>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository/</url>
+			<layout>p2</layout>
+		</repository>
+		<repository>
+			<id>xtext</id>
+			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/</url>
+			<layout>p2</layout>
+		</repository>
+	</repositories>
+
 	<build>
 		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<resolver>p2</resolver>
-					<target>
-						<artifact>
-							<groupId>net.danieldietrich.protectedregions</groupId>
-							<artifactId>net.danieldietrich.protectedregions.target</artifactId>
-							<version>1.0.0-SNAPSHOT</version>
-							<classifier>indigo</classifier>
-						</artifact>
-					</target>
-					<ignoreTychoRepositories>true</ignoreTychoRepositories>
-					<environments>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments>
-				</configuration>
-			</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<extensions>true</extensions>
 			</plugin>
+			<plugin>
+				<groupId>org.eclipse.tycho</groupId>
+				<artifactId>target-platform-configuration</artifactId>
+				<version>${tycho-version}</version>
+				<configuration>
+					<resolver>p2</resolver>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>carbon</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
+
 </project>

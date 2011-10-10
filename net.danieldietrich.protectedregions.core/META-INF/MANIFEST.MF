@@ -3,14 +3,14 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Protected Regions
 Bundle-Vendor: Daniel Dietrich
 Bundle-Version: 1.0.0.qualifier
-Bundle-SymbolicName: net.danieldietrich.protectedregions; singleton:=true
+Bundle-SymbolicName: net.danieldietrich.protectedregions.core;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: com.google.common.collect;version="1.0.0",
  org.apache.commons.io,
  org.hamcrest;version="1.1.0";resolution:=optional,
  org.hamcrest.core;version="1.1.0";resolution:=optional,
- org.junit;version="4.8.2";resolution:=optional,
+ org.junit;version="4.2.8",
  org.slf4j;version="1.6.1"
 Export-Package: net.danieldietrich.protectedregions.core,
  net.danieldietrich.protectedregions.support;uses:="net.danieldietrich.protectedregions.core"

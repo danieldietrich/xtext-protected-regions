@@ -13,7 +13,6 @@ import net.danieldietrich.protectedregions.support.IPathFilter;
 import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,11 +31,11 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   public BidiJavaIoFileSystemAccess(IProtectedRegionSupport support) {
     this.support = support;
   }
-  
+
   protected IProtectedRegionSupport getSupport() {
     return support;
   }
-  
+
   @Override
   public void setOutputPath(String path) {
     setOutputPath(DEFAULT_OUTPUT, path);
@@ -52,7 +51,7 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   @Override
   public void generateFile(String fileName, CharSequence contents) {
     URI uri = getUri(fileName);
-    logger.debug("Generating {} at {} => {}", new Object[] { fileName, DEFAULT_OUTPUT, uri});
+    logger.debug("Generating {} at {} => {}", new Object[] {fileName, DEFAULT_OUTPUT, uri});
     CharSequence mergedContents = support.mergeRegions(this, fileName, DEFAULT_OUTPUT, contents);
     super.generateFile(fileName, mergedContents);
   }
@@ -60,7 +59,7 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   @Override
   public void generateFile(String fileName, String slot, CharSequence contents) {
     URI uri = getUri(fileName, slot);
-    logger.debug("Generating {} at {} => {}", new Object[] { fileName, slot, uri });
+    logger.debug("Generating {} at {} => {}", new Object[] {fileName, slot, uri});
     CharSequence mergedContents = support.mergeRegions(this, fileName, slot, contents);
     super.generateFile(fileName, slot, mergedContents);
   }
@@ -69,7 +68,7 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
   public IPathFilter getFilter() {
     return filter;
   }
-  
+
   @Override
   public void setFilter(IPathFilter filter) {
     this.filter = filter;
@@ -88,8 +87,7 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
 
   @Override
   public Set<URI> listFiles(URI path) {
-    Collection<File> files =
-        FileUtils.listFiles(new File(path), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+    Collection<File> files = FileUtils.listFiles(new File(path), null, true);
     Set<URI> result = new HashSet<URI>();
     for (File file : files) {
       if (filter == null || filter.accept(file.toURI())) {
@@ -118,12 +116,12 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
       return uri.getRawPath();
     }
   }
-  
+
   @Override
   public URI getUri(String relativePath) {
     return getUri(relativePath, DEFAULT_OUTPUT);
   }
-  
+
   @Override
   public URI getUri(String relativePath, String slot) {
     Map<String, String> pathes = getPathes();

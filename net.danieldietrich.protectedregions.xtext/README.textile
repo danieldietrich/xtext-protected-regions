@@ -1,4 +1,4 @@
-h1(#top). Protected Region Support - Xtext Extension
+h1(#top). Xtext Protected Region Support
 
 The _Xtext Extension_ documentation is addressed to developers who want to benefit of protected region support in conjunction with Xtext.
 
@@ -57,11 +57,11 @@ bc..
 public class MyRuntimeModule extends AbstractMyRuntimeModule {
 
   @Provides
-  public JavaIoFileSystemAccess createJavaIoFileSystemAccess(IProtectedRegionSupport support) {
-    IProtectedRegionSupport support = new ProtectedRegionSupport();
+  public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionSupport support) {
     support.addParser(RegionParserFactory.createJavaParser(), ".java");
-    // support.setFilter(...); // (optional)
-    return new BidiJavaIoFileSystemAccess(support);
+    BidiJavaIoFileSystemAccess fsa = new BidiJavaIoFileSystemAccess(support);
+    // fsa.setFilter(...); // (optional)
+    return fsa;
   }
 
 }
