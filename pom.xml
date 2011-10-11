@@ -20,28 +20,11 @@
 	</properties>
 
 	<modules>
+	  <module>net.danieldietrich.protectedregions.target</module>
 		<module>net.danieldietrich.protectedregions.core</module>
 		<module>net.danieldietrich.protectedregions.xtext</module>
 	</modules>
-
-	<repositories>
-		<repository>
-			<id>indigo</id>
-			<url>http://download.eclipse.org/releases/indigo/201106220900</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>tools</id>
-			<url>http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository/</url>
-			<layout>p2</layout>
-		</repository>
-		<repository>
-			<id>xtext</id>
-			<url>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/</url>
-			<layout>p2</layout>
-		</repository>
-	</repositories>
-
+	
 	<build>
 		<plugins>
 			<plugin>
@@ -50,12 +33,21 @@
 				<version>${tycho-version}</version>
 				<extensions>true</extensions>
 			</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<resolver>p2</resolver>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <version>${tycho-version}</version>
+        <configuration>
+          <resolver>p2</resolver>
+          <target>
+            <artifact>
+              <groupId>net.danieldietrich.protectedregions</groupId>
+              <artifactId>net.danieldietrich.protectedregions.target</artifactId>
+              <version>1.0.0-SNAPSHOT</version>
+              <classifier>indigo</classifier>
+            </artifact>
+          </target>
+          <ignoreTychoRepositories>true</ignoreTychoRepositories>
 					<environments>
 						<environment>
 							<os>linux</os>
