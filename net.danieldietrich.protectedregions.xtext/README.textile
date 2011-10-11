@@ -7,12 +7,12 @@ h2(#toc). Table of Contents
 * "Table of Contents":#toc
 * "Motivation":#motivation
 * "Usage":#usage
-** "Plugin Configuration":#pluginConfig
-** "Runtime Module Configuration":#runtimeModuleConfig
-** "Portable Generators":#portableGenerators
-** "Generator Configuration":#generatorConfiguration
-*** "MWE2 Workflow":#mwe2Workflow
-*** "Standalone Generator":#standaloneGenerator
+** Plugin Configuration
+** Runtime Module Configuration
+** Portable Generators
+** Generator Configuration
+*** MWE2 Workflow
+*** Standalone Generator
 
 "top":#top
 
@@ -36,7 +36,7 @@ p. where @generatedCode@ is a CharSequence containing your generated code. *The 
 
 h2(#usage). Usage
 
-h3(#pluginConfig). Plugin Configuration
+h3. Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
 
@@ -47,7 +47,7 @@ Import-Package: net.danieldietrich.protectedregions.core,
 
 "top":#top
 
-h3(#runtimeModuleConfig). Runtime Module Configuration
+h3. Runtime Module Configuration
 
 Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class.
 
@@ -67,7 +67,7 @@ public class MyRuntimeModule extends AbstractMyRuntimeModule {
 }
 p. "top":#top
 
-h3(#portableGenerators). Portable Generators
+h3. Portable Generators
 
 Your existing generator remains untouched.
 
@@ -80,11 +80,11 @@ override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 }
 p. "top":#top
 
-h3(#generatorConfiguration). Generator Configuration
+h3. Generator Configuration
 
 Depending on whether you are using a MWE2 workflow or a standalone generator you might also want to modify the output path(s):
 
-h4(#mwe2Workflow). MWE2 Workflow
+h4. MWE2 Workflow
 
 With MWE2 workflows, output paths are declared like this:
 
@@ -99,7 +99,7 @@ Workflow {
   }
 }
 
-h4(#standaloneGenerator). Standalone Generator
+h4. Standalone Generator
 
 Assuming that @fsa@ is an implementation of @AbstractFileSystemAccess@ (like @JavaIoFileSystemAccess@), output paths are configured as follows:
 
