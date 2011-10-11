@@ -20,8 +20,7 @@ h2(#motivation). Motivation
 
 Lets assume you're already familiar with "Xtext":http://www.xtext.org. Then your existing IGenerator implementation likely will look like this:
 
-bc.. 
-void doGenerate(Resource input, IFileSystemAccess fsa) {
+bc.. void doGenerate(Resource input, IFileSystemAccess fsa) {
 
   // negleting iteration of input here
   CharSequence generatedCode = compile(...);
@@ -30,6 +29,7 @@ void doGenerate(Resource input, IFileSystemAccess fsa) {
   fsa.generateFile(fileName, slot, generatedCode);
   
 }
+
 p. where @generatedCode@ is a CharSequence containing your generated code. *The goal is to preserve manual changes of the previously generated code*. These changes are denoted in so called "protected regions":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile#intro.
 
 "top":#top
@@ -40,8 +40,7 @@ h3. Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
 
-bc. 
-Import-Package: net.danieldietrich.protectedregions.core,
+bc. Import-Package: net.danieldietrich.protectedregions.core,
   net.danieldietrich.protectedregions.support,
   net.danieldietrich.protectedregions.xtext
 
@@ -53,8 +52,7 @@ Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ clas
 
 *Example:*
 
-bc.. 
-public class MyRuntimeModule extends AbstractMyRuntimeModule {
+bc.. public class MyRuntimeModule extends AbstractMyRuntimeModule {
 
   @Provides
   public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionSupport support) {
@@ -63,21 +61,21 @@ public class MyRuntimeModule extends AbstractMyRuntimeModule {
     // fsa.setFilter(...); // (optional)
     return fsa;
   }
-
 }
+
 p. "top":#top
 
 h3. Portable Generators
 
 Your existing generator remains untouched.
 
-bc.. 
-override void doGenerate(Resource resource, IFileSystemAccess fsa) {
+bc.. override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 
   // Look ma! Portable generators! No "proprietary" APIs, simply Xtext!
   fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
 
 }
+
 p. "top":#top
 
 h3. Generator Configuration
@@ -88,8 +86,7 @@ h4. MWE2 Workflow
 
 With MWE2 workflows, output paths are declared like this:
 
-bc. 
-Workflow {
+bc. Workflow {
   // ...
   component = org.eclipse.xtext.generator.GeneratorComponent {
     // ...
