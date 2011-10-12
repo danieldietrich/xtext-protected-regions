@@ -27,7 +27,7 @@
     <module>net.danieldietrich.protectedregions.core</module>
     <module>net.danieldietrich.protectedregions.xtext</module>
     <module>net.danieldietrich.protectedregions.feature</module>
-    <module>net.danieldietrich.protectedregions.updatesite</module>
+    <module>net.danieldietrich.protectedregions.p2repository</module>
   </modules>
 
   <!-- 
