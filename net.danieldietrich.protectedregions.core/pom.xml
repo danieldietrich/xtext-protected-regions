@@ -1,51 +1,32 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	
-	<parent>
-		<groupId>net.danieldietrich.protectedregions</groupId>
-		<artifactId>net.danieldietrich.protectedregions</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
-		<relativePath>../pom.xml</relativePath>
-	</parent>
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  
+  <parent>
+    <groupId>net.danieldietrich.protectedregions</groupId>
+    <artifactId>net.danieldietrich.protectedregions</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
 
-	<artifactId>net.danieldietrich.protectedregions.core</artifactId>
-	<packaging>eclipse-plugin</packaging>
-	<name>Protected Regions Core</name>
-	<description>Protected Regions Core</description>
+  <artifactId>net.danieldietrich.protectedregions.core</artifactId>
+  <packaging>eclipse-plugin</packaging>
+  <name>Protected Regions Core</name>
+  <description>Protected Regions core project contains code which is indipendent of a specific generator implementation.</description>
 
-	<developers>
-		<developer>
-			<name>Daniel Dietrich</name>
-			<url>http://danieldietrich.net/</url>
-		</developer>
-	</developers>
-	<contributors>
-		<contributor>
-			<name>Hendy Irawan</name>
-			<url>http://eclipsedriven.blogspot.com/</url>
-		</contributor>
-	</contributors>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
           <encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
-	<url>https://github.com/danieldietrich/xtext-protectedregions</url>
-	<scm>
-		<connection>git:git://github.com/danieldietrich/xtext-protectedregions.git</connection>
-		<url>https://github.com/danieldietrich/xtext-protectedregions</url>
-	</scm>
-	
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
 </project>
