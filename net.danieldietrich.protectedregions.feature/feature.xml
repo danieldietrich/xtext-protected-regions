@@ -5,16 +5,31 @@
       version="1.0.0.qualifier">
 
    <description url="http://www.example.com/description">
-      [Enter Feature Description here.]
+      This feature provides support for Protected Regions with Xtext 2.0+. See https://github.com/danieldietrich/xtext-protectedregions/ for more details on usage.
    </description>
 
    <copyright url="http://www.example.com/copyright">
-      [Enter Copyright Description here.]
+      (C)opyright 2011 Daniel Dietrich and Hendy Irawan.
    </copyright>
 
-   <license url="http://www.example.com/license">
-      [Enter License Description here.]
+   <license url="http://www.eclipse.org/legal/epl-v10.html">
+      %license
    </license>
+
+   <requires>
+      <import plugin="com.google.collect"/>
+      <import plugin="org.apache.commons.io"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.slf4j.api"/>
+      <import plugin="org.hamcrest.core"/>
+      <import plugin="com.google.inject"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.jobs"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.xtext.builder"/>
+      <import plugin="org.eclipse.xtext"/>
+   </requires>
 
    <plugin
          id="net.danieldietrich.protectedregions.core"
