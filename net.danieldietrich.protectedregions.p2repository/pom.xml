@@ -29,6 +29,11 @@
 					<createArtifactRepository>true</createArtifactRepository>
 					<compress>true</compress>
 				</configuration>
+				<!-- TODO(@@dd): http://kaikreuzer.blogspot.com/2010/12/building-p2-enabled-products-with-tycho.html
+				<dependencies>
+          ...
+				</dependencies>
+				-->
 			</plugin>
 
 			<!-- TODO(@@dd): tycho p2 publisher
