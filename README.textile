@@ -3,26 +3,26 @@ h1. Xtext Protected Region Support
 h2(#toc). Table of Contents
 
 * "Table of Contents":#toc
-* "User Guide":#userGuide
-** "2-Step Setup":#twoStepSetup
+* "User Guide":#userguide
+** "2-Step Setup":#setup
 *** "Step 1: Download":#step1
 *** "Step 2: Adjust Your Project":#step2
 ** "Usage":#usage
-** "That's All?":#thatsAll
-* "Developer Guide":#developerGuide
+** "That's All?":#thatsall
+* "Developer Guide":#devguide
 ** "Prequisites":#prequisites
 ** "Download":#download
 ** "Setup Eclipse Workspace":#workspace
-*** "Import Projects":#importProjects
-*** "Set Target Platform":#setTargetPlatform
-** "Build Process":#buildProcess
-** "Documentation":#documentation
+*** "Import Projects":#import
+*** "Set Target Platform":#target
+** "Build Process":#build
+** "Documentation":#docs
 
-h2(#userGuide). User Guide
+h2(#userguide). User Guide
 
 The user guide is addressed to developers which want to _use_ the Xtext Protected Region Support (PRS) to enhance their existing Xtext generator.
 
-h3(#twoStepSetup). 2-Step Setup
+h3(#setup). 2-Step Setup
 
 h4(#step1). Step 1: Download
 
@@ -61,7 +61,7 @@ Now just begin to denote protected regions in the comments of your favorite lang
 
 For an in-depth description and more options (like generated regions) please take a look at the "PRS Core documentation":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile.
 
-h3(#thatsAll). That's All?
+h3(#thatsall). That's All?
 
 Yes. That's all. Your generator stays untouched. But where is all the magic?
 
@@ -92,7 +92,7 @@ Before writing a file to the file system, the PRS file system access implementat
 
 _Hint: Also here a developer may want to perform additional file system tasks, like finally copying temporary files to source folders._ 
 
-h2(#developerGuide). Developer Guide
+h2(#devguide). Developer Guide
 
 h3(#prequisites). Prequisites
 
@@ -116,7 +116,7 @@ bc. git clone git@github.com:danieldietrich/xtext-protectedregions.git
 
 h3(#workspace). Setup Eclipse Workspace
 
-h4(#importProjects). Import Projects
+h4(#import). Import Projects
 
 Maven Tycho is used to build plugins, features and update sites. In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 
@@ -130,13 +130,13 @@ table(#tableborders){border:1px solid black}.
 |@net.danieldietrich.protectedregionsupport.updatesite@|The update site project is used to create releases and snapshots of Xtext PRS. (The maven build currently resolves dependencies via p2 resources defined in the parent pom.)|
 |@net.danieldietrich.protectedregionsupport.target@|The target platform definition consists of all dependencies of the project and is needed for development of Xtext PRS.|
 
-h4(#setTargetPlatform). Set Target Platform
+h4(#target). Set Target Platform
 
 To solve missing dependencies, open @net.dd.prs.target/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
 
 _Hint: It is good practice to use a second copy of the Eclipse IDE with a minimal set of plugins to develop other plugins and features. Use target platform definitions to switch between specific project dependencies._
 
-h3(#buildProcess). Build Process
+h3(#build). Build Process
 
 To build an eclipse update site containing all artifacts, open a shell, jump to projects root and type
 
@@ -144,7 +144,7 @@ bc. mvn package
 
 The binaries can be found in @net.dd.prs.updatesite/target/site@.
 
-h3(#documentation). Documentation
+h3(#docs). Documentation
 
 The technical documentation of the Xtext PRS can be found here:
 
