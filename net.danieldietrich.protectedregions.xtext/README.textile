@@ -38,7 +38,7 @@ h2(#usage). Usage
 
 h3. Plugin Configuration
 
-Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
+Edit your plug-in's @META-INF/MANIFEST.MF@ to add all necessary dependencies to Xtext Protected Region Support:
 
 bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.0.0",
  net.danieldietrich.protectedregions.xtext;bundle-version="1.0.0"
