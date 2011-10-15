@@ -10,11 +10,9 @@ h2(#toc). Table of Contents
 ** "Plugin Configuration":#pluginconfig
 ** "Runtime Module Configuration":#runtimemoduleconfig
 ** "Portable Generators":#portablegenerators
-** "Generator Configuration"#generatorconfig
+** "Generator Configuration":#generatorconfig
 *** "MWE2 Workflow":#mwe2workflow
 *** "Standalone Generator":#standalonegenerator
-
-"top":#top
 
 h2(#motivation). Motivation
 
@@ -32,8 +30,6 @@ bc.. void doGenerate(Resource input, IFileSystemAccess fsa) {
 
 p. where @generatedCode@ is a CharSequence containing your generated code. *The goal is to preserve manual changes of the previously generated code*. These changes are denoted in so called "protected regions":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions/README.textile#intro.
 
-"top":#top
-
 h2(#usage). Usage
 
 h3(#pluginconfig). Plugin Configuration
@@ -45,8 +41,6 @@ bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.
 
 Import-Package: org.apache.commons.io,
  org.slf4j
-
-p. "top":#top
 
 h3(#runtimemoduleconfig). Runtime Module Configuration
 
@@ -65,8 +59,6 @@ bc.. public class MyRuntimeModule extends AbstractMyRuntimeModule {
   }
 }
 
-p. "top":#top
-
 h3(#portablegenerators). Portable Generators
 
 Your existing generator remains untouched.
@@ -77,8 +69,6 @@ bc.. override void doGenerate(Resource resource, IFileSystemAccess fsa) {
   fsa.generateFile(fileName, '''...Xtend/Xpand template here...''')
 
 }
-
-p. "top":#top
 
 h3(#generatorconfig). Generator Configuration
 
