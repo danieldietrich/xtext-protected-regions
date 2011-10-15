@@ -40,11 +40,13 @@ h3. Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to import Xtext Protected Region Support packages:
 
-bc. Import-Package: net.danieldietrich.protectedregions.core,
-  net.danieldietrich.protectedregions.support,
-  net.danieldietrich.protectedregions.xtext
+bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.0.0",
+ net.danieldietrich.protectedregions.xtext;bundle-version="1.0.0"
 
-"top":#top
+Import-Package: org.apache.commons.io,
+ org.slf4j
+
+p. "top":#top
 
 h3. Runtime Module Configuration
 
