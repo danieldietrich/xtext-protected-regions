@@ -19,6 +19,7 @@ h2(#toc). Table of Contents
 *** "Set Target Platform":#target
 ** "Build Process":#build
 ** "Documentation":#docs
+* "Samples":#samples
 
 h2(#userguide). User Guide
 
@@ -154,5 +155,11 @@ The technical documentation of the Xtext PRS can be found here:
 
 * "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile
 * "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
+
+h2(#samples). Samples
+
+* "Saentity Sample Project at GitHub":https://github.com/soluvas/saentity
+* "Google Web Toolkit / JPA Domain Model Sample":https://github.com/danieldietrich/xtext-javatools (work in progress, will likely move soon)
+
 
 "top":#top
