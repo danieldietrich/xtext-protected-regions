@@ -19,7 +19,7 @@ h2(#toc). Table of Contents
 ** "Build Process":#buildProcess
 ** "Documentation":#documentation
 
-"top":#top
+p. "top":#top
 
 h2(#userGuide). User Guide
 
@@ -100,7 +100,7 @@ Before writing a file to the file system, the PRS file system access implementat
 
 _Hint: Also here a developer may want to perform additional file system tasks, like finally copying temporary files to source folders._ 
 
-"top":#top
+p. "top":#top
 
 h2(#developerGuide). Developer Guide
 
@@ -165,4 +165,4 @@ The technical documentation of the Xtext PRS can be found here:
 * "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile
 * "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
 
-"top":#top
+p. "top":#top
