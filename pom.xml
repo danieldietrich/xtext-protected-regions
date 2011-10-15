@@ -27,7 +27,7 @@
     <module>net.danieldietrich.protectedregions.core</module>
     <module>net.danieldietrich.protectedregions.xtext</module>
     <module>net.danieldietrich.protectedregions.feature</module>
-    <module>net.danieldietrich.protectedregions.p2repository</module>
+    <module>net.danieldietrich.protectedregions.updatesite</module>
   </modules>
 
   <!-- 
@@ -57,6 +57,18 @@
   <build>
     <plugins>
     
+      <!-- java compiler plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.3.2</version>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+          <encoding>UTF-8</encoding>
+        </configuration>
+      </plugin>
+      
       <!-- tycho maven plugin-->
       <plugin>
         <groupId>org.eclipse.tycho</groupId>

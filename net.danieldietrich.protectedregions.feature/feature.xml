@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feature
       id="net.danieldietrich.protectedregions.feature"
-      label="Protected Regions Feature"
+      label="Xtext Protected Region Support"
       version="1.0.0.qualifier">
 
    <description url="http://www.example.com/description">
-      This feature provides support for Protected Regions with Xtext 2.0+. See https://github.com/danieldietrich/xtext-protectedregions/ for more details on usage.
+      This feature provides protected region support for Xtext 2.0+. See https://github.com/danieldietrich/xtext-protectedregions/ for more details on usage.
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -16,21 +16,6 @@
       %license
    </license>
 
-   <requires>
-      <import plugin="com.google.collect"/>
-      <import plugin="org.apache.commons.io"/>
-      <import plugin="org.junit"/>
-      <import plugin="org.slf4j.api"/>
-      <import plugin="org.hamcrest.core"/>
-      <import plugin="com.google.inject"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.jobs"/>
-      <import plugin="org.eclipse.emf.ecore"/>
-      <import plugin="org.eclipse.xtext.builder"/>
-      <import plugin="org.eclipse.xtext"/>
-   </requires>
-
    <plugin
          id="net.danieldietrich.protectedregions.core"
          download-size="0"
@@ -40,6 +25,34 @@
 
    <plugin
          id="net.danieldietrich.protectedregions.xtext"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.collect"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="com.google.inject"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.apache.commons.io"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"
+         unpack="false"/>
+
+   <plugin
+         id="org.slf4j.api"
          download-size="0"
          install-size="0"
          version="0.0.0"
