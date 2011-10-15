@@ -1,4 +1,6 @@
-h1. Xtext Protected Region Support
+h1(#top). Xtext Protected Region Support
+
+The Xtext Protected Region Support (PRS) adds protected region support to "Xtext":http://xtext.org, a very powerful language development (and generator) framework.
 
 h2(#toc). Table of Contents
 
@@ -20,7 +22,7 @@ h2(#toc). Table of Contents
 
 h2(#userguide). User Guide
 
-The user guide is addressed to developers which want to _use_ the Xtext Protected Region Support (PRS) to enhance their existing Xtext generator.
+The user guide is addressed to developers which want to _use_ the Xtext PRS to enhance their existing Xtext generator.
 
 h3(#setup). 2-Step Setup
 
@@ -94,6 +96,8 @@ _Hint: Also here a developer may want to perform additional file system tasks, l
 
 h2(#devguide). Developer Guide
 
+The developer guide is addressed to developers which want _modify_ the Xtext PRS. Contributors are welcome :-)
+
 h3(#prequisites). Prequisites
 
 The following software should be installed to your system:
@@ -150,3 +154,5 @@ The technical documentation of the Xtext PRS can be found here:
 
 * "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile
 * "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
+
+"top":#top
