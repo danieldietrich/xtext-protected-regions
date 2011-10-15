@@ -7,12 +7,12 @@ h2(#toc). Table of Contents
 * "Table of Contents":#toc
 * "Motivation":#motivation
 * "Usage":#usage
-** Plugin Configuration
-** Runtime Module Configuration
-** Portable Generators
-** Generator Configuration
-*** MWE2 Workflow
-*** Standalone Generator
+** "Plugin Configuration":#pluginconfig
+** "Runtime Module Configuration":#runtimemoduleconfig
+** "Portable Generators":#portablegenerators
+** "Generator Configuration"#generatorconfig
+*** "MWE2 Workflow":#mwe2workflow
+*** "Standalone Generator":#standalonegenerator
 
 "top":#top
 
@@ -36,7 +36,7 @@ p. where @generatedCode@ is a CharSequence containing your generated code. *The 
 
 h2(#usage). Usage
 
-h3. Plugin Configuration
+h3(#pluginconfig). Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to add all necessary dependencies to Xtext Protected Region Support:
 
@@ -48,7 +48,7 @@ Import-Package: org.apache.commons.io,
 
 p. "top":#top
 
-h3. Runtime Module Configuration
+h3(#runtimemoduleconfig). Runtime Module Configuration
 
 Configure Guice to provide @JavaIoFileSystemAccess@ in your @RuntimeModule@ class.
 
@@ -67,7 +67,7 @@ bc.. public class MyRuntimeModule extends AbstractMyRuntimeModule {
 
 p. "top":#top
 
-h3. Portable Generators
+h3(#portablegenerators). Portable Generators
 
 Your existing generator remains untouched.
 
@@ -80,11 +80,11 @@ bc.. override void doGenerate(Resource resource, IFileSystemAccess fsa) {
 
 p. "top":#top
 
-h3. Generator Configuration
+h3(#generatorconfig). Generator Configuration
 
 Depending on whether you are using a MWE2 workflow or a standalone generator you might also want to modify the output path(s):
 
-h4. MWE2 Workflow
+h4(#mwe2workflow). MWE2 Workflow
 
 With MWE2 workflows, output paths are declared like this:
 
@@ -98,7 +98,7 @@ bc. Workflow {
   }
 }
 
-h4. Standalone Generator
+h4(#standalonegenerator). Standalone Generator
 
 Assuming that @fsa@ is an implementation of @AbstractFileSystemAccess@ (like @JavaIoFileSystemAccess@), output paths are configured as follows:
 
