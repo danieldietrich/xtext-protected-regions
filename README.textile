@@ -15,11 +15,8 @@ h2(#toc). Table of Contents
 ** "Setup Eclipse Workspace":#workspace
 *** "Import Projects":#importProjects
 *** "Set Target Platform":#setTargetPlatform
-*** "Project Layout":#projectLayout
 ** "Build Process":#buildProcess
 ** "Documentation":#documentation
-
-p. "top":#top
 
 h2(#userGuide). User Guide
 
@@ -37,8 +34,7 @@ h4(#step2). Step 2: Adjust Your Project
 
 Add the following dependencies to the @META-INF/MANIFEST.MF@ of your Xtext project
 
-bc.. 
-Require-Bundle:
+bc.. Require-Bundle:
  net.danieldietrich.protectedregions.core;bundle-version="1.0.0",
  net.danieldietrich.protectedregions.xtext;bundle-version="1.0.0"
 
@@ -48,8 +44,7 @@ Import-Package:
 
 p. and adjust the @RuntimeModule@. Example:
 
-bc. 
-@Provides
+bc. @Provides
 public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionSupport support) {
   support.addParser(RegionParserFactory.createJavaParser(), ".java");
   support.addParser(RegionParserFactory.createXmlParser(), ".xml", ".xsd");
@@ -74,8 +69,7 @@ PRS performs the following tasks, assuming your generator (generally) looks like
 
 *1. Inject FileSystemAccess*
 
-bc. 
-@Inject
+bc. @Inject
 privte JavaIoFileSystemAccess fsa;
 
 With the adjusted @RuntimeModule@ Google Guice provides here a @BidiJavaIoFileSystemAccess@, the control center of PRS.
@@ -84,8 +78,7 @@ _Hint: As of Xtext, instead of @JavaIoFileSystemAccess@ you can use @EclipseReso
 
 *2. Define output path*
 
-bc. 
-fsa.setOutputPath([slot,] outputPath); // slot is optional
+bc. fsa.setOutputPath([slot,] outputPath); // slot is optional
 
 By calling setOutputPath(...) PRS parses all existing files in the given path and its subfolders, considering the parsers (file extension) filters and the optional filter of the file system access (see @RuntimeModule@). 
 
@@ -93,8 +86,7 @@ _Hint: A developer may want to generate the sources into a temp dir. Before and 
 
 *3. Write output*
 
-bc. 
-fsa.generateFile(fileName, [slot,] contents); // slot is optional
+bc. fsa.generateFile(fileName, [slot,] contents); // slot is optional
 
 Before writing a file to the file system, the PRS file system access implementation substitutes protected regions which were collected in step 2.
 
@@ -122,22 +114,13 @@ h3(#download). Download
 
 To get a local copy of xtext-protectedregions you have to clone the project hosted on GitHub:
 
-bc. 
-git clone git@github.com:danieldietrich/xtext-protectedregions.git
+bc. git clone git@github.com:danieldietrich/xtext-protectedregions.git
 
 h3(#workspace). Setup Eclipse Workspace
 
 h4(#importProjects). Import Projects
 
 Maven Tycho is used to build plugins, features and update sites. In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
-
-h4(#setTargetPlatform). Set Target Platform
-
-To solve missing dependencies, open @net.dd.prs.target/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
-
-_Hint: It is good practice to use a second copy of the Eclipse IDE with a minimal set of plugins to develop other plugins and features. Use target platform definitions to switch between specific project dependencies._
-
-h4(#projectLayout). Project Layout
 
 The Xtext PRS consists of the following projects:
 
@@ -149,12 +132,17 @@ table(#tableborders){border:1px solid black}.
 |@net.danieldietrich.protectedregionsupport.updatesite@|The update site project is used to create releases and snapshots of Xtext PRS. (The maven build currently resolves dependencies via p2 resources defined in the parent pom.)|
 |@net.danieldietrich.protectedregionsupport.target@|The target platform definition consists of all dependencies of the project and is needed for development of Xtext PRS.|
 
+h4(#setTargetPlatform). Set Target Platform
+
+To solve missing dependencies, open @net.dd.prs.target/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
+
+_Hint: It is good practice to use a second copy of the Eclipse IDE with a minimal set of plugins to develop other plugins and features. Use target platform definitions to switch between specific project dependencies._
+
 h3(#buildProcess). Build Process
 
 To build an eclipse update site containing all artifacts, open a shell, jump to projects root and type
 
-bc. 
-mvn package
+bc. mvn package
 
 The binaries can be found in @net.dd.prs.updatesite/target/site@.
 
