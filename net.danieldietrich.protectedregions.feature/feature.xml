@@ -17,15 +17,18 @@
    </license>
 
    <requires>
-      <import plugin="com.google.collect" version="1.0.0" match="greaterOrEqual"/>
-      <import plugin="org.apache.commons.io" version="2.0.1" match="greaterOrEqual"/>
-      <import plugin="org.slf4j.api" version="1.6.1" match="greaterOrEqual"/>
-      <import plugin="org.junit" version="4.8.2" match="greaterOrEqual"/>
-      <import plugin="com.google.inject" version="2.0.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.runtime" version="3.7.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.core.resources" version="3.7.100" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.xtext.generator" version="2.0.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.xtext.builder" version="2.0.1" match="greaterOrEqual"/>
+      <import plugin="com.google.collect"/>
+      <import plugin="org.apache.commons.io"/>
+      <import plugin="org.slf4j.api"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.hamcrest.core"/>
+      <import plugin="com.google.inject"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.jobs"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.xtext.builder"/>
+      <import plugin="org.eclipse.xtext.generator"/>
    </requires>
 
    <plugin
