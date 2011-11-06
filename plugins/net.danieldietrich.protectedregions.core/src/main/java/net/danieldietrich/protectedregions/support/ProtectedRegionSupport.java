@@ -26,7 +26,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
   private transient final Logger logger = LoggerFactory.getLogger(ProtectedRegionSupport.class);
 
   private static final IPathFilter ACCEPT_ALL_FILTER = new IPathFilter() {
-    @Override
+    //@Override
     public boolean accept(URI path) {
       return true;
     }
@@ -36,12 +36,12 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
   private Map<String, IRegion> protectedRegionPool = new HashMap<String, IRegion>();
   private Set<String> visitedPaths = new HashSet<String>();
 
-  @Override
+  //@Override
   public void addParser(IRegionParser parser) {
     addParser(parser, (IPathFilter) null);
   }
 
-  @Override
+  //@Override
   public void addParser(IRegionParser parser, String... fileExtensions) {
     if (fileExtensions == null || fileExtensions.length == 0) {
       throw new IllegalArgumentException("File extensions cannot be null or empty.");
@@ -49,7 +49,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
     addParser(parser, new FileExtensionFilter(fileExtensions));
   }
 
-  @Override
+  //@Override
   public void addParser(IRegionParser parser, IPathFilter filter) {
     if (parser == null) {
       throw new IllegalArgumentException("Parser cannot be null.");
@@ -58,7 +58,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
     parsers.put(parserFilter, parser);
   }
 
-   @Override
+  //@Override
   public void readRegions(IFileSystemReader reader, String slot) {
     if (parsers.isEmpty()) {
       throw new IllegalStateException("#addParser methods have to be called before #read methods.");
@@ -160,13 +160,13 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
     }
   }
   
-  @Override
+  //@Override
   public void clearRegions() {
     protectedRegionPool.clear();
     visitedPaths.clear();
   }
 
-  @Override
+  //@Override
   public CharSequence mergeRegions(IFileSystemReader reader, String fileName, String slot, CharSequence contents) {
     IDocument document = null;
     URI path = reader.getUri(fileName, slot);
@@ -216,7 +216,7 @@ public class ProtectedRegionSupport implements IProtectedRegionSupport {
       this.fileExtensions = fileExtensions;
     }
 
-    @Override
+    //@Override
     public boolean accept(URI uri) {
       String path = uri.getPath();
       for (String fileExtension : fileExtensions) {

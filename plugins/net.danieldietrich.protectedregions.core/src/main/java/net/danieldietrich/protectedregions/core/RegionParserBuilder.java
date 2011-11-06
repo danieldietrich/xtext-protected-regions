@@ -150,22 +150,22 @@ public class RegionParserBuilder {
       MULTILINE, MULTILINE_NESTABLE, SINGLELINE
     }
 
-    @Override
+    //@Override
     public boolean isMultiline() {
       return !Style.SINGLELINE.equals(style); // null case included
     }
 
-    @Override
+    //@Override
     public boolean isNestable() {
       return Style.MULTILINE_NESTABLE.equals(style); // null case included
     }
 
-    @Override
+    //@Override
     public String getStart() {
       return start;
     }
 
-    @Override
+    //@Override
     public String getEnd() {
       return end;
     }
@@ -191,22 +191,22 @@ public class RegionParserBuilder {
       this.escapeString = escapeString;
     }
     
-    @Override
+    //@Override
     public String getStart() {
       return start;
     }
 
-    @Override
+    //@Override
     public String getEnd() {
       return end;
     }
     
-    @Override
+    //@Override
     public String getEscapeString() {
       return escapeString;
     }
     
-    @Override
+    //@Override
     public boolean isEscapable() {
       return escapeString != null;
     }
@@ -230,24 +230,24 @@ public class RegionParserBuilder {
       end = Pattern.compile("\\s*" + label + "\\s+END\\s*");
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegionStart(String s) {
       return start.matcher(s).matches();
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegionEnd(String s) {
       return end.matcher(s).matches();
     }
 
-    @Override
+    //@Override
     public String getId(String markedRegionStart) {
       int i = markedRegionStart.indexOf("(");
       int j = i + 1 + markedRegionStart.substring(i + 1).indexOf(")");
       return (i != -1 && j != -1) ? markedRegionStart.substring(i + 1, j).trim() : null;
     }
 
-    @Override
+    //@Override
     public boolean isEnabled(String markedRegionStart) {
       return markedRegionStart.contains("ENABLED");
     }

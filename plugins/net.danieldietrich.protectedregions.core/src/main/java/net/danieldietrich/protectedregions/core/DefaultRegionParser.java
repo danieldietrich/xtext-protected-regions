@@ -59,7 +59,7 @@ class DefaultRegionParser implements IRegionParser {
   /**
    * @see #parse(CharSequence)
    */
-  @Override
+  //@Override
   public IDocument parse(InputStream in) throws IOException {
     return parse(IOUtils.toString(in));
   }
@@ -79,7 +79,7 @@ class DefaultRegionParser implements IRegionParser {
    * 
    * @see #getNextRegion(Input)
    */
-  @Override
+  //@Override
   public IDocument parse(CharSequence in) {
 
     DefaultDocument result = new DefaultDocument();
@@ -101,17 +101,17 @@ class DefaultRegionParser implements IRegionParser {
     return result;
   }
 
-  @Override
+  //@Override
   public boolean isInverse() {
     return inverse;
   }
 
-  @Override
+  //@Override
   public Iterable<ICommentType> getCommentTypes() {
     return Collections.unmodifiableCollection(commentTypes);
   }
 
-  @Override
+  //@Override
   public Iterable<ICDataType> getCDataTypes() {
     return Collections.unmodifiableCollection(cdataTypes);
   }
@@ -601,22 +601,22 @@ class DefaultRegionParser implements IRegionParser {
       return id;
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegion() {
       return id != null;
     }
 
-    @Override
+    //@Override
     public boolean isEnabled() {
       return enabled != null && enabled;
     }
 
-    @Override
+    //@Override
     public String getId() {
       return id;
     }
 
-    @Override
+    //@Override
     public String getText() {
       return text;
     }
@@ -636,23 +636,23 @@ class DefaultRegionParser implements IRegionParser {
       this.outerIterator = outerIterator;
     }
 
-    @Override
+    //@Override
     public Iterator<I> iterator() {
       return this;
     }
 
-    @Override
+    //@Override
     public boolean hasNext() {
       return outerIterator.hasNext();
     }
 
-    @Override
+    //@Override
     public I next() {
       currentOuter = outerIterator.next();
       return getInner(currentOuter);
     }
 
-    @Override
+    //@Override
     public void remove() {
     }
 

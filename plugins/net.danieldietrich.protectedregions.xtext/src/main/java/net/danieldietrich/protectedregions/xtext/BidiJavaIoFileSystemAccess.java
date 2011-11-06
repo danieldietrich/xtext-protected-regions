@@ -64,28 +64,28 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
     super.generateFile(fileName, slot, mergedContents);
   }
 
-  @Override
+  //@Override
   public IPathFilter getFilter() {
     return filter;
   }
 
-  @Override
+  //@Override
   public void setFilter(IPathFilter filter) {
     this.filter = filter;
   }
 
-  @Override
+  //@Override
   public boolean exists(URI uri) {
     return new File(uri).exists();
   }
 
-  @Override
+  //@Override
   public CharSequence readFile(URI uri) throws IllegalArgumentException, IOException {
     final File file = new File(uri);
     return FileUtils.readFileToString(file);
   }
 
-  @Override
+  //@Override
   public Set<URI> listFiles(URI path) {
     Collection<File> files = FileUtils.listFiles(new File(path), null, true);
     Set<URI> result = new HashSet<URI>();
@@ -97,17 +97,17 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
     return result;
   }
 
-  @Override
+  //@Override
   public boolean hasFiles(URI uri) {
     return new File(uri).isDirectory();
   }
 
-  @Override
+  //@Override
   public boolean isFile(URI uri) {
     return new File(uri).isFile();
   }
 
-  @Override
+  //@Override
   public String getCanonicalPath(URI uri) {
     try {
       return new File(uri).getCanonicalPath();
@@ -117,12 +117,12 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
     }
   }
 
-  @Override
+  //@Override
   public URI getUri(String relativePath) {
     return getUri(relativePath, DEFAULT_OUTPUT);
   }
 
-  @Override
+  //@Override
   public URI getUri(String relativePath, String slot) {
     Map<String, String> pathes = getPathes();
     if (pathes.size() == 0) {

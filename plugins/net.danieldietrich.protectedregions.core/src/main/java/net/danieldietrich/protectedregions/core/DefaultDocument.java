@@ -14,12 +14,12 @@ class DefaultDocument implements IDocument {
   private List<IRegion> regions = new ArrayList<IRegion>();
   private Map<String,IRegion> markedRegions = new HashMap<String,IRegion>();
 
-  @Override
+  //@Override
   public Iterable<IRegion> getRegions() {
     return Collections.unmodifiableList(regions);
   }
   
-  @Override
+  //@Override
   public IRegion getMarkedRegion(String id) {
     return markedRegions.get(id);
   }
@@ -34,7 +34,7 @@ class DefaultDocument implements IDocument {
     }
   }
   
-  @Override
+  //@Override
   public String getContents() {
     StringBuilder result = new StringBuilder();
     for (IRegion region : regions) {

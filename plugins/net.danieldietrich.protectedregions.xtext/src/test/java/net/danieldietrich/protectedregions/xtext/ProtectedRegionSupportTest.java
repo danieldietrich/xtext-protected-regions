@@ -174,7 +174,7 @@ public class ProtectedRegionSupportTest {
    * A Generator taking a (String) fileName instead of a Resource as argument.
    */
   static class TestGenerator implements IGenerator {
-    @Override
+    //@Override
     public void doGenerate(Resource input, IFileSystemAccess fsa) {
       throw new IllegalStateException("Call #doGenerate(String, IFileSystemAccess) instead.");
     }
@@ -236,7 +236,7 @@ public class ProtectedRegionSupportTest {
       this.name = name;
     }
 
-    @Override
+    //@Override
     public boolean accept(URI path) {
       return path.getPath().endsWith(name);
     }
@@ -253,7 +253,7 @@ public class ProtectedRegionSupportTest {
       this.pattern = Pattern.compile(pattern);
     }
 
-    @Override
+    //@Override
     public boolean accept(URI path) {
       return pattern.matcher(path.getPath()).matches();
     }

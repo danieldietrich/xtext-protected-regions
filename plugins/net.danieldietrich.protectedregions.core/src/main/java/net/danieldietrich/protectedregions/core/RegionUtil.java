@@ -20,7 +20,7 @@ public class RegionUtil {
    */
   public static IDocument merge(IDocument currentDoc, final IDocument previousDoc) {
     return merge(currentDoc, new HasMarkedRegions() {
-      @Override
+      //@Override
       public IRegion get(String id) {
         return previousDoc.getMarkedRegion(id);
       }
@@ -35,7 +35,7 @@ public class RegionUtil {
    */
   public static IDocument merge(IDocument currentDoc, final Map<String,IRegion> pool) {
     return merge(currentDoc, new HasMarkedRegions() {
-      @Override
+      //@Override
       public IRegion get(String id) {
         return pool.get(id);
       }

@@ -70,24 +70,24 @@ public class RegionUtilTest {
         .compile("\\s*PROTECTED\\s+REGION\\s+/\\*\\s*[0-9]+\\s*\\*/\\s+(ENABLED\\s+)?START\\s*");
     private final Pattern PR_END = Pattern.compile("\\s*PROTECTED\\s+REGION\\s+END\\s*");
 
-    @Override
+    //@Override
     public boolean isMarkedRegionStart(String comment) {
       return PR_START.matcher(comment).matches();
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegionEnd(String comment) {
       return PR_END.matcher(comment).matches();
     }
 
-    @Override
+    //@Override
     public String getId(String markedRegionStart) {
       int i = markedRegionStart.indexOf("/*") + 1;
       int j = i + 1 + markedRegionStart.substring(i + 1).indexOf("*/");
       return (i != -1 && j != -1) ? markedRegionStart.substring(i + 1, j).trim() : null;
     }
 
-    @Override
+    //@Override
     public boolean isEnabled(String markedRegionStart) {
       return markedRegionStart.contains("ENABLED");
     }
@@ -136,24 +136,24 @@ public class RegionUtilTest {
         .compile("\\s*GENERATED\\s+ID\\s*\\(\\s*[0-9]+\\s*\\)\\s+(DISABLED\\s+)?START\\s*");
     private final Pattern PR_END = Pattern.compile("\\s*GENERATED\\s+END\\s*");
 
-    @Override
+    //@Override
     public boolean isMarkedRegionStart(String comment) {
       return PR_START.matcher(comment).matches();
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegionEnd(String comment) {
       return PR_END.matcher(comment).matches();
     }
 
-    @Override
+    //@Override
     public String getId(String markedRegionStart) {
       int i = markedRegionStart.indexOf("(");
       int j = i + 1 + markedRegionStart.substring(i + 1).indexOf(")");
       return (i != -1 && j != -1) ? markedRegionStart.substring(i + 1, j).trim() : null;
     }
 
-    @Override
+    //@Override
     public boolean isEnabled(String markedRegionStart) {
       return !markedRegionStart.contains("DISABLED");
     }
@@ -178,25 +178,25 @@ public class RegionUtilTest {
   }
 
   IRegionOracle SIMPLE_ORACLE = new IRegionOracle() {
-    @Override
+    //@Override
     public boolean isMarkedRegionStart(String s) {
       String _s = s.trim();
       return _s.startsWith("$(") && _s.endsWith(")-{");
     }
 
-    @Override
+    //@Override
     public boolean isMarkedRegionEnd(String s) {
       return "}-$".equals(s.trim());
     }
 
-    @Override
+    //@Override
     public String getId(String s) {
       int i = s.indexOf("(");
       int j = i + 1 + s.substring(i + 1).indexOf(")");
       return (i != -1 && j != -1) ? s.substring(i + 1, j).trim() : null;
     }
 
-    @Override
+    //@Override
     public boolean isEnabled(String s) {
       return true;
     }
