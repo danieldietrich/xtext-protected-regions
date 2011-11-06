@@ -169,6 +169,18 @@ public class ProtectedRegionSupportTest {
           "Comments in string literals are not ignored. Original message: " + x.getMessage(), false);
     }
   }
+  
+  @Test
+  public void ensureStringLiteralsParsedCorrectly() {
+	  
+	IProtectedRegionSupport support = new ProtectedRegionSupport();
+	support.addParser(javaParser, ".java");
+	
+	TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support);
+	fsa.setFilter(new EndsWithFilter("ensure_str_literals_parsed_correctly.java"));
+	
+	fsa.setOutputPath("src/test/resources");
+  }
 
   /**
    * A Generator taking a (String) fileName instead of a Resource as argument.
