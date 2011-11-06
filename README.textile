@@ -41,6 +41,9 @@ bc.. Require-Bundle:
  net.danieldietrich.protectedregions.core,
  net.danieldietrich.protectedregions.xtext
 
+bc.. Import-Package: org.apache.commons.io,
+ org.slf4j
+
 p. and adjust the @RuntimeModule@. Example:
 
 bc. @Provides
