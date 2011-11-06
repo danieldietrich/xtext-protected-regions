@@ -36,8 +36,8 @@ h3(#pluginconfig). Plugin Configuration
 
 Edit your plug-in's @META-INF/MANIFEST.MF@ to add all necessary dependencies to Xtext Protected Region Support:
 
-bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.0.0",
- net.danieldietrich.protectedregions.xtext;bundle-version="1.0.0"
+bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.0.1",
+ net.danieldietrich.protectedregions.xtext;bundle-version="1.0.1"
 
 Import-Package: org.apache.commons.io,
  org.slf4j

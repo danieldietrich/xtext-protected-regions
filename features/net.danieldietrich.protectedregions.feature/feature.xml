@@ -2,10 +2,12 @@
 <feature
       id="net.danieldietrich.protectedregions.feature"
       label="Xtext Protected Region Support"
-      version="1.0.0.qualifier">
+      version="1.0.1.qualifier">
 
    <description url="http://www.example.com/description">
-      This feature provides protected region support for Xtext 2.0+. See https://github.com/danieldietrich/xtext-protectedregions/ for more details on usage.
+      This feature provides protected region support for Xtext 2.1.0.
+See https://github.com/danieldietrich/xtext-protectedregions/
+for more details on usage.
    </description>
 
    <copyright url="http://www.example.com/copyright">
@@ -28,7 +30,7 @@
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.xtext.builder"/>
-      <import plugin="org.eclipse.xtext.generator"/>
+      <import plugin="org.eclipse.xtext"/>
    </requires>
 
    <plugin
