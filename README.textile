@@ -153,8 +153,8 @@ h3(#docs). Documentation
 
 The technical documentation of the Xtext PRS can be found here:
 
-* "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile
-* "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.xtext/README.textile
+* "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile
+* "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.xtext/README.textile
 
 h2(#samples). Samples
 
