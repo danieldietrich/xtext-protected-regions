@@ -38,12 +38,8 @@ h4(#step2). Step 2: Adjust Your Project
 Add the following dependencies to the @META-INF/MANIFEST.MF@ of your Xtext project
 
 bc.. Require-Bundle:
- net.danieldietrich.protectedregions.core;bundle-version="1.0.0",
- net.danieldietrich.protectedregions.xtext;bundle-version="1.0.0"
-
-Import-Package:
- org.apache.commons.io,
- org.slf4j
+ net.danieldietrich.protectedregions.core,
+ net.danieldietrich.protectedregions.xtext
 
 p. and adjust the @RuntimeModule@. Example:
 
