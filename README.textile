@@ -56,13 +56,13 @@ public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionSuppor
   return fsa;
 }
 
-_Hint: Xtext PRS is shipped with @BidiJavaIoFileSystemAccess@ and @BidiEclipseResourceFileSystemAccess@._
+_Hint: Xtext PRS is shipped with @BidiJavaIoFileSystemAccess@_
 
 h3(#usage). Usage
 
 Now just begin to denote protected regions in the comments of your favorite language. Protected regions start with @PROTECTED REGION ID(unique.id) ENABLED START@ and end with @PROTECTED REGION END@, where @unique.id@ is a gobally unique id (in the scope of the project) and syntactically equivalent to a full qualified Java identifier . These regions are protected on subsequential generator calls, even if files move, are merged or renamed (_content over containers_).
 
-For an in-depth description and more options (like generated regions) please take a look at the "PRS Core documentation":https://github.com/danieldietrich/xtext-protectedregions/blob/master/net.danieldietrich.protectedregions.core/README.textile.
+For an in-depth description and more options (like generated regions) please take a look at the "PRS Core documentation":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile.
 
 h3(#thatsall). That's All?
 
@@ -76,8 +76,6 @@ bc. @Inject
 privte JavaIoFileSystemAccess fsa;
 
 With the adjusted @RuntimeModule@ Google Guice provides here a @BidiJavaIoFileSystemAccess@, the control center of PRS.
-
-_Hint: As of Xtext, instead of @JavaIoFileSystemAccess@ you can use @EclipseResourceFileSystemAccess@._
 
 *2. Define output path*
 
@@ -123,21 +121,20 @@ h3(#workspace). Setup Eclipse Workspace
 
 h4(#import). Import Projects
 
-Maven Tycho is used to build plugins, features and update sites. In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
+Maven Tycho is used to build the plugins, feature and update site. In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 
 The Xtext PRS consists of the following projects:
 
 table(#tableborders){border:1px solid black}.
-|@net.danieldietrich.protectedregionsupport@|Parent maven project. Defining all necessary maven modules and maven plugins.|
+|@net.danieldietrich.protectedregionsupport@|Parent maven project. Defining all necessary maven modules and maven plugins. Contains the eclipse target platform definition.|
 |@net.danieldietrich.protectedregionsupport.core@|Protected Regions Core plugin. Base of protected region support for arbitrary generators.|
 |@net.danieldietrich.protectedregionsupport.xtext@|Xtext Protected Region Support plugin. Xtext specific implementation, based on the Protected Regions Core.|
 |@net.danieldietrich.protectedregionsupport.feature@|The feature project is needed for distributing Xtext PRS via an eclipse p2 update site. It bundles the Core and the Xtext PRS plugin.|
 |@net.danieldietrich.protectedregionsupport.updatesite@|The update site project is used to create releases and snapshots of Xtext PRS. (The maven build currently resolves dependencies via p2 resources defined in the parent pom.)|
-|@net.danieldietrich.protectedregionsupport.target@|The target platform definition consists of all dependencies of the project and is needed for development of Xtext PRS.|
 
 h4(#target). Set Target Platform
 
-To solve missing dependencies, open @net.dd.prs.target/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
+To solve missing dependencies, open @net.dd.prs/targetplatform/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
 
 _Hint: It is good practice to use a second copy of the Eclipse IDE with a minimal set of plugins to develop other plugins and features. Use target platform definitions to switch between specific project dependencies._
 
