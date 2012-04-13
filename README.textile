@@ -139,7 +139,7 @@ _Hint: It is good practice to use a second copy of the Eclipse IDE with a minima
 
 h3(#build). Build Process
 
-To build an eclipse update site containing all artifacts, open a shell, jump to projects root and type
+To build an eclipse update site containing all artifacts, open a shell, jump to @xtext-protectedregions/releng@ and type
 
 bc. mvn package
 
