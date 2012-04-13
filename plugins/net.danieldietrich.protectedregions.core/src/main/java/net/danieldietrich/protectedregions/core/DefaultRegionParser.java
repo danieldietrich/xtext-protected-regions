@@ -9,11 +9,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.danieldietrich.protectedregions.core.IDocument.IRegion;
-import net.danieldietrich.protectedregions.support.ProtectedRegionSupport;
-
-import org.apache.commons.io.IOUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Parses InputStream, returning an IDocument which consists of IRegions.
@@ -64,7 +59,7 @@ class DefaultRegionParser implements IRegionParser {
 	 */
 	//@Override
 	public IDocument parse(InputStream in) throws IOException {
-		return parse(IOUtils.toString(in));
+		return parse(IOUtil.toString(in));
 	}
 
 	/**

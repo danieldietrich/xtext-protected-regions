@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -50,7 +49,7 @@ public class RegionUtilTest {
     IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
     String mergedContents = _merged.getContents();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/protected_expected.txt"));
+        IOUtil.toString(new FileReader("src/test/resources/protected_expected.txt"));
 
     assertEquals(expectedContents, mergedContents);
   }
@@ -125,7 +124,7 @@ public class RegionUtilTest {
     IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
     String mergedContents = _merged.getContents();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/switched_expected.txt"));
+        IOUtil.toString(new FileReader("src/test/resources/switched_expected.txt"));
 
     assertEquals(expectedContents, mergedContents);
   }
@@ -172,7 +171,7 @@ public class RegionUtilTest {
     IDocument _merged = RegionUtil.fillIn(currentDoc, previousDoc);
     String mergedContents = _merged.getContents();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/fill_in_expected.txt"));
+        IOUtil.toString(new FileReader("src/test/resources/fill_in_expected.txt"));
 
     assertEquals(expectedContents, mergedContents);
   }
@@ -217,7 +216,7 @@ public class RegionUtilTest {
     IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
     String mergedContents = _merged.getContents();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/simple_expected.txt"));
+        IOUtil.toString(new FileReader("src/test/resources/simple_expected.txt"));
 
     assertEquals(expectedContents, mergedContents);
   }
@@ -234,7 +233,7 @@ public class RegionUtilTest {
     IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
     String mergedContents = _merged.getContents();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/xml_expected.txt"));
+        IOUtil.toString(new FileReader("src/test/resources/xml_expected.txt"));
 
     assertEquals(expectedContents, mergedContents);
   }

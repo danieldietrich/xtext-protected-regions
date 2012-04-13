@@ -11,13 +11,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
+import net.danieldietrich.protectedregions.core.IOUtil;
 import net.danieldietrich.protectedregions.core.IRegionParser;
 import net.danieldietrich.protectedregions.core.RegionParserFactory;
 import net.danieldietrich.protectedregions.support.IPathFilter;
 import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 import net.danieldietrich.protectedregions.support.ProtectedRegionSupport;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.xtext.generator.IFileSystemAccess;
 import org.eclipse.xtext.generator.IGenerator;
@@ -78,7 +78,7 @@ public class ProtectedRegionSupportTest {
     // test results
     String mergedContents = fsa.getSingleResult();
     String expectedContents =
-        IOUtils.toString(new FileReader("src/test/resources/multilang_expected.html"));
+        IOUtil.toString(new FileReader("src/test/resources/multilang_expected.html"));
 
     assertEquals(expectedContents, mergedContents);
   }
@@ -193,7 +193,7 @@ public class ProtectedRegionSupportTest {
 
     public void doGenerate(String fileName, IFileSystemAccess fsa) throws IOException {
       // simulating current generated file by reading an existing file
-      String current = IOUtils.toString(new FileReader(fileName));
+      String current = IOUtil.toString(new FileReader(fileName));
       fsa.generateFile(fileName, current);
     }
   }

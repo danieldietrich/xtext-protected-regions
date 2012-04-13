@@ -3,16 +3,15 @@ package net.danieldietrich.protectedregions.xtext;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import net.danieldietrich.protectedregions.core.IOUtil;
 import net.danieldietrich.protectedregions.support.IFileSystemReader;
 import net.danieldietrich.protectedregions.support.IPathFilter;
 import net.danieldietrich.protectedregions.support.IProtectedRegionSupport;
 
-import org.apache.commons.io.FileUtils;
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess;
 import org.eclipse.xtext.generator.OutputConfiguration;
 import org.slf4j.Logger;
@@ -91,20 +90,31 @@ public class BidiJavaIoFileSystemAccess extends JavaIoFileSystemAccess implement
 
 	//@Override
 	public CharSequence readFile(URI uri) throws IllegalArgumentException, IOException {
-		final File file = new File(uri);
-		return FileUtils.readFileToString(file);
+		return IOUtil.toString(new File(uri));
 	}
 
 	//@Override
 	public Set<URI> listFiles(URI path) {
-		Collection<File> files = FileUtils.listFiles(new File(path), null, true);
-		Set<URI> result = new HashSet<URI>();
-		for (File file : files) {
-			if (filter == null || filter.accept(file.toURI())) {
-				result.add(file.toURI());
+		final Set<URI> result = new HashSet<URI>();
+		final File dir = new File(path);
+		listFiles(dir, result, filter);
+		return result;
+	}
+	
+	private void listFiles(File dir, Set<URI> result, IPathFilter filter) {
+		final File[] files = dir.listFiles();
+		if (files != null) {
+			for (File file : files) {
+				if (file.isDirectory()) {
+					listFiles(file, result, filter);
+				} else {
+					final URI uri = file.toURI();
+					if (filter == null || filter.accept(uri)) {
+						result.add(uri);
+					}
+				}
 			}
 		}
-		return result;
 	}
 
 	//@Override

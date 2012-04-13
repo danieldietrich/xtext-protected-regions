@@ -19,8 +19,6 @@ for more details on usage.
    </license>
 
    <requires>
-      <import plugin="com.google.collect"/>
-      <import plugin="org.apache.commons.io"/>
       <import plugin="org.slf4j.api"/>
       <import plugin="org.junit"/>
       <import plugin="org.hamcrest.core"/>
