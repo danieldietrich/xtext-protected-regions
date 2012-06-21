@@ -23,8 +23,8 @@
 		<junit-version>4.8.2</junit-version>
 		<!-- p2 repositories -->
 		<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20110523182458/repository</orbit-site>
-		<xtext-site>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/</xtext-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/S20110907174232/repository</orbit-site>
+		<xtext-site>http://download.itemis.com/updates/releases</xtext-site>
 	</properties>
 
 	<modules>
