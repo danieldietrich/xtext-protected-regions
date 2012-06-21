@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-	<feature url="features/net.danieldietrich.protectedregions.feature_1.0.1.qualifier.jar" id="net.danieldietrich.protectedregions.feature" version="1.0.1.qualifier">
-		<category name="xprs_1.0.1_indigo"/>
+	<feature url="features/net.danieldietrich.protectedregions.feature_2.0.0.qualifier.jar" id="net.danieldietrich.protectedregions.feature" version="2.0.0.qualifier">
+		<category name="xprs_2.0.0_indigo"/>
 	</feature>
-	<category-def name="xprs_1.0.1_indigo" label="Xtext PRS 1.0.1-Indigo">
-		<description>Xtext Protected Region Support v1.0.1 for Eclipse Indigo and Xtext 2.1.0</description>
+	<category-def name="xprs_2.0.0_indigo" label="Xtext Protected Regions 2.0.0-Indigo">
+		<description>Xtext Protected Regions v2.0.0 for Eclipse Indigo and Xtext 2.0.0</description>
 	</category-def>
 </site>

@@ -1,6 +1,6 @@
-h1(#top). Xtext Protected Region Support
+h1(#top). Xtext Protected Regions
 
-The _Xtext Extension_ documentation is addressed to developers who want to benefit of protected region support in conjunction with Xtext.
+The _Xtext Extension_ documentation is addressed to developers who want to benefit of protected regions in conjunction with Xtext.
 
 h2(#toc). Table of Contents
 
@@ -34,10 +34,10 @@ h2(#usage). Usage
 
 h3(#pluginconfig). Plugin Configuration
 
-Edit your plug-in's @META-INF/MANIFEST.MF@ to add all necessary dependencies to Xtext Protected Region Support:
+Edit your plug-in's @META-INF/MANIFEST.MF@ to add all necessary dependencies to Xtext Protected Regions:
 
-bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="1.0.1",
- net.danieldietrich.protectedregions.xtext;bundle-version="1.0.1"
+bc.. Require-Bundle: net.danieldietrich.protectedregions.core;bundle-version="2.0.0",
+ net.danieldietrich.protectedregions.xtext;bundle-version="2.0.0"
 
 Import-Package: org.apache.commons.io,
  org.slf4j

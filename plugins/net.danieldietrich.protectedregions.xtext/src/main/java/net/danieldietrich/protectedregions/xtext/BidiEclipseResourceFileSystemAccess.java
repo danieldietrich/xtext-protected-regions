@@ -19,7 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess;
+import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
  
@@ -31,7 +31,7 @@ import com.google.inject.Inject;
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
-public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSystemAccess implements
+public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSystemAccess2 implements
     IFileSystemReader {
  
   private transient Logger logger = LoggerFactory.getLogger(BidiEclipseResourceFileSystemAccess.class);
@@ -78,11 +78,11 @@ public class BidiEclipseResourceFileSystemAccess extends EclipseResourceFileSyst
     super.generateFile(fileName, slot, mergedContents);
   }
   
-  @Override
-  public void setRoot(IWorkspaceRoot root) {
-    super.setRoot(root);
-    this.root = root;
-  }
+//  @Override
+//  public void setRoot(IWorkspaceRoot root) {
+//    super.setRoot(root);
+//    this.root = root;
+//  }
  
   protected IFile getFile(URI uri) {
     return root.getFile(new Path(uri.getPath()));

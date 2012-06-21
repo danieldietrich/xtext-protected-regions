@@ -2,15 +2,15 @@
 <feature
       id="net.danieldietrich.protectedregions.feature"
       label="Xtext Protected Region Support"
-      version="1.0.1.qualifier">
+      version="2.0.0.qualifier">
 
-   <description url="http://www.example.com/description">
-      This feature provides protected region support for Xtext 2.1.0.
-See https://github.com/danieldietrich/xtext-protectedregions/
+   <description>
+      This feature provides protected region support for Xtext 2.0.0.
+See https://github.com/danieldietrich/xtext-protected-regions/
 for more details on usage.
    </description>
 
-   <copyright url="http://www.example.com/copyright">
+   <copyright>
       (C)opyright 2011 Daniel Dietrich and Hendy Irawan.
    </copyright>
 
