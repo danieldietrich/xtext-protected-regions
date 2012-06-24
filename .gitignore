@@ -3,4 +3,5 @@
 .settings
 bin
 target
+xtend-gen
 .DS_Store
