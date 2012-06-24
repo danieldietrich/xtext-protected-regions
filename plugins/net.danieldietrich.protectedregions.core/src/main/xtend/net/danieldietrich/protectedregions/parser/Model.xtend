@@ -6,9 +6,11 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 import java.util.List
 import java.util.regex.Pattern;
 
+// TODO: move ModelBuilder to the outside (to ParserFactory, which needs it?)
 // TODO: def greedyString(Model model, String s)
 class ModelBuilder {
 	
+	// TODO: move constants to the outside (used by ModelBuilder AND parser/tree)
 	public static val Code = "Code";
 	public static val Comment = "Comment";
 	public static val Escape = "Escape";
@@ -16,6 +18,7 @@ class ModelBuilder {
 	public static val RegionEnd = "RegionEnd";
 	public static val String = "String";
 	
+	// TODO: create RegionResolver (who needs it? ParserFactory? ModelBuilder?) and move the protected region regex pattern stuff out here
 	static String ID = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*"
 	static String label = "PROTECTED\\s+REGION" // TODO(@@dd): if (inverse) "GENERATED" else "PROTECTED\\s+REGION"
 	// TODO(@@dd): (^\\s*|\\s+) vs. \\s* and (\\s+|\\s*$) vs. \\s*
@@ -100,6 +103,7 @@ class ModelBuilder {
 
 }
 
+/** A model is built by blocks with start/end Element and children between. */
 class Model {
 	
 	@Property var Model root = this
@@ -135,6 +139,7 @@ class Model {
 	
 }
 
+/** Elements can be located within a string. */
 abstract class Element {
 	
 	def Match indexOf(String source, int index)
@@ -188,7 +193,7 @@ class RegEx extends Element {
 	
 }
 
-/** A list of elements, indexof matches one or none of them. */
+/** A list of elements, indexOf matches one or none of them. */
 class Some extends Element {
 	
 	val Element[] elements
@@ -247,6 +252,7 @@ class Seq extends Element {
 	
 }
 
+/** A location of a string match. */
 @Data class Match {
 	
 	public static val NOT_FOUND = new Match(-1, -1)

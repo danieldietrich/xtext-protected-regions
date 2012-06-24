@@ -42,7 +42,7 @@ import net.danieldietrich.protectedregions.parser.None
 				index = endMatch.end
 				finished = true
 			} else {
-				throw new IllegalStateException(name + " parser: end of " + model + " not found at " + lineAndColumn(input, currIndex))
+				throw new IllegalStateException(name + " parser: end of " + model.type + " not found at " + lineAndColumn(input, currIndex))
 			}
 			
 		} while(!finished)
