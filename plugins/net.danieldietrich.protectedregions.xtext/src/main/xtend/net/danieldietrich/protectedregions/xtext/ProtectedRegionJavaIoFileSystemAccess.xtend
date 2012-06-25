@@ -1,10 +1,10 @@
 package net.danieldietrich.protectedregions.xtext
 
-import org.eclipse.xtext.generator.JavaIoFileSystemAccess
-import java.util.Map
-import org.eclipse.xtext.generator.OutputConfiguration
-import net.danieldietrich.protectedregions.ProtectedRegionSupport
 import java.io.File
+import java.util.Map
+import net.danieldietrich.protectedregions.ProtectedRegionSupport
+import org.eclipse.xtext.generator.JavaIoFileSystemAccess
+import org.eclipse.xtext.generator.OutputConfiguration
 
 class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	
