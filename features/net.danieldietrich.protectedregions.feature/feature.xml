@@ -5,7 +5,7 @@
       version="2.0.0.qualifier">
 
    <description>
-      This feature provides protected region support for Xtext 2.0.0.
+      This feature provides protected region support for Xtext 2.x/Xtend 2.3.x.
 See https://github.com/danieldietrich/xtext-protected-regions/
 for more details on usage.
    </description>
@@ -22,17 +22,22 @@ for more details on usage.
       <import plugin="org.slf4j.api"/>
       <import plugin="org.junit"/>
       <import plugin="org.hamcrest.core"/>
-      <import plugin="com.google.inject"/>
       <import plugin="org.eclipse.core.resources"/>
       <import plugin="org.eclipse.core.runtime"/>
       <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.xtext.builder"/>
       <import plugin="org.eclipse.xtext"/>
+      <import plugin="org.eclipse.xtext.xbase.lib" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.xtend.lib" version="2.3.0" match="greaterOrEqual"/>
+      <import plugin="com.google.inject" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="javax.inject"/>
+      <import plugin="com.google.guava"/>
+      <import plugin="org.eclipse.emf.common"/>
    </requires>
 
    <plugin
-         id="net.danieldietrich.protectedregions.core"
+         id="net.danieldietrich.protectedregionsc.core"
          download-size="0"
          install-size="0"
          version="0.0.0"
