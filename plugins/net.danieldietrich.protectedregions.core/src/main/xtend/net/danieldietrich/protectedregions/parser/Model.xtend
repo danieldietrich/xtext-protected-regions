@@ -46,11 +46,16 @@ class Model {
 	val String name
 }
 
-/** Elements can be located within a string. */
+/** Element which can be located within a String. */
 abstract class Element {
 	
+	/** Returns an implementation specific Match of this Element, maybe NOT_FOUND. */
 	def Match indexOf(String source, int index)
 	
+	/**
+	 * Checks if this.indexOf(input, index) < that.indexOf(input, index).
+	 * Also true if that not found or indexes are equal and that.length < this.length.
+	 */
 	def ahead(Element that, String input, int index) {
 		val m1 = this.indexOf(input, index)
 		val m2 = that.indexOf(input, index)
@@ -59,15 +64,17 @@ abstract class Element {
 	
 }
 
-/** A string element, indexOf is a string match. */
+/** A plain String representation. */
 class Str extends Element {
 	
 	val String s
 
 	new(String s) {
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("Str argument cannot be empty")
 		this.s = s
 	}
-	
+
+	/** Returns the first Match of this String or NOT_FOUND. */	
 	override indexOf(String source, int index) {
 		val int i = source.indexOf(s, index)
 		if (i == -1) NOT_FOUND else new Match(i, s.length)
@@ -79,15 +86,44 @@ class Str extends Element {
 	
 }
 
-/** An reqular expression element, indexOf is a pattern match. */
+/** A greedy String representation. */
+class GreedyStr extends Element {
+
+	val String s
+
+	new(String s) {
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("GreedyStr argument cannot be empty")
+		s.toCharArray.reduce[x,y | if (x == y) x else throw new IllegalArgumentException("All characters have to be equal")]
+		this.s = s
+	}
+	
+	/**
+	 * Returns the first greedy Match of this String or NOT_FOUND.
+	 * Example: new GreedyStr("'''").indexOf("Test''''123", 0) returns Match(5, 3) remaining "123"
+	 */
+	override indexOf(String source, int index) {
+		var int i = source.indexOf(s, index)
+		while (source.indexOf(s, i+1) == i+1) i = i + 1
+		if (i == -1) NOT_FOUND else new Match(i, s.length)
+	}
+
+	override String toString() {
+		"GreedyStr("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
+	}
+	
+}
+
+/** An reqular expression element. */
 class RegEx extends Element {
 	
 	val Pattern pattern
 	
 	new(String regEx) {
+		if (regEx.isNullOrEmpty) throw new IllegalArgumentException("RegEx argument cannot be empty")
 		pattern = Pattern::compile(regEx)
 	}
 	
+	/** Returns the first Match of this Pattern or NOT_FOUND. */
 	override indexOf(String source, int index) {
 		val m = pattern.matcher(source)
 		val found = m.find(index)
@@ -100,16 +136,17 @@ class RegEx extends Element {
 	
 }
 
-/** A list of elements, indexOf matches one or none of them. */
+/** A list of possibilities. */
 class Some extends Element {
 	
 	val Element[] elements
 	
 	new(Element... elements) {
-		if (elements.size == 0) throw new IllegalArgumentException("No elements specified")
+		if (elements.size == 0) throw new IllegalArgumentException("Some argument needs at least one Element")
 		this.elements = elements
 	}
 	
+	/** Returns the Match of the Element occurring first or NOT_FOUND. */
 	override indexOf(String source, int index) {
 		val e = elements.reduce(e1, e2 | if (e1.ahead(e2, source, index)) e1 else e2)
 		if (e == null) NOT_FOUND else e.indexOf(source, index)
@@ -121,9 +158,10 @@ class Some extends Element {
 	
 }
 
-/** Placeholder for no element, indexOf is not supported. */
+/** Placeholder for no Element. */
 class None extends Element {
 	
+	/** Throws UnsupportedOperationException. */
 	override indexOf(String source, int index) {
 		throw new UnsupportedOperationException()
 	}
@@ -134,16 +172,17 @@ class None extends Element {
 	
 }
 
-/** A sequence of elements, indexOf matches their concatenation or none. */
+/** A sequence of Elements. */
 class Seq extends Element {
 	
 	val Element[] sequence
 	
 	new(Element... sequence) {
-		if (sequence.size == 0) throw new IllegalArgumentException("Empty sequence not allowed")
+		if (sequence.size == 0) throw new IllegalArgumentException("Seq argument needs at least one Element")
 		this.sequence = sequence
 	}
 	
+	/** Matches the concatenation of this sequence or NOT_FOUND. */
 	override indexOf(String source, int index) {
 		sequence.map[indexOf(source, index)].reduce(m1, m2 |
 			if (m1 == NOT_FOUND || m2 == NOT_FOUND || m2.index != m1.index + m1.length)
@@ -159,7 +198,7 @@ class Seq extends Element {
 	
 }
 
-/** A location of a string match. */
+/** A location (index, length) of a string match. */
 @Data class Match {
 	
 	public static val NOT_FOUND = new Match(-1, -1)
