@@ -8,9 +8,11 @@ abstract class Tree {
 	
 	@Property val String id
 	
-	protected new(String id) {
+	new(String id) {
 		this._id = id
 	}
+	
+	def void traverse((Tree)=>Object f)
 	
 	override toString() {
 		toString(0)
@@ -24,39 +26,39 @@ class Node extends Tree {
 	
 	@Property val List<Tree> children = newArrayList()
 	
-	protected new(String id) {
+	new(String id) {
 		super(id)
 	}
 	
-	// syntactic sugar for Node creation
-	def static Node Node(String type, Tree... children) {
-		val node = new Node(type)
-		children.forEach[node.add(it)]
-		node
-	}
-	
 	// build tree-like structures by adding children
-	def <T extends Tree> T add(T child) { children.add(child); child }
-	
+	def <T extends Tree> T add(T child) {
+		children.add(child); child
+	}
+
+	override traverse((Tree)=>Object f) {
+		f.apply(this)
+		children.forEach[traverse(f)]
+	}
+		
 	override protected toString(int depth) {
 		val indent = indent(depth)
     	indent + id +"(\n"+ children.map[toString(depth+1)].reduce(l,r | l +",\n"+ r) +"\n"+ indent +")"
 	}
 		
+
 }
 
 class Leaf extends Tree {
 	
 	@Property val String value
 	
-	protected new(String id, String value) {
+	new(String id, String value) {
 		super(id)
 		this._value = value
 	}
 	
-	// syntactic sugar for Leaf creation
-	def static Leaf Leaf(String id, String value) {
-		new Leaf(id, value)
+	override traverse((Tree)=>Object f) {
+		f.apply(this)
 	}
 	
 	override protected toString(int depth) {

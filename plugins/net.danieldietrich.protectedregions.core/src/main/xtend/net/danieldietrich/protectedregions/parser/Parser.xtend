@@ -14,7 +14,7 @@ import net.danieldietrich.protectedregions.parser.None
 	
 	def parse(CharSequence original) {
 		val input = original.toString()
-		val output = Node(model.type)
+		val output = Node(model.symbol.name)
 		parse(model, input, output, 0, 0)
 		output
 	}
@@ -31,10 +31,10 @@ import net.danieldietrich.protectedregions.parser.None
 			val childMatch = if (child == null) NOT_FOUND else child.start.indexOf(input, currIndex)
 			val endMatch = model.end.indexOf(input, currIndex)
 			
-			// parse child if found and it is ahead of current model end (root has no end)
+			// parse child if found and it is ahead of current model end
 			if (childMatch.found && (!endMatch.found || child.start.ahead(model.end, input, currIndex))) {
 				if (currIndex < childMatch.index) output.add(Text(input.substring(currIndex, childMatch.index)))
-				val unit = output.add(Node(child.type, Text(input.substring(childMatch.index, childMatch.end))))
+				val unit = output.add(Node(child.symbol.name, Text(input.substring(childMatch.index, childMatch.end))))
 				index = if (child.end.isNone) childMatch.end else parse(child, input, unit, childMatch.end, depth+1)
 			} else if (endMatch.found) {
 				if (currIndex < endMatch.index) output.add(Text(input.substring(currIndex, endMatch.index)))
@@ -42,7 +42,7 @@ import net.danieldietrich.protectedregions.parser.None
 				index = endMatch.end
 				finished = true
 			} else {
-				throw new IllegalStateException(name + " parser: end of " + model.type + " not found at " + lineAndColumn(input, currIndex))
+				throw new IllegalStateException(name + " parser: end of " + model.symbol.name + " not found at " + lineAndColumn(input, currIndex))
 			}
 			
 		} while(!finished)
@@ -50,8 +50,14 @@ import net.danieldietrich.protectedregions.parser.None
 		index
 	}
 	
+	def static Node Node(String id, Tree... children) {
+		val node = new Node(id)
+		children.forEach[node.add(it)]
+		node
+	}
+
 	def private Text(String value) {
-		Leaf("Text", value)
+		new Leaf("Text", value)
 	}
 	
 	def private isNone(Element e) {

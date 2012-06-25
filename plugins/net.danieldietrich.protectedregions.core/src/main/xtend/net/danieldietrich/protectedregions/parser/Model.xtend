@@ -6,114 +6,17 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 import java.util.List
 import java.util.regex.Pattern;
 
-// TODO: move ModelBuilder to the outside (to ParserFactory, which needs it?)
-// TODO: def greedyString(Model model, String s)
-class ModelBuilder {
-	
-	// TODO: move constants to the outside (used by ModelBuilder AND parser/tree)
-	public static val Code = "Code";
-	public static val Comment = "Comment";
-	public static val Escape = "Escape";
-	public static val RegionStart = "RegionStart";
-	public static val RegionEnd = "RegionEnd";
-	public static val String = "String";
-	
-	// TODO: create RegionResolver (who needs it? ParserFactory? ModelBuilder?) and move the protected region regex pattern stuff out here
-	static String ID = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*"
-	static String label = "PROTECTED\\s+REGION" // TODO(@@dd): if (inverse) "GENERATED" else "PROTECTED\\s+REGION"
-	// TODO(@@dd): (^\\s*|\\s+) vs. \\s* and (\\s+|\\s*$) vs. \\s*
-	static String start = label + "\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(ENABLED\\s+)?START"
-    static String end = label + "\\s+END"
-    
-    static Model PR_START = new Model(RegionStart, RegEx(start), None())
-    static Model PR_END = new Model(RegionEnd, RegEx(end), None())
-	
-	def model((Model)=>void initializer) {
-		val model = new Model(Code, RegEx("^"), RegEx("\\z"))
-		initializer.apply(model)
-		model
-	}
-	
-	def comment(Model model, String s) {
-		val Model comment = new Model(Comment, Str(s), Some(Str("\r\n"), Str("\n\r"), Str("\n"), Str("\r")))
-		model.add(comment)
-		protectedRegion(comment)
-	}
-	
-	def comment(Model model, String start, String end) {
-		val Model comment = new Model(Comment, Str(start), Str(end))
-		model.add(comment)
-		protectedRegion(comment)
-	}
-	
-	def nestableComment(Model model, String start, String end) {
-		val comment = new Model(Comment, Str(start), Str(end))
-		model.add(comment)
-		protectedRegion(comment)
-		comment.add(comment) // recursive model
-	}
-	
-	def string(Model model, String s) {
-		model.add(new Model(String, Str(s), Str(s)))
-	}
-	
-	def string(Model model, String start, String end) {
-		model.add(new Model(String, Str(start), Str(end)))
-	}
-	
-	def withEscape(Model model, String escape) {
-		if (model == model.root) throw new IllegalStateException("<root>.withEscape() not allowed")
-		model.add(new Model(Escape, Seq(Str(escape), model.start), None()))
-		model // return parent because escape models have no children
-  	}
-  	
-  	def withCode(Model model, String start, String end) {
-		if (model == model.root) throw new IllegalStateException("<root>.withCode() not allowed")
-  		val code = new Model(Code, Str(start), Str(end))
-  		model.add(code)
-  		code.add(model.root)
-  		model // return parent because code models have root as only child
-  	}
-  	
-  	def private protectedRegion(Model model) {
-		model.add(PR_START)
-		model.add(PR_END)
-		model // return parent because protected regions have no children
-	}
-	
-	def private static Str(String s) {
-		new Str(s)
-	}
-	
-	def private static RegEx(String regEx) {
-		new RegEx(regEx)
-	}
-	
-	def private static Element Some(Element... elements) {
-  		new Some(elements)
-  	}
-  	
-  	def private static Element None() {
-		new None()
-	}
-	
-	def private static Element Seq(Element... sequence) {
-		new Seq(sequence)
-	}
-
-}
-
 /** A model is built by blocks with start/end Element and children between. */
 class Model {
 	
 	@Property var Model root = this
 	@Property val List<Model> children = newArrayList()
-	@Property val String type
+	@Property val Symbol symbol
 	@Property val Element start
 	@Property val Element end
 
-	new(String type, Element start, Element end) {
-		this._type = type
+	new(Symbol symbol, Element start, Element end) {
+		this._symbol = symbol
 		this._start = start
 		this._end = end
 	}
@@ -132,11 +35,15 @@ class Model {
 	
 	def private String toString(int depth) {
 		val indent = indent(depth)
-    	indent + type +"("+ start +", "+ end +")"+
+    	indent + symbol.name +"("+ start +", "+ end +")"+
     		if (children.size == 0) ""
     		else "(\n"+ children.map[toString(depth+1)].reduce(l,r | l +",\n"+ r) +"\n"+ indent +")"
 	}
 	
+}
+
+@Data class Symbol {
+	val String name
 }
 
 /** Elements can be located within a string. */
