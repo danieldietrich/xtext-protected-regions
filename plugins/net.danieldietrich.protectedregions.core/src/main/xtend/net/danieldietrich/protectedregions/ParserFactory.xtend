@@ -4,6 +4,7 @@ import static net.danieldietrich.protectedregions.Symbols.*
 
 import com.google.inject.Inject
 import net.danieldietrich.protectedregions.parser.Element
+import net.danieldietrich.protectedregions.parser.GreedyStr
 import net.danieldietrich.protectedregions.parser.Leaf
 import net.danieldietrich.protectedregions.parser.Model
 import net.danieldietrich.protectedregions.parser.None
@@ -18,8 +19,8 @@ class ParserFactory {
 	
 	@Inject extension ModelBuilder
 	
-	def javaParser() {
-		parser("java", model[
+	def javaParser(RegionResolver... optionalResolver) {
+		parser("java", model(optionalResolver)[
 			comment("//")
 			comment("/*", "*/")
 			string('"').withEscape("\\")
@@ -27,8 +28,8 @@ class ParserFactory {
 		])
 	}
 	
-	def xmlParser() {
-		parser("xml", model[
+	def xmlParser(RegionResolver... optionalResolver) {
+		parser("xml", model(optionalResolver)[
 			comment("<!--", "-->")
 			string("<![CDATA[", "]]>")
 			string("'")
@@ -36,8 +37,8 @@ class ParserFactory {
 		])
 	}
 	
-	def xtendParser() {
-		parser("xtend", model[
+	def xtendParser(RegionResolver... optionalResolver) {
+		parser("xtend", model(optionalResolver)[
 			comment("//")
 			comment("/*", "*/")
 			string('"').withEscape("\\")
@@ -121,7 +122,7 @@ class ParserFactory {
 //      nestableComment("/*", "*/")
 //      string('"').withEscape("\\")
 //      string("'").withEscape("\\")
-//      string('"""')
+//      greedyString('"""')
 //    ]
 //  }
 //  
@@ -215,6 +216,7 @@ class ParserFactory {
 	
 }
 
+// TODO: needing this class?
 @Data class Region {
 
 	val String id
@@ -241,47 +243,42 @@ class Symbols {
 // TODO: def greedyString(Model model, String s)
 class ModelBuilder {
 	
-	// TODO: create RegionResolver (who needs it? ParserFactory? ModelBuilder?) and move the protected region regex pattern stuff out here
-	static String ID = "([a-zA-Z_$][a-zA-Z\\d_$]*\\.)*[a-zA-Z_$][a-zA-Z\\d_$]*"
-	static String label = "PROTECTED\\s+REGION" // TODO(@@dd): if (inverse) "GENERATED" else "PROTECTED\\s+REGION"
-	// TODO(@@dd): (^\\s*|\\s+) vs. \\s* and (\\s+|\\s*$) vs. \\s*
-	static String start = label + "\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(ENABLED\\s+)?START"
-    static String end = label + "\\s+END"
-    
-    static Model PR_START = new Model(RegionStart, RegEx(start), None())
-    static Model PR_END = new Model(RegionEnd, RegEx(end), None())
+	static val DEFAULT_REGION_RESOLVER = new DefaultProtectedRegionResolver()
+	static val EOL = Some(Str("\r\n"), Str("\n\r"), Str("\n"), Str("\r"))
 	
-	private static val EOL = Some(Str("\r\n"), Str("\n\r"), Str("\n"), Str("\r"))
-	
-	def model((Model)=>void initializer) {
+	def model(RegionResolver[] optionalResolver, (Model)=>void initializer) {
+		if (optionalResolver.size > 1) throw new IllegalArgumentException("Some or none RegionResolver allowed.")
+		val resolver = if (optionalResolver.size == 0) DEFAULT_REGION_RESOLVER else optionalResolver.get(0)
 		val model = new Model(Code, RegEx("^"), RegEx("\\z"))
 		initializer.apply(model)
+		withRegions(model, resolver)
 		model
 	}
 	
 	def comment(Model model, String s) {
 		val Model comment = new Model(Comment, Str(s), EOL)
 		model.add(comment)
-		protectedRegion(comment)
 	}
 	
 	def comment(Model model, String start, String end) {
 		val Model comment = new Model(Comment, Str(start), Str(end))
 		model.add(comment)
-		protectedRegion(comment)
 	}
 	
 	def nestableComment(Model model, String start, String end) {
 		val comment = new Model(Comment, Str(start), Str(end))
 		model.add(comment)
-		protectedRegion(comment)
 		comment.add(comment) // recursive model
 	}
 	
 	def string(Model model, String s) {
 		model.add(new Model(String, Str(s), Str(s)))
 	}
-	
+
+	def greedyString(Model model, String s) {
+		model.add(new Model(String, Str(s), GreedyStr(s)))
+	}
+		
 	def string(Model model, String start, String end) {
 		model.add(new Model(String, Str(start), Str(end)))
 	}
@@ -300,14 +297,21 @@ class ModelBuilder {
   		model // return parent because code models have root as only child
   	}
   	
-  	def private protectedRegion(Model model) {
-		model.add(PR_START)
-		model.add(PR_END)
-		model // return parent because protected regions have no children
+  	def private void withRegions(Model model, RegionResolver resolver) {
+  		if (model.symbol == Comment) {
+  			model.add(new Model(RegionStart, RegEx(resolver.start.pattern), None))
+  			model.add(new Model(RegionEnd, RegEx(resolver.end.pattern), None))
+  		} else { // need 'else' here because of nested comments
+  			model.children.forEach[withRegions(resolver)]
+  		}
 	}
 	
 	def private static Str(String s) {
 		new Str(s)
+	}
+	
+	def private static GreedyStr(String s) {
+		new GreedyStr(s)
 	}
 	
 	def private static RegEx(String regEx) {

@@ -5,7 +5,11 @@ import java.util.regex.Pattern
 
 class Strings {
 	
-	static Pattern EOL = Pattern::compile("(\\r\\n|\\n|\\r)")
+	static Pattern EOL = Pattern::compile("\\r\\n|\\n|\\r")
+	
+	def static isEmpty(String s) {
+		return s == null || "".equals(s.trim)
+	}
 	
 	def static operator_multiply(int count, String s) {
 		var result = new StringBuffer()

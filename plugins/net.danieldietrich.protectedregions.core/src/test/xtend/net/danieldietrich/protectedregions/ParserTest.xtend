@@ -7,12 +7,12 @@ import java.util.List
 /**
  * @author Daniel Dietrich - Initial contribution and API
  */
-class Test {
+class ParserTest {
 
 	@Inject extension ParserFactory
 
 	def static void main(String[] args) {
-		Guice::createInjector().getInstance(typeof(Test)).run()
+		Guice::createInjector().getInstance(typeof(ParserTest)).run()
 	}
 	
 	def private run() {

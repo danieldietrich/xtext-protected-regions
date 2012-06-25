@@ -11,11 +11,6 @@ abstract class ResourceReader {
 	// TODO
 }
 
-// TODO: RegionOracle = RegionResolver (isStart, isEnd, getId, ...)
-abstract class RegionResolver {
-	
-}
-
 class ProtectedRegionSupport {
 	
 	val Map<String, Parser> parsers = newHashMap()
