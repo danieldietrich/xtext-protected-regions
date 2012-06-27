@@ -11,7 +11,7 @@ for more details on usage.
    </description>
 
    <copyright>
-      (C)opyright 2011 Daniel Dietrich and Hendy Irawan.
+      Written by Daniel Dietrich and Hendy Irawan.
    </copyright>
 
    <license url="http://www.eclipse.org/legal/epl-v10.html">
@@ -19,21 +19,22 @@ for more details on usage.
    </license>
 
    <requires>
-      <import plugin="org.slf4j.api"/>
-      <import plugin="org.junit"/>
-      <import plugin="org.hamcrest.core"/>
-      <import plugin="org.eclipse.core.resources"/>
-      <import plugin="org.eclipse.core.runtime"/>
-      <import plugin="org.eclipse.core.jobs"/>
-      <import plugin="org.eclipse.emf.ecore"/>
-      <import plugin="org.eclipse.xtext.builder"/>
-      <import plugin="org.eclipse.xtext"/>
       <import plugin="org.eclipse.xtext.xbase.lib" version="2.3.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.xtend.lib" version="2.3.0" match="greaterOrEqual"/>
       <import plugin="com.google.inject" version="3.0.0" match="greaterOrEqual"/>
+      <import plugin="org.junit4" version="4.8.1" match="greaterOrEqual"/>
+      <import plugin="org.slf4j.api" version="1.6.1" match="greaterOrEqual"/>
       <import plugin="javax.inject"/>
       <import plugin="com.google.guava"/>
+      <import plugin="org.eclipse.core.resources"/>
+      <import plugin="org.eclipse.core.runtime"/>
+      <import plugin="org.eclipse.core.jobs"/>
       <import plugin="org.eclipse.emf.common"/>
+      <import plugin="org.eclipse.emf.ecore"/>
+      <import plugin="org.eclipse.xtext.builder"/>
+      <import plugin="org.eclipse.xtext"/>
+      <import plugin="org.junit"/>
+      <import plugin="org.hamcrest.core"/>
    </requires>
 
    <plugin
