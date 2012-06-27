@@ -5,14 +5,19 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 import java.util.List
 import net.danieldietrich.protectedregions.util.None
 import net.danieldietrich.protectedregions.util.Option
+import net.danieldietrich.protectedregions.util.OptionExtensions
 import net.danieldietrich.protectedregions.util.Some
 import java.util.ArrayList
 
 class TreeExtensions {
 
+	extension OptionExtensions = new OptionExtensions()
+
 	/** Construct a Node. */
 	def <T> Node Node(String id, Tree<T>... children) {
-		new Node<T>(id, children)
+		val node = new Node<T>(id)
+		children.forEach[node.add(it)]
+		node
 	}
 
 	/** Construct a Leaf. */
@@ -27,10 +32,7 @@ class TreeExtensions {
 	
 	/** Example: node.leafs.find[id.equals('xxx')] */
 	def <T, X extends Tree<T>> Option<X> find(Iterable<X> children, (X)=>Boolean predicate) {
-		// WORKAROUND { Option(children.findFirst(predicate)) }-->
-		val el = children.findFirst(predicate)
-		if (el == null) new None<X> else new Some(el)
-		// <-- WORKAROUND
+		Option(children.findFirst(predicate))
 	}
 	
 	/** Example: node.leafs.find('xxx') */
@@ -89,7 +91,7 @@ class TreeExtensions {
 abstract class Tree<T> {
 	
 	@Property val String id
-	@Property var Tree<T> parent = null
+	@Property var Node<T> parent = null
 	
 	new(String id) {
 		if (id == null) throw new IllegalArgumentException("Id cannot be null")
@@ -97,12 +99,12 @@ abstract class Tree<T> {
 	}
 	
 	def boolean isLeaf()
-	def isRoot() { parent == null }
-	def Tree<T> root() { if (isRoot) this else parent.root }
+	def isRoot() { _parent == null }
+	def Tree<T> root() { if (isRoot) this else _parent.root }
 	
 	override toString() { _toString(0, new ArrayList<Tree<T>>()) }
 	
-	// WORKAROUND: need to name method _toString instead of toString because of Xtend bug
+	// Need to name method _toString instead of toString because of Xtend 2.3.0 bug
 	def protected String _toString(int depth, List<Tree<T>> visited)
 	
 }
@@ -111,13 +113,14 @@ class Node<T> extends Tree<T> {
 	
 	@Property val List<Tree<T>> children = newArrayList()
 	
-	new(String id, Tree<T>... children) {
+	new(String id) {
 		super(id)
-		add(children)
 	}
 	
-	def add(Tree<T>... children) {
-		children.forEach[_children.add(it); it.parent = this]
+	def add(Tree<T> child) {
+		children.add(child)
+		child.parent = this
+		child
 	}
 		
 	override isLeaf() { false }

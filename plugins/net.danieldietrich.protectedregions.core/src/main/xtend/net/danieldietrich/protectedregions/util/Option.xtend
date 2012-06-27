@@ -27,10 +27,10 @@ class Some<T> extends Option<T> {
 		(new ArrayList<T> => [ add(obj) ]).iterator
 	}
 	override equals(Object o) {
-		this == o || (o != null && switch o {
+		o != null && switch o {
 			Some<T> : o.obj.equals(obj)
 			default : false
-		})
+		}
 	}
 	override hashCode() { obj.hashCode + 31 }
 	override toString() { "Some("+ obj +")" }
@@ -43,10 +43,10 @@ class None<T> extends Option<T> {
 		new ArrayList<T>.iterator
 	}
 	override equals(Object o) {
-		this == o || (o != null && switch o {
+		o != null && switch o {
 			None<T> : true
 			default : false
-		})
+		}
 	}
 	override hashCode() { 0 }
 	override toString() { "None" }

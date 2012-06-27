@@ -15,7 +15,10 @@ class ModelExtensions {
 	
 	def Model(String id, Element start, Element end) {
 		if (NoElement.equals(start)) throw new IllegalArgumentException("The start element cannot be NoElement.")
-		new Node<Element>(id, new Leaf<Element>('Start', start), new Leaf<Element>('End', end))
+		new Node<Element>(id) => [
+			add(new Leaf<Element>('Start', start))
+			add(new Leaf<Element>('End', end))
+		]
 	}
 	
 	def Model(String id, String start, Element end) {
@@ -94,28 +97,6 @@ abstract class Element {
 	
 }
 
-/** A plain String representation. */
-class StrElement extends Element {
-	
-	val String s
-
-	new(String s) {
-		if (s.isNullOrEmpty) throw new IllegalArgumentException("StrElement argument cannot be empty")
-		this.s = s
-	}
-
-	/** Returns the first Match of this String or NOT_FOUND. */	
-	override indexOf(String source, int index) {
-		val int i = source.indexOf(s, index)
-		if (i == -1) NOT_FOUND else new Match(i, s.length)
-	}
-	
-	override String toString() {
-		"StrElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
-	}
-	
-}
-
 /** A greedy String representation. */
 class GreedyElement extends Element {
 
@@ -143,6 +124,20 @@ class GreedyElement extends Element {
 	
 }
 
+/** Placeholder for no Element. */
+class NoElement extends Element {
+	
+	/** By definition NoElement cannot be found. */
+	override indexOf(String source, int index) {
+		NOT_FOUND
+	}
+	
+	override String toString() {
+		"NoElement"
+	}
+	
+}
+
 /** An reqular expression element. */
 class RegExElement extends Element {
 	
@@ -162,42 +157,6 @@ class RegExElement extends Element {
 	
 	override String toString() {
 		"RegExElement("+ pattern.pattern() + ")"
-	}
-	
-}
-
-/** A list of possibilities. */
-class SomeElement extends Element {
-	
-	val Element[] elements
-	
-	new(Element... elements) {
-		if (elements.size == 0) throw new IllegalArgumentException("SomeElement argument needs at least one Element")
-		this.elements = elements
-	}
-	
-	/** Returns the Match of the Element occurring first or NOT_FOUND. */
-	override indexOf(String source, int index) {
-		val e = elements.reduce(e1, e2 | if (e1.ahead(e2, source, index)) e1 else e2)
-		if (e == null) NOT_FOUND else e.indexOf(source, index)
-	}
-	
-	override String toString() {
-		"SomeElement("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
-	}
-	
-}
-
-/** Placeholder for no Element. */
-class NoElement extends Element {
-	
-	/** By definition NoElement cannot be found. */
-	override indexOf(String source, int index) {
-		NOT_FOUND
-	}
-	
-	override String toString() {
-		"NoElement"
 	}
 	
 }
@@ -228,6 +187,50 @@ class SeqElement extends Element {
 	
 }
 
+/** A list of possibilities. */
+class SomeElement extends Element {
+	
+	val Element[] elements
+	
+	new(Element... elements) {
+		if (elements.size == 0) throw new IllegalArgumentException("SomeElement argument needs at least one Element")
+		this.elements = elements
+	}
+	
+	/** Returns the Match of the Element occurring first or NOT_FOUND. */
+	override indexOf(String source, int index) {
+		val e = elements.reduce(e1, e2 | if (e1.ahead(e2, source, index)) e1 else e2)
+		if (e == null) NOT_FOUND else e.indexOf(source, index)
+	}
+	
+	override String toString() {
+		"SomeElement("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
+	}
+	
+}
+
+/** A plain String representation. */
+class StrElement extends Element {
+	
+	val String s
+
+	new(String s) {
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("StrElement argument cannot be empty")
+		this.s = s
+	}
+
+	/** Returns the first Match of this String or NOT_FOUND. */	
+	override indexOf(String source, int index) {
+		val int i = source.indexOf(s, index)
+		if (i == -1) NOT_FOUND else new Match(i, s.length)
+	}
+	
+	override String toString() {
+		"StrElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
+	}
+	
+}
+
 /** A location (index, length) of a string match. */
 @Data class Match {
 	
@@ -238,5 +241,9 @@ class SeqElement extends Element {
 	
 	def boolean found() { index > -1 }
 	def int end() { index + length }
+	
+	override toString() {
+		"Match("+ index +", "+ length +")"
+	}
 	
 }

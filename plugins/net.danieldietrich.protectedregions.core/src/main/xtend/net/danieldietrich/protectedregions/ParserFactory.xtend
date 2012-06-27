@@ -10,7 +10,6 @@ import net.danieldietrich.protectedregions.parser2.Node
 import net.danieldietrich.protectedregions.parser2.Parser
 import net.danieldietrich.protectedregions.parser2.TreeExtensions
 import org.slf4j.LoggerFactory
-import net.danieldietrich.protectedregions.parser2.Tree
 
 class ParserFactory {
 	
@@ -278,45 +277,46 @@ class ModelBuilder {
 	@Inject extension TreeExtensions	
 	
 	def model((Node<Element>)=>void initializer) {
-		val model = Model('Code', "^".r, "\\z".r)
-		initializer.apply(model)
-		model
+		Model('Code', "^".r, "\\z".r) => [
+			initializer.apply(it)	
+		]
 	}
 	
 	def comment(Node<Element> model, String s) {
-		val comment = Model('Comment', s, EOL)
-		model.add(comment)
-		comment
+		Model('Comment', s, EOL) => [
+			model.add(it)
+		]
 	}
 	
 	def comment(Node<Element> model, String start, String end) {
-		val comment = Model('Comment', start, end)
-		model.add(comment)
-		comment
+		Model('Comment', start, end) => [
+			model.add(it)
+		]
 	}
 	
 	def nestableComment(Node<Element> model, String start, String end) {
-		val comment = Model('Comment', start, end)
-		model.add(comment)
-		comment.add(comment) // recursive model
+		Model('Comment', start, end) => [
+			model.add(it)
+			it.add(it) // recursive model
+		]
 	}
 	
 	def string(Node<Element> model, String s) {
-		val string = Model('String', s, s)
-		model.add(string)
-		string
+		Model('String', s, s) => [
+			model.add(it)
+		]
 	}
 
 	def greedyString(Node<Element> model, String s) {
-		val greedy = Model('String', s, GreedyElement(s))
-		model.add(greedy)
-		greedy
+		Model('String', s, GreedyElement(s)) => [
+			model.add(it)	
+		]
 	}
 		
 	def string(Node<Element> model, String start, String end) {
-		val string = Model('String', start, end)
-		model.add(string)
-		string
+		Model('String', start, end) => [
+			model.add(it)
+		]
 	}
 	
 	def withEscape(Node<Element> model, String escape) {
@@ -330,7 +330,7 @@ class ModelBuilder {
 		if (model == model.root) throw new IllegalStateException(model.id +".withCode() not allowed at root node")
   		val code = Model('Code', start, end)
   		model.add(code)
-  		code.add(model.root.children as Tree<Element>[])
+  		model.root.children.forEach[code.add(it)]
   		model // return parent because code models have root as only child
   	}
   	
