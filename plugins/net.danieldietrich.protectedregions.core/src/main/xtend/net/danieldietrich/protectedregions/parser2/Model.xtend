@@ -1,78 +1,77 @@
-package net.danieldietrich.protectedregions.parser
+package net.danieldietrich.protectedregions.parser2
 
-import static net.danieldietrich.protectedregions.parser.Match.*
-import static net.danieldietrich.protectedregions.util.Strings.*
+import static net.danieldietrich.protectedregions.parser2.Match.*
 
-import java.util.List
-import java.util.regex.Pattern;
+import java.util.regex.Pattern
+import net.danieldietrich.protectedregions.util.None
+import net.danieldietrich.protectedregions.util.Option
+import net.danieldietrich.protectedregions.util.Some
 
-/** A model is built by blocks with start/end Element and children between. */
-class Model {
-
-	@Property var Model root = this
-	@Property val List<Model> children = newArrayList()
-	@Property val Symbol symbol
-	@Property val Element start
-	@Property val Element end
-
-	new(Symbol symbol, Element start, Element end) {
-		this._symbol = symbol
-		this._start = start
-		this._end = end
-	}
-
-	def add(Model child) {
-		if (child == root && child != this) {
-			children.addAll(root.children)
-		} else {
-			children.add(child)
-			child.root = root
-		}
-		child
+/** Extensions helping model builders. */
+class ModelExtensions {
+	
+	extension ElementExtensions = new ElementExtensions()
+	extension TreeExtensions = new TreeExtensions()
+	
+	def Model(String id, Element start, Element end) {
+		if (NoElement.equals(start)) throw new IllegalArgumentException("The start element cannot be NoElement.")
+		new Node<Element>(id, new Leaf<Element>('Start', start), new Leaf<Element>('End', end))
 	}
 	
-	override toString() { toString(0) }
-	
-	def private String toString(int depth) {
-		val indent = indent(depth)
-    	indent + symbol.name +"("+ start +", "+ end +")"+
-    		if (children.size == 0) ""
-    		else "(\n"+ children.map[toString(depth+1)].reduce(l,r | l +",\n"+ r) +"\n"+ indent +")"
+	def Model(String id, String start, Element end) {
+		Model(id, StrElement(start), end)
+	}
+
+	def Model(String id, String start, String end) {
+		Model(id, StrElement(start), StrElement(end))
 	}
 	
+	def start(Node<Element> node) {
+		node.leafs.find('Start')
+	}
+
+	def end(Node<Element> node) {
+		node.leafs.find('End')
+	}
+
 }
 
-@Data class Symbol {
-	val String name
-}
-
+/** Syntactic sugar creating elements. */
 class ElementExtensions {
 	
-	// TODO: move this away
 	public val EOL = SomeElement(StrElement("\r\n"), StrElement("\n"), StrElement("\r"))
-	
-	def StrElement(String s) {
-		new StrElement(s)
-	}
 	
 	def GreedyElement(String s) {
 		new GreedyElement(s)
 	}
 	
-	def RegExElement(String regEx) {
+  	def NoElement() {
+		new NoElement()
+	}
+
+	// Scala's parser combinator regex style
+	def r(String regEx) {
 		new RegExElement(regEx)
 	}
 	
-	def Element SomeElement(Element... elements) {
+	def SeqElement(Element... sequence) {
+		new SeqElement(sequence)
+	}
+	
+	def SomeElement(Element... elements) {
   		new SomeElement(elements)
   	}
   	
-  	def Element NoElement() {
-		new NoElement()
+	def StrElement(String s) {
+		new StrElement(s)
 	}
 	
-	def Element SeqElement(Element... sequence) {
-		new SeqElement(sequence)
+	/** Returns a Some<Element> of the Element contained in o or None<Element>. */
+	def unpack(Option<Leaf<Element>> o) {
+		switch o {
+			Some<Leaf<Element>> : new Some<Element>(o.get.value)
+			None<Leaf<Element>> : new None<Element>
+		}
 	}
 	
 }
@@ -82,7 +81,7 @@ abstract class Element {
 	
 	/** Returns an implementation specific Match of this Element, maybe NOT_FOUND. */
 	def Match indexOf(String source, int index)
-	
+
 	/**
 	 * Checks if this.indexOf(input, index) < that.indexOf(input, index).
 	 * Also true if that not found or indexes are equal and that.length < this.length.
@@ -192,9 +191,9 @@ class SomeElement extends Element {
 /** Placeholder for no Element. */
 class NoElement extends Element {
 	
-	/** Throws UnsupportedOperationException. */
+	/** By definition NoElement cannot be found. */
 	override indexOf(String source, int index) {
-		throw new UnsupportedOperationException()
+		NOT_FOUND
 	}
 	
 	override String toString() {

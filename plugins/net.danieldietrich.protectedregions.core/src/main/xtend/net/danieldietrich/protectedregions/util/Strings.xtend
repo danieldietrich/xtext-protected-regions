@@ -1,16 +1,17 @@
 package net.danieldietrich.protectedregions.util
 
 import static java.lang.Math.*
+
 import java.util.regex.Pattern
 
 class Strings {
 	
-	static Pattern EOL = Pattern::compile("\\r\\n|\\n|\\r")
+	static val EOL = Pattern::compile("\\r\\n|\\n|\\r")
 	
-	def static isEmpty(String s) {
-		return s == null || "".equals(s.trim)
-	}
-	
+	/**
+	 * Defines multiplication for int and String.
+	 * Concatenates s count times.
+	 */
 	def static operator_multiply(int count, String s) {
 		var result = new StringBuffer()
 		var i = 0
@@ -21,21 +22,25 @@ class Strings {
 		result.toString()
 	}
 
+	/**
+	 * Same as operator_multiply(int, String)
+	 */
 	def static operator_multiply(String s, int count) {
 		operator_multiply(count, s)
 	}
 
 	/**
-	 * Returnes len*2 spaces.
-	 * @param len
-	 * @return
+	 * Returnes times * 2 spaces.
 	 */
 	def static indent(int times) {
 		operator_multiply(times, "  ")
 	}
 
+	/**
+	 * Returns times * width spaces.
+	 */
 	def static indent(int times, int width) {
-		operator_multiply(times, operator_multiply(width, " "))
+		operator_multiply(times * width, " ")
 	}
 
 	/**

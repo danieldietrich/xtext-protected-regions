@@ -5,8 +5,6 @@ import static net.danieldietrich.protectedregions.parser.Match.*
 import static net.danieldietrich.protectedregions.parser.Node.*
 import static net.danieldietrich.protectedregions.util.Strings.*
 
-import net.danieldietrich.protectedregions.parser.None
-
 @Data class Parser {
 
 	val String name
@@ -61,7 +59,7 @@ import net.danieldietrich.protectedregions.parser.None
 	}
 	
 	def private isNone(Element e) {
-		typeof(None).equals(e.getClass)
+		typeof(NoElement).equals(e.getClass)
 	}
 	
 }
