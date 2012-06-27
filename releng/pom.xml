@@ -16,12 +16,11 @@
 		<java-version>1.6</java-version>
 		<!-- plugin versions -->
 		<tycho-version>0.15.0</tycho-version>
-		<junit-version>4.8.2</junit-version>
+		<junit-version>4.8.1</junit-version>
 		<!-- p2 repositories -->
-		<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
-		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository</orbit-site>
-		<!--xtext-site>http://download.itemis.com/updates/releases</xtext-site-->
-		<xtext-site>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/milestones/</xtext-site>
+		<eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
+		<orbit-site>http://download.eclipse.org/tools/orbit/downloads/drops/R20120526062928/repository/</orbit-site>
+		<xtext-site>http://download.eclipse.org/modeling/tmf/xtext/updates/composite/releases/</xtext-site>
 	</properties>
 
 	<modules>
@@ -120,6 +119,19 @@
 			<properties>
 				<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
 				<platform-version>[3.7,3.8)</platform-version>
+			</properties>
+		</profile>
+		<profile>
+			<id>platform-juno</id>
+			<activation>
+				<property>
+					<name>platform-version-name</name>
+					<value>juno</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
+				<platform-version>[4.2,4.3)</platform-version>
 			</properties>
 		</profile>
 	</profiles>
