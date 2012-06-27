@@ -1,35 +1,38 @@
 package net.danieldietrich.protectedregions
 
 import com.google.inject.Guice
-import com.google.inject.Inject
 import java.util.List
+import org.junit.Before
+import org.junit.Test
 
-/**
- * @author Daniel Dietrich - Initial contribution and API
- */
 class ParserTest {
 
-	@Inject extension ParserFactory
+	extension ParserFactory parserFactory
 
-	def static void main(String[] args) {
-		Guice::createInjector().getInstance(typeof(ParserTest)).run()
+	@Before
+	def void setup() {
+		parserFactory = Guice::createInjector().getInstance(typeof(ParserFactory))
 	}
 	
-	def private run() {
-		println("starting tests...")
+	@Test
+	def void testJavaParser() {
 		test("java parser fails", javaParser, javaContent)
+	}
+	
+	@Test
+	def void testXtendParser() {
 		test("xtend parser fails", xtendParser, xtendContent)
+	}
+	
+	@Test
+	def void testXmlParser() {
 		test("xml parser fails", xmlParser, xmlContent)
 		testException("corrupted xml parsed wrong", xmlParser, xmlContent_corrupted, "xml parser: end of String (', [']) not found at [4,23]")
-		println("all test ok!")
 	}
-	
+		
 	def private test(String msg, ProtectedRegionParser parser, CharSequence content) {
-		val start = System::currentTimeMillis()
 		val regions = parser.parse(content)
-		/*DEBUG*/println("Parsed content in " + (System::currentTimeMillis - start) + " ms.")
 		val parsed = toString(regions)
-		/*DEBUG*/println(parsed)
 		if (!parsed.equals(content.toString)) {
 			throw new IllegalStateException(msg + "\n\nOriginal:\n###" + content + "###\n\nParsed:\n###" + parsed + "###\n\n")
 		}
@@ -44,7 +47,6 @@ class ParserTest {
 	}
 			
 	def private testException(String msg, ProtectedRegionParser parser, CharSequence content, String exception) {
-		val start = System::currentTimeMillis()
 		try {
 			parser.parse(content)
 			throw new IllegalStateException("Parser DIDN'T throw exception " + exception)
@@ -52,12 +54,10 @@ class ParserTest {
 			if (!x.message.equals(exception)) {
 				throw new IllegalStateException(msg, x)
 			}
-		} finally {
-			/*DEBUG*/println("Parsed content in " + (System::currentTimeMillis - start) + " ms.")
 		}
 	}
 
-	def javaContent() '''
+	val javaContent = '''
 		public class GeneratedClass {
 			/**
 			 * Generated comment.
@@ -73,7 +73,7 @@ class ParserTest {
 		}
 	'''
 	
-	def private xmlContent() '''
+	val xmlContent = '''
 		<xml>
 			<!-- PROTECTED REGION ID(test) START -->
 			<![CDATA[this is character data]]>
@@ -84,7 +84,7 @@ class ParserTest {
 		</xml>
 	'''
 		
-	def private xmlContent_corrupted() '''
+	val xmlContent_corrupted = '''
 		<xml>
 			<!-- PROTECTED REGION ID(test) START -->
 			<![CDATA[this is character data]]>
@@ -95,7 +95,7 @@ class ParserTest {
 		</xml>
 	'''
 	
-	def private xtendContent() {
+	val xtendContent = {
 		"'''This is «\"\\\"a\"» rich «\"'''\"»string«\"'''\"» which ends here:'''"
 	}
 
