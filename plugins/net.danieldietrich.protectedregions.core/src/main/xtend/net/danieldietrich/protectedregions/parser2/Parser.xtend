@@ -79,29 +79,31 @@ import net.danieldietrich.protectedregions.util.Some
 			switch next {
 				Some<Leaf<Element>> : {
 					val match = next.unpack.get.indexOf(input, currIndex)
+					val hasEnd = !end.unpack.get.isNoElement
 					if (currIndex < match.index) {
-						output.add(Text(input.substring(currIndex, match.index)))
+						output.add(input.copy(currIndex, match.index))
 					}
 					if (next == end) {
-						if (!end.unpack.get.isNoElement) {
+						if (hasEnd) {
 							if (model != model.root) {
-								output.add(Text(input.substring(match.index, match.end)))
+								output.add(input.copy(match))
 							}
 							index = match.end
 						}
 						finished = true
 					} else {
 						val child = next.get.parent
-						val ast = Node(child.id, Text(input.substring(match.index, match.end)))
+						val ast = Node(child.id, input.copy(match))
 						output.add(ast)
-						index = if (end.unpack.get.isNoElement) match.end else parse(child, input, ast, match.end)						
+						index = if (!hasEnd) match.end else parse(child, input, ast, match.end)						
 					}
 				}
 				None<Leaf<Element>> : {
 					throw new IllegalStateException(
 						name +" parser: no viable match for model element "+
-						model.id +" found at "+ lineAndColumn(input, currIndex))
-					}
+						model.id +" found at "+ lineAndColumn(input, currIndex)
+					)
+				}
 			}
 		} while (!finished)
 		
@@ -135,8 +137,12 @@ import net.danieldietrich.protectedregions.util.Some
 		}
 	}
 	
-	def private Text(String value) {
-		new Leaf('Text', value)
+	def private copy(String input, int beginIndex, int endIndex) {
+		new Leaf('Text', input.substring(beginIndex, endIndex))
 	}
-	
+
+	def private copy(String input, Match match) {
+		copy(input, match.index, match.end)
+	}
+		
 }
