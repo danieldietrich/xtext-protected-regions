@@ -113,7 +113,7 @@ import net.danieldietrich.protectedregions.util.Some
 	
 	/**
 	 * The leaf (Option) whose Element occurs first in input (starting the search at given index)
-	 * or None, if nothing matches at all. 
+	 * or None, if nothing matches at all.
 	 */
 	def private min(Option<Leaf<Element>> l1, Option<Leaf<Element>> l2, String input, int index) {
 		val e1 = l1.unpack
