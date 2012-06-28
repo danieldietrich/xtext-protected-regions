@@ -124,6 +124,7 @@ class ParserFactory {
 //  }
 	
 	def private parser(String name, RegionResolver[] optionalResolver, Node<Element> model) {
+		/*DEBUG*/println(model)
 		if (optionalResolver.size > 1) throw new IllegalArgumentException("Some or none RegionResolver allowed.")
 		val resolver = if (optionalResolver.size == 0) DEFAULT_RESOLVER else optionalResolver.get(0)
 // TODO: add protected region elements to model comments
@@ -295,9 +296,9 @@ class ModelBuilder {
 	}
 	
 	def nestableComment(Node<Element> model, String start, String end) {
-		Model('Comment', start, end) => [
+		Model('NestableComment', start, end) => [
 			model.add(it)
-			it.add(it) // recursive model
+			it.add(Link(it)) // nestable: comment may contain comments
 		]
 	}
 	
@@ -308,7 +309,7 @@ class ModelBuilder {
 	}
 
 	def greedyString(Node<Element> model, String s) {
-		Model('String', s, GreedyElement(s)) => [
+		Model('GreedyString', s, GreedyElement(s)) => [
 			model.add(it)	
 		]
 	}
@@ -328,9 +329,9 @@ class ModelBuilder {
   	
   	def withCode(Node<Element> model, String start, String end) {
 		if (model == model.root) throw new IllegalStateException(model.id +".withCode() not allowed at root node")
-  		val code = Model('Code', start, end)
+  		val code = Model('EmbeddedCode', start, end)
   		model.add(code)
-  		model.root.children.forEach[code.add(it)]
+  		code.add(Link(model.root))
   		model // return parent because code models have root as only child
   	}
   	

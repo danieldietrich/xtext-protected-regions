@@ -2,12 +2,11 @@ package net.danieldietrich.protectedregions.parser2
 
 import static net.danieldietrich.protectedregions.util.Strings.*
 
-import java.util.List
 import net.danieldietrich.protectedregions.util.None
 import net.danieldietrich.protectedregions.util.Option
 import net.danieldietrich.protectedregions.util.OptionExtensions
 import net.danieldietrich.protectedregions.util.Some
-import java.util.ArrayList
+import java.util.List
 
 class TreeExtensions {
 
@@ -23,6 +22,14 @@ class TreeExtensions {
 	/** Construct a Leaf. */
 	def <T> Leaf(String id, T value) {
 		new Leaf<T>(id, value)
+	}
+	
+	/** Construct a Link. */
+	def <T, X extends Tree<T>> Link(X ref) {
+		switch ref {
+			Node<T> : new NodeLink<T>(ref)
+			Leaf<T> : new LeafLink<T>(ref)
+		}
 	}
 	
 	/** Find first child of node which satisfies the given predicate. */
@@ -47,19 +54,17 @@ class TreeExtensions {
 	
 	/** Return all children of type Leaf. */
 	def <T> Iterable<Leaf<T>> leafs(Node<T> node) {
-		// TODO: flatMap instead
 		node.children.map[switch it {
-			Leaf : new Some<Leaf<T>>(it)
-			Node : new None<Leaf<T>>
+			Leaf<T> : new Some<Leaf<T>>(it)
+			Node<T> : new None<Leaf<T>>
 		}].flatten
 	}
 	
 	/** Return all children of type Node. */
 	def <T> Iterable<Node<T>> nodes(Node<T> node) {
-		// TODO: flatMap instead
 		node.children.map[switch it {
-			Node : new Some<Node<T>>(it)
-			Leaf : new None<Node<T>>
+			Node<T> : new Some<Node<T>>(it)
+			Leaf<T> : new None<Node<T>>
 		}].flatten
 	}
 	
@@ -98,14 +103,11 @@ abstract class Tree<T> {
 		this._id = id
 	}
 	
-	def boolean isLeaf()
 	def isRoot() { _parent == null }
 	def Tree<T> root() { if (isRoot) this else _parent.root }
 	
-	override toString() { _toString(0, new ArrayList<Tree<T>>()) }
-	
-	// Need to name method _toString instead of toString because of Xtend 2.3.0 bug
-	def protected String _toString(int depth, List<Tree<T>> visited)
+	override toString() { toString(0) }
+	def protected String toString(int depth)
 	
 }
 
@@ -118,37 +120,75 @@ class Node<T> extends Tree<T> {
 	}
 	
 	def add(Tree<T> child) {
-		children.add(child)
+		if (isCycle(child)) throw new IllegalArgumentException("A tree has no cycles.")
+		_children.add(child)
 		child.parent = this
 		child
 	}
-		
-	override isLeaf() { false }
 	
-	override protected _toString(int depth, List<Tree<T>> visited) {
-		val indent = indent(depth)
-		indent + id + if (visited.contains(this)) {
-			"..."
-		} else {
-			visited.add(this)
-			"(\n"+ _children.map[it._toString(depth+1, visited)].reduce[l,r | l +",\n"+ r] +"\n"+ indent +")"
-		}
+	def private isCycle(Tree<T> child) {
+		this == child || (!isRoot && (parent as Node<T>).isCycle(child)) // BUG: parent.isCycle(child)
 	}
 	
+	override protected toString(int depth) {
+		val indent = indent(depth) // BUG:map[toString(depth+1)]
+		indent + id +"(\n"+ _children.map[Tree<T> child | child.toString(depth+1)].reduce[l,r | l +",\n"+ r] +"\n"+ indent +")"
+	}
+
 }
 
 class Leaf<T> extends Tree<T> {
 
 	@Property val T value
 
-	new(String id, T value) { super(id); this._value = value }
+	new(String id, T value) {
+		super(id)
+		this._value = value
+	}
 	
-	override isLeaf() { true }
-	
-	override protected _toString(int depth, List<Tree<T>> visited) {
+	override protected toString(int depth) {
 		val indent = indent(depth)
-		visited.add(this)
-		indent + id +"("+ _value +")"
+		indent + id +"("+ _value.toString.replaceAll("\\s+", " ") +")"
+	}
+	
+}
+
+class NodeLink<T> extends Node<T> {
+	
+	@Property Node<T> ref
+	
+	new(Node<T> ref) {
+		super('Link->'+ ref.id)
+		this._ref = ref
+	}
+	
+	override getChildren() { ref.children }
+	
+	override add(Tree<T> child) {
+		ref.add(child)
+	}
+
+	override protected toString(int depth) {
+		val indent = indent(depth)
+		indent + id
+	}
+	
+}
+
+class LeafLink<T> extends Leaf<T> {
+	
+	@Property Leaf<T> ref
+	
+	new(Leaf<T> ref) {
+		super('Link->'+ ref.id, null)
+		this._ref = ref
+	}
+
+	override getValue() { ref.value }
+
+	override protected toString(int depth) {
+		val indent = indent(depth)
+		indent + id
 	}
 	
 }
