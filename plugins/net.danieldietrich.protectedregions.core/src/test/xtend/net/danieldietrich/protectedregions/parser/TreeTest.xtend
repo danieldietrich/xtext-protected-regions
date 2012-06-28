@@ -1,4 +1,4 @@
-package net.danieldietrich.protectedregions.parser2
+package net.danieldietrich.protectedregions.parser
 
 import static org.junit.Assert.*
 

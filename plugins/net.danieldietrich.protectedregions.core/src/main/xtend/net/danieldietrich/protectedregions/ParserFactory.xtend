@@ -3,12 +3,12 @@ package net.danieldietrich.protectedregions
 import com.google.inject.Inject
 import net.danieldietrich.protectedregions.DefaultProtectedRegionResolver
 import net.danieldietrich.protectedregions.RegionResolver
-import net.danieldietrich.protectedregions.parser2.Element
-import net.danieldietrich.protectedregions.parser2.ElementExtensions
-import net.danieldietrich.protectedregions.parser2.ModelExtensions
-import net.danieldietrich.protectedregions.parser2.Node
-import net.danieldietrich.protectedregions.parser2.Parser
-import net.danieldietrich.protectedregions.parser2.TreeExtensions
+import net.danieldietrich.protectedregions.parser.Element
+import net.danieldietrich.protectedregions.parser.ElementExtensions
+import net.danieldietrich.protectedregions.parser.ModelExtensions
+import net.danieldietrich.protectedregions.parser.Node
+import net.danieldietrich.protectedregions.parser.Parser
+import net.danieldietrich.protectedregions.parser.TreeExtensions
 import org.slf4j.LoggerFactory
 
 class ParserFactory {

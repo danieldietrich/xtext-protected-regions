@@ -1,78 +1,80 @@
 package net.danieldietrich.protectedregions.parser
 
 import static net.danieldietrich.protectedregions.parser.Match.*
-import static net.danieldietrich.protectedregions.util.Strings.*
 
-import java.util.List
-import java.util.regex.Pattern;
+import java.util.regex.Pattern
+import net.danieldietrich.protectedregions.util.None
+import net.danieldietrich.protectedregions.util.Option
+import net.danieldietrich.protectedregions.util.Some
 
-/** A model is built by blocks with start/end Element and children between. */
-class Model {
-
-	@Property var Model root = this
-	@Property val List<Model> children = newArrayList()
-	@Property val Symbol symbol
-	@Property val Element start
-	@Property val Element end
-
-	new(Symbol symbol, Element start, Element end) {
-		this._symbol = symbol
-		this._start = start
-		this._end = end
-	}
-
-	def add(Model child) {
-		if (child == root && child != this) {
-			children.addAll(root.children)
-		} else {
-			children.add(child)
-			child.root = root
-		}
-		child
+/** Extensions helping model builders. */
+class ModelExtensions {
+	
+	extension ElementExtensions = new ElementExtensions()
+	extension TreeExtensions = new TreeExtensions()
+	
+	def Model(String id, Element start, Element end) {
+		if (NoElement.equals(start)) throw new IllegalArgumentException("The start element cannot be NoElement.")
+		new Node<Element>(id) => [
+			add(new Leaf<Element>('Start', start))
+			add(new Leaf<Element>('End', end))
+		]
 	}
 	
-	override toString() { toString(0) }
-	
-	def private String toString(int depth) {
-		val indent = indent(depth)
-    	indent + symbol.name +"("+ start +", "+ end +")"+
-    		if (children.size == 0) ""
-    		else "(\n"+ children.map[toString(depth+1)].reduce(l,r | l +",\n"+ r) +"\n"+ indent +")"
+	def Model(String id, String start, Element end) {
+		Model(id, StrElement(start), end)
+	}
+
+	def Model(String id, String start, String end) {
+		Model(id, StrElement(start), StrElement(end))
 	}
 	
+	def start(Node<Element> node) {
+		node.leafs.find('Start')
+	}
+
+	def end(Node<Element> node) {
+		node.leafs.find('End')
+	}
+
 }
 
-@Data class Symbol {
-	val String name
-}
-
+/** Syntactic sugar creating elements. */
 class ElementExtensions {
 	
-	// TODO: move this away
 	public val EOL = SomeElement(StrElement("\r\n"), StrElement("\n"), StrElement("\r"))
-	
-	def StrElement(String s) {
-		new StrElement(s)
-	}
 	
 	def GreedyElement(String s) {
 		new GreedyElement(s)
 	}
 	
-	def RegExElement(String regEx) {
+  	def NoElement() {
+		new NoElement()
+	}
+
+	// Scala's parser combinator regex style
+	def r(String regEx) {
 		new RegExElement(regEx)
 	}
 	
-	def Element SomeElement(Element... elements) {
+	def SeqElement(Element... sequence) {
+		new SeqElement(sequence)
+	}
+	
+	def SomeElement(Element... elements) {
   		new SomeElement(elements)
   	}
   	
-  	def Element NoElement() {
-		new NoElement()
+	def StrElement(String s) {
+		new StrElement(s)
 	}
 	
-	def Element SeqElement(Element... sequence) {
-		new SeqElement(sequence)
+	/** Returns a Some<Element> of the Element contained in o or None<Element>. */
+	def unpack(Option<Leaf<Element>> o) {
+		switch o {
+			Some<Leaf<Element>> : new Some<Element>(o.get.value)
+			None<Leaf<Element>> : new None<Element>
+		}
 	}
 	
 }
@@ -82,7 +84,7 @@ abstract class Element {
 	
 	/** Returns an implementation specific Match of this Element, maybe NOT_FOUND. */
 	def Match indexOf(String source, int index)
-	
+
 	/**
 	 * Checks if this.indexOf(input, index) < that.indexOf(input, index).
 	 * Also true if that not found or indexes are equal and that.length < this.length.
@@ -91,28 +93,6 @@ abstract class Element {
 		val m1 = this.indexOf(input, index)
 		val m2 = that.indexOf(input, index)
 		!m2.found || (m1.found && (m1.index < m2.index || (m1.index == m2.index && m1.length >= m2.length)))
-	}
-	
-}
-
-/** A plain String representation. */
-class StrElement extends Element {
-	
-	val String s
-
-	new(String s) {
-		if (s.isNullOrEmpty) throw new IllegalArgumentException("StrElement argument cannot be empty")
-		this.s = s
-	}
-
-	/** Returns the first Match of this String or NOT_FOUND. */	
-	override indexOf(String source, int index) {
-		val int i = source.indexOf(s, index)
-		if (i == -1) NOT_FOUND else new Match(i, s.length)
-	}
-	
-	override String toString() {
-		"StrElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
 	}
 	
 }
@@ -144,6 +124,20 @@ class GreedyElement extends Element {
 	
 }
 
+/** Placeholder for no Element. */
+class NoElement extends Element {
+	
+	/** By definition NoElement cannot be found. */
+	override indexOf(String source, int index) {
+		NOT_FOUND
+	}
+	
+	override String toString() {
+		"NoElement"
+	}
+	
+}
+
 /** An reqular expression element. */
 class RegExElement extends Element {
 	
@@ -163,42 +157,6 @@ class RegExElement extends Element {
 	
 	override String toString() {
 		"RegExElement("+ pattern.pattern() + ")"
-	}
-	
-}
-
-/** A list of possibilities. */
-class SomeElement extends Element {
-	
-	val Element[] elements
-	
-	new(Element... elements) {
-		if (elements.size == 0) throw new IllegalArgumentException("SomeElement argument needs at least one Element")
-		this.elements = elements
-	}
-	
-	/** Returns the Match of the Element occurring first or NOT_FOUND. */
-	override indexOf(String source, int index) {
-		val e = elements.reduce(e1, e2 | if (e1.ahead(e2, source, index)) e1 else e2)
-		if (e == null) NOT_FOUND else e.indexOf(source, index)
-	}
-	
-	override String toString() {
-		"SomeElement("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
-	}
-	
-}
-
-/** Placeholder for no Element. */
-class NoElement extends Element {
-	
-	/** Throws UnsupportedOperationException. */
-	override indexOf(String source, int index) {
-		throw new UnsupportedOperationException()
-	}
-	
-	override String toString() {
-		"NoElement"
 	}
 	
 }
@@ -229,6 +187,50 @@ class SeqElement extends Element {
 	
 }
 
+/** A list of possibilities. */
+class SomeElement extends Element {
+	
+	val Element[] elements
+	
+	new(Element... elements) {
+		if (elements.size == 0) throw new IllegalArgumentException("SomeElement argument needs at least one Element")
+		this.elements = elements
+	}
+	
+	/** Returns the Match of the Element occurring first or NOT_FOUND. */
+	override indexOf(String source, int index) {
+		val e = elements.reduce(e1, e2 | if (e1.ahead(e2, source, index)) e1 else e2)
+		if (e == null) NOT_FOUND else e.indexOf(source, index)
+	}
+	
+	override String toString() {
+		"SomeElement("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
+	}
+	
+}
+
+/** A plain String representation. */
+class StrElement extends Element {
+	
+	val String s
+
+	new(String s) {
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("StrElement argument cannot be empty")
+		this.s = s
+	}
+
+	/** Returns the first Match of this String or NOT_FOUND. */	
+	override indexOf(String source, int index) {
+		val int i = source.indexOf(s, index)
+		if (i == -1) NOT_FOUND else new Match(i, s.length)
+	}
+	
+	override String toString() {
+		"StrElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
+	}
+	
+}
+
 /** A location (index, length) of a string match. */
 @Data class Match {
 	
@@ -239,5 +241,9 @@ class SeqElement extends Element {
 	
 	def boolean found() { index > -1 }
 	def int end() { index + length }
+	
+	override toString() {
+		"Match("+ index +", "+ length +")"
+	}
 	
 }
