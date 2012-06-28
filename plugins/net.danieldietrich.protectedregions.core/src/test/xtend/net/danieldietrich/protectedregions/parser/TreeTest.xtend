@@ -44,7 +44,7 @@ class TreeTest {
 		assertTrue("child1.parent should be root1", child1.parent == root1)
 		assertTrue("root1.parent should be null", root1.parent == null)
 		
-		child2.add(root1)
+		child2.add(root1) // should fail, because child2.parent.parent.parent = root1
 		assertTrue("Cycle not detected", false)
 	}
 	
