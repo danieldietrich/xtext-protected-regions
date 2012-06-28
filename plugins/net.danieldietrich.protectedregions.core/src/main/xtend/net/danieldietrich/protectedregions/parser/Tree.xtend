@@ -1,59 +1,49 @@
 package net.danieldietrich.protectedregions.parser
 
+import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+import static extension net.danieldietrich.protectedregions.util.OptionExtensions.*
+
 import static net.danieldietrich.protectedregions.util.Strings.*
 
 import net.danieldietrich.protectedregions.util.None
 import net.danieldietrich.protectedregions.util.Option
-import net.danieldietrich.protectedregions.util.OptionExtensions
 import net.danieldietrich.protectedregions.util.Some
 import java.util.List
 
-class TreeExtensions {
-
-	extension OptionExtensions = new OptionExtensions()
+abstract class TreeExtensions {
 
 	/** Construct a Node. */
-	def <T> Node Node(String id, Tree<T>... children) {
+	def static <T> Node Node(String id, Tree<T>... children) {
 		val node = new Node<T>(id)
 		children.forEach[node.add(it)]
 		node
 	}
 
 	/** Construct a Leaf. */
-	def <T> Leaf(String id, T value) {
+	def static <T> Leaf(String id, T value) {
 		new Leaf<T>(id, value)
 	}
 	
 	/** Construct a Link. */
-	def <T, X extends Tree<T>> Link(X ref) {
+	def static <T, X extends Tree<T>> Link(X ref) {
 		switch ref {
 			Node<T> : new NodeLink<T>(ref)
 			Leaf<T> : new LeafLink<T>(ref)
 		}
 	}
 	
-	/** Find first child of node which satisfies the given predicate. */
-	def <T> Option<Tree<T>> find(Node<T> node, (Tree<T>)=>Boolean predicate) {
-		node.children.find(predicate)
-	}
-	
 	/** Example: node.leafs.find[id.equals('xxx')] */
-	def <T, X extends Tree<T>> Option<X> find(Iterable<X> children, (X)=>Boolean predicate) {
+	def static <T, X extends Tree<T>> Option<X> find(Iterable<X> children, (X)=>Boolean predicate) {
 		Option(children.findFirst(predicate))
 	}
 	
 	/** Example: node.leafs.find('xxx') */
-	def <T, X extends Tree<T>> Option<X> find(Iterable<X> children, String _id) {
+	def static <T, X extends Tree<T>> Option<X> find(Iterable<X> children, String _id) {
 		children.find[id.equals(_id)]
 	}
 	
-	/** Return all children satisfying the given predicate. */
-	def <T> Iterable<Tree<T>> filter(Node<T> node, (Tree<T>)=>Boolean predicate) {
-		node.children.filter(predicate)
-	}
-	
 	/** Return all children of type Leaf. */
-	def <T> Iterable<Leaf<T>> leafs(Node<T> node) {
+	def static <T> Iterable<Leaf<T>> leafs(Node<T> node) {
 		node.children.map[switch it {
 			Leaf<T> : new Some<Leaf<T>>(it)
 			Node<T> : new None<Leaf<T>>
@@ -61,33 +51,21 @@ class TreeExtensions {
 	}
 	
 	/** Return all children of type Node. */
-	def <T> Iterable<Node<T>> nodes(Node<T> node) {
+	def static <T> Iterable<Node<T>> nodes(Node<T> node) {
 		node.children.map[switch it {
 			Node<T> : new Some<Node<T>>(it)
 			Leaf<T> : new None<Node<T>>
 		}].flatten
 	}
 	
-	/** Traversing a Tree top down, applying a function f to each tree node. */
-	def <T> void traverse(Tree<T> tree, (Tree<T>)=>Object f) {
-		f.apply(tree)
-		switch tree {
-			Node<T> : tree.children.forEach[traverse(f)]
-		}
-	}
-	
-	/** Return all tree nodes satisfying the given predicate. */
-	def <T> List<Tree<T>> collect(Tree<T> tree, (Tree<T>)=>Boolean predicate) {
-		val List<Tree<T>> result = newArrayList()
-		tree.traverse[if (predicate.apply(it)) result.add(it)]
-		result
-	}
-	
-	/** Returns the children, if tree is a Node or an empty List. */
-	def <T> List<Tree<T>> children(Tree<T> tree) {
-		switch tree {
-			Node<T> : tree.children
-			Leaf<T> : newArrayList()
+	/**
+	 * Traverses a Tree top down, applying a function f to each tree node.
+	 * If f returns true, descend children, else go on with neighbors.
+	 */
+	def static <T> void traverse(Tree<T> tree, (Tree<T>)=>Boolean f) {
+		val descend = f.apply(tree)
+		if (descend == null || descend) switch tree {
+			Node<T> : tree.children.forEach[it.traverse(f)]
 		}
 	}
 	

@@ -2,10 +2,10 @@ package net.danieldietrich.protectedregions.util
 
 import java.util.ArrayList
 
-class OptionExtensions {
-	def <T> Option<T> Option(T obj) { if (obj == null) None else Some(obj) }
-	def <T> Some<T> Some(T obj) { new Some(obj) }
-	def <T> None<T> None() { new None<T> }
+abstract class OptionExtensions {
+	def static <T> Option<T> Option(T obj) { if (obj == null) None else Some(obj) }
+	def static <T> Some<T> Some(T obj) { new Some(obj) }
+	def static <T> None<T> None() { new None<T> }
 }
 
 // A life without NullPointerExceptions

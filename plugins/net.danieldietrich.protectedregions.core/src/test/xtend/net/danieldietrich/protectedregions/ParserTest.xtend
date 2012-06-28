@@ -26,6 +26,10 @@ class ParserTest {
 	@Test
 	def void testXmlParser() {
 		test("xml parser fails", xmlParser, xmlContent)
+	}
+	
+	@Test
+	def void testXmlParserCorruptedXml() {
 		testException("corrupted xml parsed wrong", xmlParser, xmlContent_corrupted, "xml parser: end of String (', [']) not found at [4,23]")
 	}
 		

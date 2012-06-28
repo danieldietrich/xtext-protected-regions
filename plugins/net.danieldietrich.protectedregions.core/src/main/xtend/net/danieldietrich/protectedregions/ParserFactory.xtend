@@ -1,17 +1,21 @@
 package net.danieldietrich.protectedregions
 
+import static extension net.danieldietrich.protectedregions.parser.ElementExtensions.*
+import static extension net.danieldietrich.protectedregions.parser.ModelExtensions.*
+import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+import static extension net.danieldietrich.protectedregions.util.OptionExtensions.*
+
 import com.google.inject.Inject
+import java.util.List
 import net.danieldietrich.protectedregions.DefaultProtectedRegionResolver
 import net.danieldietrich.protectedregions.RegionResolver
 import net.danieldietrich.protectedregions.parser.Element
-import net.danieldietrich.protectedregions.parser.ElementExtensions
 import net.danieldietrich.protectedregions.parser.Leaf
-import net.danieldietrich.protectedregions.parser.ModelExtensions
 import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
-import net.danieldietrich.protectedregions.parser.TreeExtensions
+import net.danieldietrich.protectedregions.util.Option
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-import java.util.List
 
 // TODO: Only the model should depend on the resolver. The parser should return an AST containing all informations about the protected regions. (-> move getResolver to the ModelBuilder) 
 class ParserFactory {
@@ -20,8 +24,9 @@ class ParserFactory {
 	
 	@Inject extension ModelBuilder
 	
-	def javaParser(RegionResolver... optionalResolver) {
-		val resolver = getResolver(optionalResolver)
+	def javaParser() { javaParser(None) }
+	def javaParser(Option<RegionResolver> customResolver) {
+		val resolver = getResolver(customResolver)
 		parser("java", resolver, model(resolver)[
 			comment("//")
 			comment("/*", "*/")
@@ -30,8 +35,9 @@ class ParserFactory {
 		])
 	}
 	
-	def xmlParser(RegionResolver... optionalResolver) {
-		val resolver = getResolver(optionalResolver)
+	def xmlParser() { xmlParser(None) }
+	def xmlParser(Option<RegionResolver> customResolver) {
+		val resolver = getResolver(customResolver)
 		parser("xml", resolver, model(resolver)[
 			comment("<!--", "-->")
 			string("<![CDATA[", "]]>")
@@ -40,8 +46,9 @@ class ParserFactory {
 		])
 	}
 	
-	def xtendParser(RegionResolver... optionalResolver) {
-		val resolver = getResolver(optionalResolver)
+	def xtendParser() { xtendParser(None) }
+	def xtendParser(Option<RegionResolver> customResolver) {
+		val resolver = getResolver(customResolver)
 		parser("xtend", resolver, model(resolver)[
 			comment("//")
 			comment("/*", "*/")
@@ -49,11 +56,6 @@ class ParserFactory {
 			string("'").withEscape("\\")
 			string("'''").withCode("«", "»") // .withCode("\u00ab", "\u00ba") // french braces
 		])
-	}
-	
-	def private getResolver(RegionResolver[] optionalResolver) {
-		if (optionalResolver.size > 1) throw new IllegalArgumentException("Some or none RegionResolver allowed.")
-		if (optionalResolver.size == 0) DEFAULT_RESOLVER else optionalResolver.get(0)
 	}
 	
 //  def clojureParser() {
@@ -135,12 +137,72 @@ class ParserFactory {
 //  }
 	
 	def private parser(String name, RegionResolver resolver, Node<Element> model) {
-		/*DEBUG*/println("### MODEL:\n"+ model +"\n")
 		new ProtectedRegionParser(
 			new Parser(name, model),
 			resolver
 		)
 	}
+	
+	def private getResolver(Option<RegionResolver> customResolver) {
+		if (customResolver.isEmpty) DEFAULT_RESOLVER else customResolver.get
+	}
+	
+}
+
+class Regions {
+	
+	static val Logger logger = LoggerFactory::getLogger(typeof(Regions))
+	
+	val List<Region> regions = newArrayList()
+	var String id = null
+	var Boolean enabled = null
+	var buf = new StringBuffer()
+	
+	def void begin(String start, String id, boolean enabled) {
+		if (this.id != null) {
+			logger.warn("Already started a region with id '"+ this.id +"' but found another region with id '"+ id +"'")
+		} else {
+			buf.append(start)
+			regions.add(new Region(null, buf.toString, null))
+			buf.setLength(0)
+			this.id = id
+			this.enabled = enabled
+		}
+	}
+	
+	def void end(String end) {
+		if (id == null) {
+			logger.warn("Missing region start")
+		} else {
+			regions.add(new Region(id, buf.toString, enabled))
+			buf.setLength(0) // clear buffer
+			buf.append(end)
+			id = null
+			enabled = null
+		}
+	}
+	
+	def void append(String text) {
+		buf.append(text)
+	}
+	
+	def Iterable<Region> get() {
+		if (id != null) logger.warn("Missing end of last region with id '"+ id +"'")
+		if (buf.length > 0) {
+			regions.add(new Region(id, buf.toString, enabled))
+		}
+		regions
+	}
+	
+}
+
+@Data class Region {
+
+	val String id
+	val String content
+	val Boolean eanbled
+
+	def isMarked() { id != null }
 	
 }
 
@@ -148,46 +210,40 @@ class ParserFactory {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionParser))
 	
-	extension TreeExtensions treeExtensions = new TreeExtensions()
-	
 	val Parser parser
 	val RegionResolver resolver
 	
 	def parse(CharSequence input) {
 		
-		val List<Region> result = newArrayList
 		val ast = parser.parse(input)
-		/*DEBUG*/println("### AST:\n"+ ast +"\n")
-		
-		println("--8<--*snip*--8<--")
+		val regions = new Regions()
+
 		ast.traverse[switch it {
 			Node<String> case id == 'RegionStart' : {
-				//
+				val start = it.text
+				val id = resolver.getId(start)
+				val enabled = resolver.isEnabled(start)
+				regions.begin(start, id, enabled)
+				false
 			}
 			Node<String> case id == 'RegionEnd' : {
-				//
+				regions.end(it.text)
+				false
 			}
 			Leaf<String> : {
-				print(it.value)
+				regions.append(it.value)
+				true
 			}
 		}]
-		println("\n--8<--*snap*--8<--")
 		
-		result
+		regions.get()
 		
 	}
 	
-}
-
-// TODO: needing this class?
-// TODO: isEnabled()
-@Data class Region {
-
-	val String id
-	val String content
-
-	def isMarked() {
-		id != null
+	def private text(Node<String> node) {
+		val buf = new StringBuffer()
+		node.traverse[switch it { Leaf<String> : buf.append(it.value) }; true]
+		buf.toString
 	}
 	
 }
@@ -200,10 +256,6 @@ class ParserFactory {
 
 // cycles definitely allowed when building models because of nested- and code-structures
 class ModelBuilder {
-
-	@Inject extension ElementExtensions
-	@Inject extension ModelExtensions	
-	@Inject extension TreeExtensions	
 	
 	def model(RegionResolver regionResolver, (ModelBuilderContext)=>void initializer) {
 		Model('Code', "^".r, "\\z".r) => [

@@ -4,7 +4,7 @@ import static java.lang.Math.*
 
 import java.util.regex.Pattern
 
-class Strings {
+abstract class Strings {
 	
 	static val EOL = Pattern::compile("\\r\\n|\\n|\\r")
 	

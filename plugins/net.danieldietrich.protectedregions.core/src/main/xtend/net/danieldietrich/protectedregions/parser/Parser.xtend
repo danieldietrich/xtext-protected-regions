@@ -1,5 +1,9 @@
 package net.danieldietrich.protectedregions.parser
 
+import static extension net.danieldietrich.protectedregions.parser.ElementExtensions.*
+import static extension net.danieldietrich.protectedregions.parser.ModelExtensions.*
+import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+
 import static net.danieldietrich.protectedregions.util.Strings.*
 
 import net.danieldietrich.protectedregions.parser.Element
@@ -49,15 +53,14 @@ import net.danieldietrich.protectedregions.util.Some
  */
 @Data class Parser {
 
-	extension ElementExtensions = new ElementExtensions
-	extension ModelExtensions = new ModelExtensions
-	extension TreeExtensions = new TreeExtensions
-
 	val String name
 	val Node<Element> model
 
 	/** Applies the parser model to the given CharSequence and returns the corresponding AST. */
 	def parse(CharSequence original) {
+		
+		/*DEBUG*/println("### Starting parser...")
+		
 		val input = original.toString()
 		val Node<String> output = Node(model.id)
 		parse(model, input, output, 0)
@@ -99,16 +102,20 @@ import net.danieldietrich.protectedregions.util.Some
 					}
 				}
 				None<Leaf<Element>> : {
-					throw new IllegalStateException(
-						name +" parser: no viable match for model element "+
-						model.id +" found at "+ lineAndColumn(input, currIndex)
-					)
+					throwNoViableInputFound(model, input, currIndex)
 				}
 			}
 		} while (!finished)
 		
 		index
 		
+	}
+	
+	def private throwNoViableInputFound(Node<Element> model, String input, int index) {
+		throw new IllegalStateException(
+			name +" parser: no viable match for model element "+
+			model.id +" found at "+ lineAndColumn(input, index)
+		)
 	}
 	
 	/**
@@ -138,6 +145,7 @@ import net.danieldietrich.protectedregions.util.Some
 	}
 	
 	def private copy(String input, int beginIndex, int endIndex) {
+		/*DEBUG*/print("Match("+ beginIndex +", "+ endIndex +")"); println(", input: "+ input.substring(beginIndex, endIndex))
 		new Leaf('Text', input.substring(beginIndex, endIndex))
 	}
 

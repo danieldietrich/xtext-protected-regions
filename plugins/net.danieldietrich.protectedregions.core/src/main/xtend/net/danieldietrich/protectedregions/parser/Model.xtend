@@ -1,5 +1,8 @@
 package net.danieldietrich.protectedregions.parser
 
+import static extension net.danieldietrich.protectedregions.parser.ElementExtensions.*
+import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+
 import static net.danieldietrich.protectedregions.parser.Match.*
 
 import java.util.regex.Pattern
@@ -7,13 +10,9 @@ import net.danieldietrich.protectedregions.util.None
 import net.danieldietrich.protectedregions.util.Option
 import net.danieldietrich.protectedregions.util.Some
 
-/** Extensions helping model builders. */
-class ModelExtensions {
+abstract class ModelExtensions {
 	
-	extension ElementExtensions = new ElementExtensions()
-	extension TreeExtensions = new TreeExtensions()
-	
-	def Model(String id, Element start, Element end) {
+	def static Model(String id, Element start, Element end) {
 		if (NoElement.equals(start)) throw new IllegalArgumentException("The start element cannot be NoElement.")
 		new Node<Element>(id) => [
 			add(new Leaf<Element>('Start', start))
@@ -21,60 +20,59 @@ class ModelExtensions {
 		]
 	}
 	
-	def Model(String id, String start, Element end) {
+	def static Model(String id, String start, Element end) {
 		Model(id, StrElement(start), end)
 	}
 
-	def Model(String id, String start, String end) {
+	def static Model(String id, String start, String end) {
 		Model(id, StrElement(start), StrElement(end))
 	}
 	
-	def start(Node<Element> node) {
+	def static start(Node<Element> node) {
 		node.leafs.find('Start')
 	}
 
-	def end(Node<Element> node) {
+	def static end(Node<Element> node) {
 		node.leafs.find('End')
-	}
-
-}
-
-/** Syntactic sugar creating elements. */
-class ElementExtensions {
-	
-	public val EOL = SomeElement(StrElement("\r\n"), StrElement("\n"), StrElement("\r"))
-	
-	def GreedyElement(String s) {
-		new GreedyElement(s)
-	}
-	
-  	def NoElement() {
-		new NoElement()
-	}
-
-	// Scala's parser combinator regex style
-	def r(String regEx) {
-		new RegExElement(regEx)
-	}
-	
-	def SeqElement(Element... sequence) {
-		new SeqElement(sequence)
-	}
-	
-	def SomeElement(Element... elements) {
-  		new SomeElement(elements)
-  	}
-  	
-	def StrElement(String s) {
-		new StrElement(s)
 	}
 	
 	/** Returns a Some<Element> of the Element contained in o or None<Element>. */
-	def unpack(Option<Leaf<Element>> o) {
+	def static unpack(Option<Leaf<Element>> o) {
 		switch o {
 			Some<Leaf<Element>> : new Some<Element>(o.get.value)
 			None<Leaf<Element>> : new None<Element>
 		}
+	}
+
+}
+
+abstract class ElementExtensions {
+	
+	public static val EOL = SomeElement(StrElement("\r\n"), StrElement("\n"), StrElement("\r"))
+	
+	def static GreedyElement(String s) {
+		new GreedyElement(s)
+	}
+	
+  	def static NoElement() {
+		new NoElement()
+	}
+
+	// Scala's parser combinator regex style
+	def static r(String regEx) {
+		new RegExElement(regEx)
+	}
+	
+	def static SeqElement(Element... sequence) {
+		new SeqElement(sequence)
+	}
+	
+	def static SomeElement(Element... elements) {
+  		new SomeElement(elements)
+  	}
+  	
+	def static StrElement(String s) {
+		new StrElement(s)
 	}
 	
 }

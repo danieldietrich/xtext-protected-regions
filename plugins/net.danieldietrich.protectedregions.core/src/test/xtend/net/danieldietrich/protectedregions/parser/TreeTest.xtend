@@ -1,5 +1,7 @@
 package net.danieldietrich.protectedregions.parser
 
+import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+
 import static org.junit.Assert.*
 
 import org.junit.Test
@@ -46,6 +48,22 @@ class TreeTest {
 		
 		child2.add(root1) // should fail, because child2.parent.parent.parent = root1
 		assertTrue("Cycle not detected", false)
+	}
+	
+	@Test
+	def void testTraverseWithInheritence() {
+		
+		val boolean[] result = newArrayList(false)
+		
+		(new Node<String>('Root') => [
+			add(new Node<String>('Child') => [
+				add(new Leaf<String>('Leaf', 'Test'))
+			])
+		]).traverse[switch it {
+			Leaf<String> : result.set(0, true)
+		}]
+		
+		assertTrue("Leaf 'Test' not found", result.get(0))
 	}
 	
 }
