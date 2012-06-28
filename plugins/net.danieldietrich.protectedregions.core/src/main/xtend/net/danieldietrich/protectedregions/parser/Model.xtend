@@ -6,14 +6,11 @@ import static extension net.danieldietrich.protectedregions.parser.TreeExtension
 import static net.danieldietrich.protectedregions.parser.Match.*
 
 import java.util.regex.Pattern
-import net.danieldietrich.protectedregions.util.None
-import net.danieldietrich.protectedregions.util.Option
-import net.danieldietrich.protectedregions.util.Some
 
 abstract class ModelExtensions {
 	
 	def static Model(String id, Element start, Element end) {
-		if (NoElement.equals(start)) throw new IllegalArgumentException("The start element cannot be NoElement.")
+		if (typeof(None).equals(start.getClass)) throw new IllegalArgumentException("The start element cannot be None.")
 		new Node<Element>(id) => [
 			add(new Leaf<Element>('Start', start))
 			add(new Leaf<Element>('End', end))
@@ -21,11 +18,11 @@ abstract class ModelExtensions {
 	}
 	
 	def static Model(String id, String start, Element end) {
-		Model(id, StrElement(start), end)
+		Model(id, start.str, end)
 	}
 
 	def static Model(String id, String start, String end) {
-		Model(id, StrElement(start), StrElement(end))
+		Model(id, start.str, end.str)
 	}
 	
 	def static start(Node<Element> node) {
@@ -35,44 +32,36 @@ abstract class ModelExtensions {
 	def static end(Node<Element> node) {
 		node.leafs.find('End')
 	}
-	
-	/** Returns a Some<Element> of the Element contained in o or None<Element>. */
-	def static unpack(Option<Leaf<Element>> o) {
-		switch o {
-			Some<Leaf<Element>> : new Some<Element>(o.get.value)
-			None<Leaf<Element>> : new None<Element>
-		}
-	}
 
 }
 
 abstract class ElementExtensions {
 	
-	public static val EOL = SomeElement(StrElement("\r\n"), StrElement("\n"), StrElement("\r"))
+	public static val EOL = Some("\r\n".str, "\n".str, "\r".str)
 	
-	def static GreedyElement(String s) {
-		new GreedyElement(s)
+	def static grstr(String s) {
+		new GreedyStr(s)
 	}
 	
-  	def static NoElement() {
-		new NoElement()
+  	def static None() {
+		new None()
 	}
 
 	// Scala's parser combinator regex style
 	def static r(String regEx) {
-		new RegExElement(regEx)
+		new RegEx(regEx)
 	}
 	
-	def static SeqElement(Element... sequence) {
-		new SeqElement(sequence)
+	def static Seq(Element... sequence) {
+		new Seq(sequence)
 	}
 	
-	def static SomeElement(Element... elements) {
-  		new SomeElement(elements)
+	def static Some(Element... elements) {
+  		new Some(elements)
   	}
   	
-	def static StrElement(String s) {
-		new StrElement(s)
+	def static str(String s) {
+		new Str(s)
 	}
 	
 }
@@ -96,12 +85,12 @@ abstract class Element {
 }
 
 /** A greedy String representation. */
-class GreedyElement extends Element {
+class GreedyStr extends Element {
 
 	val String s
 
 	new(String s) {
-		if (s.isNullOrEmpty) throw new IllegalArgumentException("GreedyElement argument cannot be empty")
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("GreedyStr argument cannot be empty")
 		s.toCharArray.reduce[x,y | if (x == y) x else throw new IllegalArgumentException("All characters have to be equal")]
 		this.s = s
 	}
@@ -117,13 +106,13 @@ class GreedyElement extends Element {
 	}
 
 	override String toString() {
-		"GreedyElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
+		"GreedyStr("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
 	}
 	
 }
 
 /** Placeholder for no Element. */
-class NoElement extends Element {
+class None extends Element {
 	
 	/** By definition NoElement cannot be found. */
 	override indexOf(String source, int index) {
@@ -131,18 +120,18 @@ class NoElement extends Element {
 	}
 	
 	override String toString() {
-		"NoElement"
+		"None"
 	}
 	
 }
 
 /** An reqular expression element. */
-class RegExElement extends Element {
+class RegEx extends Element {
 	
 	val Pattern pattern
 	
 	new(String regEx) {
-		if (regEx.isNullOrEmpty) throw new IllegalArgumentException("RegExElement argument cannot be empty")
+		if (regEx.isNullOrEmpty) throw new IllegalArgumentException("RegEx argument cannot be empty")
 		pattern = Pattern::compile(regEx)
 	}
 	
@@ -154,18 +143,18 @@ class RegExElement extends Element {
 	}
 	
 	override String toString() {
-		"RegExElement("+ pattern.pattern() + ")"
+		"RegEx("+ pattern.pattern() + ")"
 	}
 	
 }
 
 /** A sequence of Elements. */
-class SeqElement extends Element {
+class Seq extends Element {
 	
 	val Element[] sequence
 	
 	new(Element... sequence) {
-		if (sequence.size == 0) throw new IllegalArgumentException("SeqElement argument needs at least one Element")
+		if (sequence.size == 0) throw new IllegalArgumentException("Seq argument needs at least one Element")
 		this.sequence = sequence
 	}
 	
@@ -180,18 +169,18 @@ class SeqElement extends Element {
 	}
 	
 	override String toString() {
-		"SeqElement("+ sequence.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
+		"Seq("+ sequence.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
 	}
 	
 }
 
 /** A list of possibilities. */
-class SomeElement extends Element {
+class Some extends Element {
 	
 	val Element[] elements
 	
 	new(Element... elements) {
-		if (elements.size == 0) throw new IllegalArgumentException("SomeElement argument needs at least one Element")
+		if (elements.size == 0) throw new IllegalArgumentException("Some argument needs at least one Element")
 		this.elements = elements
 	}
 	
@@ -202,18 +191,18 @@ class SomeElement extends Element {
 	}
 	
 	override String toString() {
-		"SomeElement("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
+		"Some("+ elements.map[toString].reduce(s1, s2 | s1 +", "+ s2) +")"
 	}
 	
 }
 
 /** A plain String representation. */
-class StrElement extends Element {
+class Str extends Element {
 	
 	val String s
 
 	new(String s) {
-		if (s.isNullOrEmpty) throw new IllegalArgumentException("StrElement argument cannot be empty")
+		if (s.isNullOrEmpty) throw new IllegalArgumentException("Str argument cannot be empty")
 		this.s = s
 	}
 
@@ -224,7 +213,7 @@ class StrElement extends Element {
 	}
 	
 	override String toString() {
-		"StrElement("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
+		"Str("+ s.replaceAll("\\r", "\n").replaceAll("\\n+", "<EOL>").replaceAll("\\s+", " ") +")"
 	}
 	
 }

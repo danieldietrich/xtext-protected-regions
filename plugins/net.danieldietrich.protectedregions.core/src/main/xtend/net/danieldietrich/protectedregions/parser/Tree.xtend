@@ -1,13 +1,7 @@
 package net.danieldietrich.protectedregions.parser
 
-import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
-import static extension net.danieldietrich.protectedregions.util.OptionExtensions.*
-
 import static net.danieldietrich.protectedregions.util.Strings.*
 
-import net.danieldietrich.protectedregions.util.None
-import net.danieldietrich.protectedregions.util.Option
-import net.danieldietrich.protectedregions.util.Some
 import java.util.List
 
 abstract class TreeExtensions {
@@ -32,29 +26,24 @@ abstract class TreeExtensions {
 		}
 	}
 	
-	/** Example: node.leafs.find[id.equals('xxx')] */
-	def static <T, X extends Tree<T>> Option<X> find(Iterable<X> children, (X)=>Boolean predicate) {
-		Option(children.findFirst(predicate))
-	}
-	
 	/** Example: node.leafs.find('xxx') */
-	def static <T, X extends Tree<T>> Option<X> find(Iterable<X> children, String _id) {
-		children.find[id.equals(_id)]
+	def static <T, X extends Tree<T>> X find(Iterable<X> children, String _id) {
+		children.findFirst[id.equals(_id)]
 	}
 	
 	/** Return all children of type Leaf. */
 	def static <T> Iterable<Leaf<T>> leafs(Node<T> node) {
 		node.children.map[switch it {
-			Leaf<T> : new Some<Leaf<T>>(it)
-			Node<T> : new None<Leaf<T>>
+			Leaf<T> : newArrayList(it)
+			Node<T> : emptyList
 		}].flatten
 	}
 	
 	/** Return all children of type Node. */
 	def static <T> Iterable<Node<T>> nodes(Node<T> node) {
 		node.children.map[switch it {
-			Node<T> : new Some<Node<T>>(it)
-			Leaf<T> : new None<Node<T>>
+			Node<T> : newArrayList(it)
+			Leaf<T> : emptyList
 		}].flatten
 	}
 	
@@ -65,7 +54,7 @@ abstract class TreeExtensions {
 	def static <T> void traverse(Tree<T> tree, (Tree<T>)=>Boolean f) {
 		val descend = f.apply(tree)
 		if (descend == null || descend) switch tree {
-			Node<T> : tree.children.forEach[it.traverse(f)]
+			Node<T> : tree.children.forEach[traverse(it, f)]
 		}
 	}
 	
@@ -98,14 +87,9 @@ class Node<T> extends Tree<T> {
 	}
 	
 	def add(Tree<T> child) {
-		if (isCycle(child)) throw new IllegalArgumentException("A tree has no cycles.")
 		_children.add(child)
 		child.parent = this
 		child
-	}
-	
-	def private isCycle(Tree<T> child) {
-		this == child || (!isRoot && (parent as Node<T>).isCycle(child)) // BUG: parent.isCycle(child)
 	}
 	
 	override protected toString(int depth) {

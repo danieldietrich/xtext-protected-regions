@@ -3,7 +3,6 @@ package net.danieldietrich.protectedregions
 import static extension net.danieldietrich.protectedregions.parser.ElementExtensions.*
 import static extension net.danieldietrich.protectedregions.parser.ModelExtensions.*
 import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
-import static extension net.danieldietrich.protectedregions.util.OptionExtensions.*
 
 import com.google.inject.Inject
 import java.util.List
@@ -13,19 +12,17 @@ import net.danieldietrich.protectedregions.parser.Element
 import net.danieldietrich.protectedregions.parser.Leaf
 import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
-import net.danieldietrich.protectedregions.util.Option
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-// TODO: Only the model should depend on the resolver. The parser should return an AST containing all informations about the protected regions. (-> move getResolver to the ModelBuilder) 
 class ParserFactory {
 	
 	static val DEFAULT_RESOLVER = new DefaultProtectedRegionResolver()
 	
 	@Inject extension ModelBuilder
 	
-	def javaParser() { javaParser(None) }
-	def javaParser(Option<RegionResolver> customResolver) {
+	def javaParser() { javaParser(null) }
+	def javaParser(RegionResolver customResolver) {
 		val resolver = getResolver(customResolver)
 		parser("java", resolver, model(resolver)[
 			comment("//")
@@ -35,8 +32,8 @@ class ParserFactory {
 		])
 	}
 	
-	def xmlParser() { xmlParser(None) }
-	def xmlParser(Option<RegionResolver> customResolver) {
+	def xmlParser() { xmlParser(null) }
+	def xmlParser(RegionResolver customResolver) {
 		val resolver = getResolver(customResolver)
 		parser("xml", resolver, model(resolver)[
 			comment("<!--", "-->")
@@ -46,8 +43,8 @@ class ParserFactory {
 		])
 	}
 	
-	def xtendParser() { xtendParser(None) }
-	def xtendParser(Option<RegionResolver> customResolver) {
+	def xtendParser() { xtendParser(null) }
+	def xtendParser(RegionResolver customResolver) {
 		val resolver = getResolver(customResolver)
 		parser("xtend", resolver, model(resolver)[
 			comment("//")
@@ -143,8 +140,8 @@ class ParserFactory {
 		)
 	}
 	
-	def private getResolver(Option<RegionResolver> customResolver) {
-		if (customResolver.isEmpty) DEFAULT_RESOLVER else customResolver.get
+	def private getResolver(RegionResolver customResolver) {
+		if (customResolver == null) DEFAULT_RESOLVER else customResolver
 	}
 	
 }
@@ -292,7 +289,7 @@ class ModelBuilder {
 	}
 
 	def greedyString(ModelBuilderContext ctx, String s) {
-		(Model('GreedyString', s, GreedyElement(s)) => [
+		(Model('GreedyString', s, s.grstr) => [
 			ctx.model.add(it)	
 		]).ctx(ctx.resolver)
 	}
@@ -306,7 +303,7 @@ class ModelBuilder {
 	def void withEscape(ModelBuilderContext ctx, String escape) {
 		val model = ctx.model
 		if (model == model.root) throw new IllegalStateException(model.id +".withEscape() not allowed at root node")
-		model.add(Model('Escape', SeqElement(StrElement(escape), model.start.unpack.get), NoElement))
+		model.add(Model('Escape', Seq(escape.str, model.start.value), None))
   	}
   	
   	def void withCode(ModelBuilderContext ctx, String start, String end) {
@@ -320,8 +317,8 @@ class ModelBuilder {
   	def void withProtectedRegion(ModelBuilderContext ctx) {
   		val resolver = ctx.resolver
   		ctx.model => [
-  			add(Model('RegionStart', resolver.start.pattern.r, NoElement))
-  			add(Model('RegionEnd', resolver.end.pattern.r, NoElement))
+  			add(Model('RegionStart', resolver.start.pattern.r, None))
+  			add(Model('RegionEnd', resolver.end.pattern.r, None))
   		]
   	}
   	

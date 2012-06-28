@@ -9,38 +9,13 @@ abstract class Strings {
 	static val EOL = Pattern::compile("\\r\\n|\\n|\\r")
 	
 	/**
-	 * Defines multiplication for int and String.
-	 * Concatenates s count times.
-	 */
-	def static operator_multiply(int count, String s) {
-		var result = new StringBuffer()
-		var i = 0
-		while (i < count) {
-			result.append(s)
-			i = i + 1
-		}
-		result.toString()
-	}
-
-	/**
-	 * Same as operator_multiply(int, String)
-	 */
-	def static operator_multiply(String s, int count) {
-		operator_multiply(count, s)
-	}
-
-	/**
 	 * Returnes times * 2 spaces.
 	 */
 	def static indent(int times) {
-		operator_multiply(times, "  ")
-	}
-
-	/**
-	 * Returns times * width spaces.
-	 */
-	def static indent(int times, int width) {
-		operator_multiply(times * width, " ")
+		var buf = new StringBuffer()
+		var i = 0
+		while ((i=i+1) <= times) { buf.append("  ") }
+		buf.toString
 	}
 
 	/**
