@@ -5,12 +5,15 @@ import net.danieldietrich.protectedregions.DefaultProtectedRegionResolver
 import net.danieldietrich.protectedregions.RegionResolver
 import net.danieldietrich.protectedregions.parser.Element
 import net.danieldietrich.protectedregions.parser.ElementExtensions
+import net.danieldietrich.protectedregions.parser.Leaf
 import net.danieldietrich.protectedregions.parser.ModelExtensions
 import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
 import net.danieldietrich.protectedregions.parser.TreeExtensions
 import org.slf4j.LoggerFactory
+import java.util.List
 
+// TODO: Only the model should depend on the resolver. The parser should return an AST containing all informations about the protected regions. (-> move getResolver to the ModelBuilder) 
 class ParserFactory {
 	
 	static val DEFAULT_RESOLVER = new DefaultProtectedRegionResolver()
@@ -18,7 +21,8 @@ class ParserFactory {
 	@Inject extension ModelBuilder
 	
 	def javaParser(RegionResolver... optionalResolver) {
-		parser("java", optionalResolver, model[
+		val resolver = getResolver(optionalResolver)
+		parser("java", resolver, model(resolver)[
 			comment("//")
 			comment("/*", "*/")
 			string('"').withEscape("\\")
@@ -27,7 +31,8 @@ class ParserFactory {
 	}
 	
 	def xmlParser(RegionResolver... optionalResolver) {
-		parser("xml", optionalResolver, model[
+		val resolver = getResolver(optionalResolver)
+		parser("xml", resolver, model(resolver)[
 			comment("<!--", "-->")
 			string("<![CDATA[", "]]>")
 			string("'")
@@ -36,13 +41,19 @@ class ParserFactory {
 	}
 	
 	def xtendParser(RegionResolver... optionalResolver) {
-		parser("xtend", optionalResolver, model[
+		val resolver = getResolver(optionalResolver)
+		parser("xtend", resolver, model(resolver)[
 			comment("//")
 			comment("/*", "*/")
 			string('"').withEscape("\\")
 			string("'").withEscape("\\")
 			string("'''").withCode("«", "»") // .withCode("\u00ab", "\u00ba") // french braces
 		])
+	}
+	
+	def private getResolver(RegionResolver[] optionalResolver) {
+		if (optionalResolver.size > 1) throw new IllegalArgumentException("Some or none RegionResolver allowed.")
+		if (optionalResolver.size == 0) DEFAULT_RESOLVER else optionalResolver.get(0)
 	}
 	
 //  def clojureParser() {
@@ -123,30 +134,13 @@ class ParserFactory {
 //    ]
 //  }
 	
-	def private parser(String name, RegionResolver[] optionalResolver, Node<Element> model) {
-		/*DEBUG*/println(model)
-		if (optionalResolver.size > 1) throw new IllegalArgumentException("Some or none RegionResolver allowed.")
-		val resolver = if (optionalResolver.size == 0) DEFAULT_RESOLVER else optionalResolver.get(0)
-// TODO: add protected region elements to model comments
-//		model.augmentResolver(resolver)
+	def private parser(String name, RegionResolver resolver, Node<Element> model) {
+		/*DEBUG*/println("### MODEL:\n"+ model +"\n")
 		new ProtectedRegionParser(
 			new Parser(name, model),
 			resolver
 		)
 	}
-	
-//	def private void augmentResolver(Node<Element> model, RegionResolver resolver) {
-//  		augmentResolver(model.root, resolver, newHashSet())
-//	}
-//
-//  	def private void augmentResolver(Tree<Element> model, RegionResolver resolver, Set<Node<Element>> visited) {
-//  		if (model.symbol == Comment) {
-//  			model.add(new Model(RegionStart, RegExElement(resolver.start.pattern), NoElement))
-//  			model.add(new Model(RegionEnd, RegExElement(resolver.end.pattern), NoElement))
-//  		}
-//  		visited.add(model)
-//  		model.children.forEach[if (!visited.contains(it)) augmentResolver(resolver, visited)]
-//	}
 	
 }
 
@@ -154,106 +148,34 @@ class ParserFactory {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionParser))
 	
+	extension TreeExtensions treeExtensions = new TreeExtensions()
+	
 	val Parser parser
 	val RegionResolver resolver
 	
 	def parse(CharSequence input) {
+		
+		val List<Region> result = newArrayList
 		val ast = parser.parse(input)
+		/*DEBUG*/println("### AST:\n"+ ast +"\n")
 		
-		println("### AST ###\n"+ ast +"\n")
+		println("--8<--*snip*--8<--")
+		ast.traverse[switch it {
+			Node<String> case id == 'RegionStart' : {
+				//
+			}
+			Node<String> case id == 'RegionEnd' : {
+				//
+			}
+			Leaf<String> : {
+				print(it.value)
+			}
+		}]
+		println("\n--8<--*snap*--8<--")
 		
-		println("### TRAVERSE ###")
-		
-//		val curr = new Region()
-//		val List<Region> regions = newArrayList(curr)
-//		val String[] id = newArrayList(false)
-//		val boolean[] next = newArrayList(false)
-//		
-//		ast.traverse[switch it {
-//			Node case id == RegionStart: {
-//				if (in.get(0)) {
-//					logger.warn("Nested region detected")
-//				} else {
-//					in.set(0, true)
-//					next.set(0, true)
-//				}
-//			}
-//			Node case id == RegionEnd: {
-//				if (!in.get(0)) {
-//					logger.warn("Missing region start")
-//				} else {
-//					in.set(0, false)
-//					next.set(0, true)
-//				}
-//			}
-//			Leaf: {
-//				if (next) {
-//					if ()
-//					next.set(0, false)
-//				}
-//			}
-//		}]
-		
-		val Region[] result = newArrayList()
 		result
+		
 	}
-	
-//	def parse(CharSequence input) {
-//		val ast = parser.parse(input)
-//		/*DEBUG*/println(ast)
-//		val List<Region> result = newArrayList()
-//		val buf = new StringBuffer()
-//		parse(ast, result, buf)
-//		if (buf.length > 0) {
-//			val region = result.last
-//			if (region == null || region.isMarked) {
-//				regionStart("", result, buf)
-//			} else {
-//				regionEnd("", result, buf)
-//			}
-//		}
-//		result
-//	}
-//	
-//	def private dispatch void parse(Node node, List<Region> regions, StringBuffer buf) {
-//		if (node.id == RegionStart) {
-//			val text = (node.children.head as Leaf).value
-//			regionStart(text, regions, buf)
-//		} else if (node.id == RegionEnd) {
-//			val text = (node.children.head as Leaf).value
-//			regionEnd(text, regions, buf)
-//		} else {
-//			node.children.forEach[parse(regions, buf)]
-//		}
-//	}
-//	
-//	def private dispatch void parse(Leaf node, List<Region> regions, StringBuffer buf) {
-//		buf.append(node.value)
-//	}
-//	
-//	def private regionStart(String text, List<Region> regions, StringBuffer buf) {
-//		buf.append(text)
-//		val region = regions.last
-//		if (region == null || region.isMarked) {
-//			regions.add(new Region(buf.toString, getId(text))) // create generated region
-//			buf.setLength(0)
-//		} // else IllegalStateException("Missing end of protected region")
-//	}
-//	
-//	def private regionEnd(String text, List<Region> regions, StringBuffer buf) {
-//		val region = regions.last
-//		if (region != null && !region.isMarked) {
-//			regions.add(new Region(buf.toString, null))
-//			buf.setLength(0)
-//		} // else IllegalStateException("Missing start of protected region")
-//		buf.append(text)
-//	}
-//	
-//	def private getId(String markedRegionStart) {
-//		val i = markedRegionStart.indexOf("(")
-//      	val j = 1 + i + markedRegionStart.substring(i + 1).indexOf(")")
-//      	return if (i != -1 && j != -1) markedRegionStart.substring(1 + i, j).trim() else null
-//	}
 	
 }
 
@@ -270,6 +192,12 @@ class ParserFactory {
 	
 }
 
+/** Needed to pass informations when building the model. */
+@Data class ModelBuilderContext {
+	val Node<Element> model
+	val RegionResolver resolver
+}
+
 // cycles definitely allowed when building models because of nested- and code-structures
 class ModelBuilder {
 
@@ -277,62 +205,76 @@ class ModelBuilder {
 	@Inject extension ModelExtensions	
 	@Inject extension TreeExtensions	
 	
-	def model((Node<Element>)=>void initializer) {
+	def model(RegionResolver regionResolver, (ModelBuilderContext)=>void initializer) {
 		Model('Code', "^".r, "\\z".r) => [
-			initializer.apply(it)	
+			initializer.apply(ctx(regionResolver))	
 		]
 	}
 	
-	def comment(Node<Element> model, String s) {
-		Model('Comment', s, EOL) => [
-			model.add(it)
-		]
+	def comment(ModelBuilderContext ctx, String s) {
+		(Model('Comment', s, EOL) => [
+			ctx.model.add(it)
+			ctx(ctx.resolver).withProtectedRegion
+		]).ctx(ctx.resolver)
 	}
 	
-	def comment(Node<Element> model, String start, String end) {
-		Model('Comment', start, end) => [
-			model.add(it)
-		]
+	def comment(ModelBuilderContext ctx, String start, String end) {
+		(Model('Comment', start, end) => [
+			ctx.model.add(it)
+			ctx(ctx.resolver).withProtectedRegion
+		]).ctx(ctx.resolver)
 	}
 	
-	def nestableComment(Node<Element> model, String start, String end) {
-		Model('NestableComment', start, end) => [
-			model.add(it)
-			it.add(Link(it)) // nestable: comment may contain comments
-		]
+	def nestableComment(ModelBuilderContext ctx, String start, String end) {
+		(Model('Comment', start, end) => [
+			ctx.model.add(it)
+			ctx(ctx.resolver).withProtectedRegion
+			add(Link(it)) // nestable: comment may contain comments
+		]).ctx(ctx.resolver)
 	}
 	
-	def string(Node<Element> model, String s) {
-		Model('String', s, s) => [
-			model.add(it)
-		]
+	def string(ModelBuilderContext ctx, String s) {
+		(Model('String', s, s) => [
+			ctx.model.add(it)
+		]).ctx(ctx.resolver)
 	}
 
-	def greedyString(Node<Element> model, String s) {
-		Model('GreedyString', s, GreedyElement(s)) => [
-			model.add(it)	
-		]
+	def greedyString(ModelBuilderContext ctx, String s) {
+		(Model('GreedyString', s, GreedyElement(s)) => [
+			ctx.model.add(it)	
+		]).ctx(ctx.resolver)
 	}
 		
-	def string(Node<Element> model, String start, String end) {
-		Model('String', start, end) => [
-			model.add(it)
-		]
+	def string(ModelBuilderContext ctx, String start, String end) {
+		(Model('String', start, end) => [
+			ctx.model.add(it)
+		]).ctx(ctx.resolver)
 	}
 	
-	def withEscape(Node<Element> model, String escape) {
+	def void withEscape(ModelBuilderContext ctx, String escape) {
+		val model = ctx.model
 		if (model == model.root) throw new IllegalStateException(model.id +".withEscape() not allowed at root node")
-		// model.start.unpack.get allowed, because ModelExtension.Model ensures model.start is never None
 		model.add(Model('Escape', SeqElement(StrElement(escape), model.start.unpack.get), NoElement))
-		model // return parent because escape models have no children
   	}
   	
-  	def withCode(Node<Element> model, String start, String end) {
+  	def void withCode(ModelBuilderContext ctx, String start, String end) {
+  		val model = ctx.model
 		if (model == model.root) throw new IllegalStateException(model.id +".withCode() not allowed at root node")
   		val code = Model('EmbeddedCode', start, end)
   		model.add(code)
   		code.add(Link(model.root))
-  		model // return parent because code models have root as only child
   	}
   	
+  	def void withProtectedRegion(ModelBuilderContext ctx) {
+  		val resolver = ctx.resolver
+  		ctx.model => [
+  			add(Model('RegionStart', resolver.start.pattern.r, NoElement))
+  			add(Model('RegionEnd', resolver.end.pattern.r, NoElement))
+  		]
+  	}
+  	
+  	def private ctx(Node<Element> model, RegionResolver resolver) {
+		new ModelBuilderContext(model, resolver)
+	}
+	
 }

@@ -1,7 +1,6 @@
 package net.danieldietrich.protectedregions
 
 import com.google.inject.Guice
-import java.util.List
 import org.junit.Before
 import org.junit.Test
 
@@ -38,7 +37,7 @@ class ParserTest {
 		}
 	}
 	
-	def private toString(List<Region> regions) {
+	def private toString(Iterable<Region> regions) {
 		val buf = new StringBuffer()
 		for (region : regions) {
 			buf.append(region.content)
