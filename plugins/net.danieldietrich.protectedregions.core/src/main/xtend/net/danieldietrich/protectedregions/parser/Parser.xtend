@@ -83,6 +83,9 @@ import net.danieldietrich.protectedregions.util.Some
 				Some<Leaf<Element>> : {
 					val match = next.unpack.get.indexOf(input, currIndex)
 					val hasEnd = !end.unpack.get.isNoElement
+					if (hasEnd && !match.found) {
+						throwNoViableInputFound(model, input, currIndex)
+					}
 					if (currIndex < match.index) {
 						output.add(input.copy(currIndex, match.index))
 					}
@@ -113,8 +116,8 @@ import net.danieldietrich.protectedregions.util.Some
 	
 	def private throwNoViableInputFound(Node<Element> model, String input, int index) {
 		throw new IllegalStateException(
-			name +" parser: no viable match for model element "+
-			model.id +" found at "+ lineAndColumn(input, index)
+			name +" parser: "+ model.end.unpack.get.toString
+			+" not found at "+ lineAndColumn(input, index)
 		)
 	}
 	

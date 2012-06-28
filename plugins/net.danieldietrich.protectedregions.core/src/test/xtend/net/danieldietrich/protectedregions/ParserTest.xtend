@@ -30,7 +30,7 @@ class ParserTest {
 	
 	@Test
 	def void testXmlParserCorruptedXml() {
-		testException("corrupted xml parsed wrong", xmlParser, xmlContent_corrupted, "xml parser: end of String (', [']) not found at [4,23]")
+		testException("corrupted xml parsed wrong", xmlParser, xmlContent_corrupted, "xml parser: StrElement(') not found at [4,23]")
 	}
 		
 	def private test(String msg, ProtectedRegionParser parser, CharSequence content) {
