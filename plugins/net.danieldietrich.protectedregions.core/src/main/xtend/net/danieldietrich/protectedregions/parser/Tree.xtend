@@ -95,7 +95,7 @@ class TreeExtensions {
 
 abstract class Tree<T> {
 	
-	@Property val String id
+	@Property val String id // identifier, not necessarily unique
 	@Property var Node<T> parent = null
 	
 	new(String id) {
