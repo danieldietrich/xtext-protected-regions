@@ -146,15 +146,18 @@ class ParserFactory {
 	
 }
 
-class Regions {
+/** Needed when post-processing the AST. */
+class RegionBuffer {
 	
-	static val Logger logger = LoggerFactory::getLogger(typeof(Regions))
+	static val Logger logger = LoggerFactory::getLogger(typeof(RegionBuffer))
 	
 	val List<Region> regions = newArrayList()
+	
 	var String id = null
 	var Boolean enabled = null
 	var buf = new StringBuffer()
 	
+	/** Called when a protected region start is found in the AST. */
 	def void begin(String start, String id, boolean enabled) {
 		if (this.id != null) {
 			logger.warn("Already started a region with id '"+ this.id +"' but found another region with id '"+ id +"'")
@@ -167,6 +170,7 @@ class Regions {
 		}
 	}
 	
+	/** Called when a protected region end is found in the AST. */
 	def void end(String end) {
 		if (id == null) {
 			logger.warn("Missing region start")
@@ -179,10 +183,12 @@ class Regions {
 		}
 	}
 	
+	/** Called to store the leaf values of the AST */
 	def void append(String text) {
 		buf.append(text)
 	}
 	
+	/** Called once at the end of AST processing to retrieve the result. */
 	def Iterable<Region> get() {
 		if (id != null) logger.warn("Missing end of last region with id '"+ id +"'")
 		if (buf.length > 0) {
@@ -193,6 +199,7 @@ class Regions {
 	
 }
 
+/** Representation of regions (generated and non-generated). */
 @Data class Region {
 
 	val String id
@@ -203,9 +210,8 @@ class Regions {
 	
 }
 
+/** A parser wrapper which postprocesses the resultung AST.  */
 @Data class ProtectedRegionParser {
-	
-	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionParser))
 	
 	val Parser parser
 	val RegionResolver resolver
@@ -213,8 +219,8 @@ class Regions {
 	def parse(CharSequence input) {
 		
 		val ast = parser.parse(input)
-		val regions = new Regions()
-
+		val regions = new RegionBuffer()
+		
 		ast.traverse[switch it {
 			Node<String> case id == 'RegionStart' : {
 				val start = it.text
@@ -251,7 +257,7 @@ class Regions {
 	val RegionResolver resolver
 }
 
-// cycles definitely allowed when building models because of nested- and code-structures
+/** Builds a parser model. */
 class ModelBuilder {
 	
 	def model(RegionResolver regionResolver, (ModelBuilderContext)=>void initializer) {

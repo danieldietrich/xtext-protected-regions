@@ -2,6 +2,15 @@ package net.danieldietrich.protectedregions
 
 import java.util.regex.Pattern
 
+/**
+ * The prototype for resolvers of protected regions.
+ * Write your own resolvers by implementing getId() and isEnabled().
+ * Pass regular expressions for protected region start and end to the constructor.
+ * The id has to be the first regex group (denoted by '(' and ')').
+ * The enabled part has to be the second regex group.
+ * If additional groups are nescessary they have to be disabled using '(?:' and ')'.
+ * Nested groups are allowed, e.g. '(?:xxx(xxx))*'.
+ */
 abstract class RegionResolver {
 	
 	@Property val Pattern start
@@ -22,22 +31,21 @@ abstract class RegionResolver {
 		end.matcher(region).matches
 	}
 
+	def String getId(String regionStart) {
+		getString(regionStart, 1)
+	}
+
+	def getEnabled(String regionStart) {
+		getString(regionStart, 2)
+	}
+	
+	/** To be implemented by custom resolvers. */
 	def boolean isEnabled(String regionStart)
 	
-	def String getId(String regionStart)
-
-	/** Intended to be used by getId(String) */
-	def protected getEnabled(String regionStart, int regExGroup) {
+	def protected getString(String regionStart, int group) {
 		val matcher = start.matcher(regionStart)
 		val found = matcher.find()
-		if (!found) null else matcher.group(regExGroup)
-	}
-		
-	/** Intended to be used by getId(String) */
-	def protected getId(String regionStart, int regExGroup) {
-		val matcher = start.matcher(regionStart)
-		val found = matcher.find()
-		if (!found) null else matcher.group(regExGroup)
+		if (!found) null else matcher.group(group)
 	}
 	
 }
@@ -48,16 +56,10 @@ class DefaultProtectedRegionResolver extends RegionResolver {
 	static val PR_START = "PROTECTED\\s+REGION\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
 	static val PR_END = "PROTECTED\\s+REGION\\s+END"
 	
-	new() {
-		super(PR_START, PR_END)
-	}
-	
-	override getId(String regionStart) {
-		getId(regionStart, 1)
-	}
+	new() { super(PR_START, PR_END) }
 	
 	override isEnabled(String regionStart) {
-		"ENABLED".equals(getEnabled(regionStart, 2)?.trim)
+		"ENABLED".equals(getEnabled(regionStart)?.trim)
 	}
 	
 }
@@ -68,16 +70,10 @@ class DefaultGeneratedRegionResolver extends RegionResolver {
 	static val GR_START = "GENERATED\\s+REGION\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
 	static val GR_END = "GENERATED\\s+REGION\\s+END"
 	
-	new() {
-		super(GR_START, GR_END)
-	}
-	
-	override getId(String regionStart) {
-		getId(regionStart, 1)
-	}
+	new() { super(GR_START, GR_END) }
 	
 	override isEnabled(String regionStart) {
-		"ENABLED".equals(getEnabled(regionStart, 2)?.trim)
+		"ENABLED".equals(getEnabled(regionStart)?.trim)
 	}
 	
 }

@@ -93,7 +93,7 @@ class Node<T> extends Tree<T> {
 	}
 	
 	override protected toString(int depth) {
-		val indent = indent(depth) // BUG:map[toString(depth+1)]
+		val indent = indent(depth)
 		indent + id +"(\n"+ _children.map[Tree<T> child | child.toString(depth+1)].reduce[l,r | l +",\n"+ r] +"\n"+ indent +")"
 	}
 
