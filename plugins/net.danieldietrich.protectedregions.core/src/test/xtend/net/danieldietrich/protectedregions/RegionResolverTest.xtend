@@ -24,8 +24,8 @@ class RegionResolverTest {
 		
 		val resolver = new DefaultGeneratedRegionResolver()
 		val id = "$Some:123.id_"
-		val startEnabled = "GENERATED REGION ID( "+ id +" )  ENABLED  START"
-		val startDisabled = "GENERATED  REGION  ID  ( "+ id +" )  START"
+		val startEnabled = "GENERATED REGION ID( "+ id +" )  START"
+		val startDisabled = "GENERATED  REGION  ID  ( "+ id +" )  DISABLED  START"
 		val end = "GENERATED  REGION  END"
 		
 		assertRegionIsValid(resolver, id, startEnabled, startDisabled, end)

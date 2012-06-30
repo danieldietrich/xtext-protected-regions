@@ -6,11 +6,11 @@ import com.google.common.io.Files
 import com.google.inject.Guice
 
 import java.io.File
+import java.io.FileNotFoundException
 import java.nio.charset.Charset
 
 import org.junit.Before
 import org.junit.Test
-import java.rmi.UnexpectedException
 
 /**
  * Note: These test cases access the file system instead of passing
@@ -18,6 +18,7 @@ import java.rmi.UnexpectedException
  */
 class ProtectedRegionSupportTest {
 	
+	extension ModelBuilder modelBuilder
 	extension ParserFactory parserFactory
 	extension ProtectedRegionSupport support
 	
@@ -27,24 +28,51 @@ class ProtectedRegionSupportTest {
 	@Before
 	def void setup() {
 		val injector = Guice::createInjector()
+		modelBuilder = injector.getInstance(typeof(ModelBuilder))
 		parserFactory = injector.getInstance(typeof(ParserFactory))
 		support = injector.getInstance(typeof(ProtectedRegionSupport))
 	}
 	
-	@Test
-	def void nonExistingFilesShouldByHandledGracefully() {
-		support.merge(new File("does_not_exist"), "")
-	}
+	// TODO: RegionResolver test when 2nd regex group is empty && id == enabled/disabled keyword
+	// TODO: Test delete protected region start and end identifiert because they are part of
+	//       the protected region (-> to remember enabled/disabled state)
+	// TODO: throw exceptions when detecting missing region start/end?
 	
 	@Test
 	def void mergeShouldMatchExpected() {
+		parsingPreviousAndMergingCurrentShouldMatchExpected(javaParser, "protected")
+	}
+	
+	@Test
+	def void xmlParserShouldMatchExpected() {
+		parsingPreviousAndMergingCurrentShouldMatchExpected(xmlParser, "xml")
+	}
+	
+	@Test
+	def void switchedRegionsParserShouldPreserveEnabledRegionsOnly() {
+		parsingPreviousAndMergingCurrentShouldMatchExpected(javaParser, "switched")
+	}
+	
+	@Test
+	def void fillInShouldMatchExpected() {
 		
-		val currentFile = "src/test/resources/protected_current.txt".file
-		val previousFile = "src/test/resources/protected_previous.txt".file
-		val expectedFile = "src/test/resources/protected_expected.txt".file
+		val parser = javaParser => [
+			inverse = true
+			resolver = new FillInRegionResolver
+		]
+		
+		parsingPreviousAndMergingCurrentShouldMatchExpected(parser, "fill_in")
+		
+	}	
+	
+	def private parsingPreviousAndMergingCurrentShouldMatchExpected(ProtectedRegionParser parser, String fileNamePrefix) {
+		
+		val currentFile = '''src/test/resources/«fileNamePrefix»_current.txt'''.file
+		val previousFile = '''src/test/resources/«fileNamePrefix»_previous.txt'''.file
+		val expectedFile = '''src/test/resources/«fileNamePrefix»_expected.txt'''.file
 
 		// only support files relevant for this test case
-		support.addParser(javaParser, previousFile.filter)
+		support.addParser(parser, previousFile.filter)
 
 		// only read previous content
 		support.read(BASE_DIR.file, [CHARSET])
@@ -58,6 +86,11 @@ class ProtectedRegionSupportTest {
 	}
 
 	@Test
+	def void nonExistingFilesShouldByHandledGracefully() {
+		support.merge(new File("does_not_exist"), "")
+	}
+		
+	@Test
 	def void idsShouldBeUniquePerFile() {
 		val file = "src/test/resources/non_unique_ids.txt".file
 		support.addParser(javaParser, file.filter)
@@ -69,215 +102,76 @@ class ProtectedRegionSupportTest {
 		}
 	}
 
-//	IRegionOracle NESTED_COMMENT_ORACLE = new IRegionOracle() {
-//		// example: PROTECTED REGION /*1234*/ START
-//		private final Pattern PR_START = Pattern
-//				.compile("\\s*PROTECTED\\s+REGION\\s+/\\*\\s*[0-9]+\\s*\\*/\\s+(ENABLED\\s+)?START\\s*");
-//		private final Pattern PR_END = Pattern.compile("\\s*PROTECTED\\s+REGION\\s+END\\s*");
-//
-//		//@Override
-//		public boolean isMarkedRegionStart(String comment) {
-//			return PR_START.matcher(comment).matches();
-//		}
-//
-//		//@Override
-//		public boolean isMarkedRegionEnd(String comment) {
-//			return PR_END.matcher(comment).matches();
-//		}
-//
-//		//@Override
-//		public String getId(String markedRegionStart) {
-//			int i = markedRegionStart.indexOf("/*") + 1;
-//			int j = i + 1 + markedRegionStart.substring(i + 1).indexOf("*/");
-//			return (i != -1 && j != -1) ? markedRegionStart.substring(i + 1, j).trim() : null;
-//		}
-//
-//		//@Override
-//		public boolean isEnabled(String markedRegionStart) {
-//			return markedRegionStart.contains("ENABLED");
-//		}
-//	};
-//
-//	@Test
-//	public void scalaParserShouldReadNestedComments() throws Exception {
-//		IRegionParser parser = RegionParserFactory.createScalaParser(NESTED_COMMENT_ORACLE, false);
-//		IDocument doc = parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
-//		// Scala does not recognize nested comment-like id's
-//		assertTrue(doc.getMarkedRegion("1234") != null);
-//	}
-//
-//	@Test
-//	public void javaParserShouldntReadNestedComments() throws Exception {
-//		try {
-//			IRegionParser parser = RegionParserFactory.createJavaParser(NESTED_COMMENT_ORACLE, false);
-//			parser.parse(new FileInputStream("src/test/resources/nested_comments.txt"));
-//		} catch (IllegalStateException x) {
-//			assertTrue(
-//					x.getMessage(),
-//					"Detected marked region end without corresponding marked region start between (5,7) and (6,1), near [ PROTECTED REGION END]."
-//							.equals(x.getMessage()));
-//		}
-//	}
-//
-//	@Test
-//	public void switchedRegionsParserShouldPreserveEnabledRegionsOnly() throws Exception {
-//
-//		IDocument currentDoc =
-//				javaParser.parse(new FileInputStream("src/test/resources/switched_current.txt"));
-//		IDocument previousDoc =
-//				javaParser.parse(new FileInputStream("src/test/resources/switched_previous.txt"));
-//
-//		IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
-//		String mergedContents = _merged.getContents();
-//		String expectedContents =
-//				IOUtil.toString(new FileReader("src/test/resources/switched_expected.txt"));
-//
-//		assertEquals(expectedContents, mergedContents);
-//	}
-//
-//	IRegionOracle FILL_IN_ORACLE = new IRegionOracle() {
-//		// example: GENERATED ID(1234) START
-//		private final Pattern PR_START = Pattern
-//				.compile("\\s*GENERATED\\s+ID\\s*\\(\\s*[0-9]+\\s*\\)\\s+(DISABLED\\s+)?START\\s*");
-//		private final Pattern PR_END = Pattern.compile("\\s*GENERATED\\s+END\\s*");
-//
-//		//@Override
-//		public boolean isMarkedRegionStart(String comment) {
-//			return PR_START.matcher(comment).matches();
-//		}
-//
-//		//@Override
-//		public boolean isMarkedRegionEnd(String comment) {
-//			return PR_END.matcher(comment).matches();
-//		}
-//
-//		//@Override
-//		public String getId(String markedRegionStart) {
-//			int i = markedRegionStart.indexOf("(");
-//			int j = i + 1 + markedRegionStart.substring(i + 1).indexOf(")");
-//			return (i != -1 && j != -1) ? markedRegionStart.substring(i + 1, j).trim() : null;
-//		}
-//
-//		//@Override
-//		public boolean isEnabled(String markedRegionStart) {
-//			return !markedRegionStart.contains("DISABLED");
-//		}
-//	};
-//
-//	@Test
-//	public void fillInShouldMatchExpected() throws Exception {
-//
-//		IRegionParser parser = RegionParserFactory.createJavaParser(FILL_IN_ORACLE, false);
-//
-//		IDocument currentDoc =
-//				parser.parse(new FileInputStream("src/test/resources/fill_in_current.txt"));
-//		IDocument previousDoc =
-//				parser.parse(new FileInputStream("src/test/resources/fill_in_previous.txt"));
-//
-//		IDocument _merged = RegionUtil.fillIn(currentDoc, previousDoc);
-//		String mergedContents = _merged.getContents();
-//		String expectedContents =
-//				IOUtil.toString(new FileReader("src/test/resources/fill_in_expected.txt"));
-//
-//		assertEquals(expectedContents, mergedContents);
-//	}
-//
-//	IRegionOracle SIMPLE_ORACLE = new IRegionOracle() {
-//		//@Override
-//		public boolean isMarkedRegionStart(String s) {
-//			String _s = s.trim();
-//			return _s.startsWith("$(") && _s.endsWith(")-{");
-//		}
-//
-//		//@Override
-//		public boolean isMarkedRegionEnd(String s) {
-//			return "}-$".equals(s.trim());
-//		}
-//
-//		//@Override
-//		public String getId(String s) {
-//			int i = s.indexOf("(");
-//			int j = i + 1 + s.substring(i + 1).indexOf(")");
-//			return (i != -1 && j != -1) ? s.substring(i + 1, j).trim() : null;
-//		}
-//
-//		//@Override
-//		public boolean isEnabled(String s) {
-//			return true;
-//		}
-//	};
-//
-//	@Test
-//	public void alternativeRegionNotationsWorkAsWell() throws Exception {
-//
-//		IRegionParser parser =
-//				new RegionParserBuilder().addComment("/*", "*/").addComment("//").setInverse(false)
-//						.useOracle(SIMPLE_ORACLE).build();
-//
-//		IDocument currentDoc =
-//				parser.parse(new FileInputStream("src/test/resources/simple_current.txt"));
-//		IDocument previousDoc =
-//				parser.parse(new FileInputStream("src/test/resources/simple_previous.txt"));
-//
-//		IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
-//		String mergedContents = _merged.getContents();
-//		String expectedContents =
-//				IOUtil.toString(new FileReader("src/test/resources/simple_expected.txt"));
-//
-//		assertEquals(expectedContents, mergedContents);
-//	}
-//
-//	@Test
-//	public void xmlParserShouldMatchExpected() throws Exception {
-//
-//		IRegionParser parser = RegionParserFactory.createXmlParser();
-//
-//		IDocument currentDoc = parser.parse(new FileInputStream("src/test/resources/xml_current.txt"));
-//		IDocument previousDoc =
-//				parser.parse(new FileInputStream("src/test/resources/xml_previous.txt"));
-//
-//		IDocument _merged = RegionUtil.merge(currentDoc, previousDoc);
-//		String mergedContents = _merged.getContents();
-//		String expectedContents =
-//				IOUtil.toString(new FileReader("src/test/resources/xml_expected.txt"));
-//
-//		assertEquals(expectedContents, mergedContents);
-//	}
-//
-//	@Test
-//	public void xmlCDataShouldBeIgnored() throws Exception {
-//		try {
-//			RegionParserFactory.createXmlParser().parse(
-//					new FileInputStream("src/test/resources/ignore_xml_cdata.txt"));
-//		} catch (IllegalStateException x) {
-//			assertTrue(
-//					x.getMessage(),
-//					"Detected marked region end without corresponding marked region start between (5,7) and (5,32), near [ PROTECTED REGION END ]."
-//							.equals(x.getMessage()));
-//		}
-//	}
-//
-//	@Test
-//	public void javaStringsShouldBeIgnored() throws Exception {
-//		try {
-//			RegionParserFactory.createJavaParser().parse(
-//					new FileInputStream("src/test/resources/ignore_java_strings.txt"));
-//		} catch (IllegalStateException x) {
-//			assertTrue(
-//					x.getMessage(),
-//					"Detected marked region end without corresponding marked region start between (5,5) and (5,29), near [ PROTECTED REGION END ]."
-//							.equals(x.getMessage()));
-//		}
-//	}
-//
-//	@Test
-//	public void javaStringEscapesShouldBeIgnored() throws Exception {
-//		RegionParserFactory.createJavaParser().parse(
-//				new FileInputStream("src/test/resources/ignore_java_string_escapes.txt"));
-//	}
+	@Test
+	def void scalaParserShouldReadNestedComments() {
+		
+		val regions = (scalaParser => [
+			resolver = new NestedCommentRegionResolver	
+		]).parse("src/test/resources/nested_comments.txt".file.read)
+		
+		// Scala does not recognize nested comment-like id's
+		assertTrue(regions.findFirst[id == "1234"] != null)
+		
+	}
 
-	def private file(String fileName) {
-		new File(fileName)
+	@Test
+	def void javaParserShouldntReadNestedCommentsButDoesWhichIsOkInThisCase() {
+		
+		val regions = (javaParser => [
+			resolver = new NestedCommentRegionResolver	
+		]).parse("src/test/resources/nested_comments.txt".file.read)
+
+		// SPECIAL CASE
+		// ------------
+		// xpr reads:  /* PROTECTED REGION /*1234*/ ENABLED START */
+		// java reads: /* PROTECTED REGION /*1234*/
+		// -> remaining string invalid java:        ENABLED START */
+		//
+		// GOLDEN RULE: xtext-protected-regions reads valid code only
+		// => this case cannot occur
+		// => the following xpr behavior is ok:
+		assertTrue(regions.findFirst[id == "1234"] != null)
+		
+	}
+	
+	@Test
+	def void alternativeRegionNotationsShouldWorkAsWell() {
+		
+		val parser = parser("java")[
+			model[
+				comment("//")
+				comment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+			]
+		] => [
+			resolver = new SimpleRegionResolver
+		]
+		
+		parsingPreviousAndMergingCurrentShouldMatchExpected(parser, "simple")
+		
+	}
+	
+	@Test
+	def void xmlCDataShouldBeIgnored() {
+		val regions = xmlParser.parse("src/test/resources/ignore_xml_cdata.txt".file.read)
+		assertTrue(regions.findFirst[id == "no.id"] == null)
+	}
+	
+	@Test
+	def void javaStringsShouldBeIgnored() {
+		val regions = javaParser.parse("src/test/resources/ignore_java_strings.txt".file.read)
+		assertTrue(regions.findFirst[id == "no.id"] == null)
+	}
+
+	@Test
+	def void javaStringEscapesShouldBeIdentified() {
+		val regions = javaParser.parse("src/test/resources/ignore_java_string_escapes.txt".file.read)
+		assertTrue(regions.findFirst[id == "no.id"] == null)
+	}
+
+	def private file(CharSequence fileName) {
+		new File(fileName.toString)
 	}
 	
 	def private filter(File file) {
@@ -285,6 +179,7 @@ class ProtectedRegionSupportTest {
 	}
 
 	def private read(File file) {
+		if (!file.exists) throw new FileNotFoundException("File "+ file +" not found.")
 		Files::toString(file, CHARSET)
 	}
 	
@@ -295,4 +190,46 @@ class ProtectedRegionSupportTest {
 	override accept(File file) {
 		_file.equals(file)
 	}
+}
+
+class NestedCommentRegionResolver extends RegionResolver {
+	
+	// example: PROTECTED REGION /*1234*/ START
+	static val PR_START = "PROTECTED\\s+REGION\\s+/\\*\\s*([0-9]+)\\s*\\*/\\s+(?:(ENABLED)\\s+)?START"
+	static val PR_END = "PROTECTED\\s+REGION\\s+END"
+	
+	new() { super(PR_START, PR_END) }
+	
+	override isEnabled(String regionStart) {
+		"ENABLED".equals(getEnabled(regionStart))
+	}
+	
+}
+
+class FillInRegionResolver extends RegionResolver {
+	
+	// example: GENERATED ID(1234) START
+	static val PR_START = "GENERATED\\s+ID\\s*\\(\\s*([0-9]+)\\s*\\)\\s+(?:(DISABLED)\\s+)?START"
+	static val PR_END = "GENERATED\\s+END"
+	
+	new() { super(PR_START, PR_END) }
+	
+	override isEnabled(String regionStart) {
+		!"DISABLED".equals(getEnabled(regionStart))
+	}
+	
+}
+
+class SimpleRegionResolver extends RegionResolver {
+	
+	// $(SomeClass.imports)-{
+	// }-$
+	static val ID = "[\\p{L}\\p{N}\\.:_$]*"
+	static val PR_START = "\\$\\(("+ ID +")\\)-\\{"
+	static val PR_END = "\\}-\\$"
+	
+	new() { super(PR_START, PR_END) }
+	
+	override isEnabled(String regionStart) { true }
+	
 }

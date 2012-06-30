@@ -5,7 +5,6 @@ import static org.junit.Assert.*
 import com.google.inject.Guice
 import org.junit.Before
 import org.junit.Test
-import java.rmi.UnexpectedException
 
 class ProtectedRegionParserTest {
 
@@ -36,7 +35,7 @@ class ProtectedRegionParserTest {
 		val msg = "xml parser: Str(') not found at [4,23]"
 		try {
 			xmlParser.parse(xmlContent_corrupted)
-			throw new UnexpectedException('''Parser didn't recognized corrupted xml. Expected IllegalStateException('«msg»')''')
+			throw new RuntimeException('''Parser didn't recognized corrupted xml. Expected IllegalStateException('«msg»')''')
 		} catch(IllegalStateException x) {
 			assertEquals('''Parser threw unexpected exception message. Expected '«msg»' but found '«x.message»'.''', msg, x.message)
 		}
@@ -88,7 +87,7 @@ class ProtectedRegionParserTest {
 			}
 
 			public void testGenerated() {
-			// GENERATED REGION ID(dynamic::generated) ENABLED START
+			// GENERATED REGION ID(dynamic::generated) START
 			
 			// TODO: testGenerated()
 			
