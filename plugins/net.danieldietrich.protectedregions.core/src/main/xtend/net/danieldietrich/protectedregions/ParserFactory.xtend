@@ -153,11 +153,11 @@ class RegionBuffer {
 	/** Called when a protected region start is found in the AST. */
 	def void begin(String start, String id, boolean enabled) {
 		if (this.id != null) {
-			logger.warn("Already started a region with id '"+ this.id +"' but found another region with id '"+ id +"'")
+			logger.warn("Already started a region with id '"+ this.id +"'")
 		} else {
-			buf.append(start)
 			regions.add(new Region(null, buf.toString, null))
 			buf.setLength(0)
+			buf.append(start)
 			this.id = id
 			this.enabled = enabled
 		}
@@ -168,9 +168,9 @@ class RegionBuffer {
 		if (id == null) {
 			logger.warn("Missing region start")
 		} else {
+			buf.append(end)
 			regions.add(new Region(id, buf.toString, enabled))
 			buf.setLength(0) // clear buffer
-			buf.append(end)
 			id = null
 			enabled = null
 		}
@@ -339,8 +339,8 @@ class ModelBuilder {
   	def void withProtectedRegion(ModelBuilderContext ctx) {
   		val parser = ctx.parser // the minimum information Deferred can be given
   		ctx.model => [
-  			add(Model('RegionStart', Dynamic[| parser.resolver.start.pattern.r], None))
-  			add(Model('RegionEnd', Dynamic[| parser.resolver.end.pattern.r], None))
+  			add(Model('RegionStart', Dynamic[|parser.resolver.start.pattern.r], None))
+  			add(Model('RegionEnd', Dynamic[|parser.resolver.end.pattern.r], None))
   		]
   	}
 	

@@ -1,20 +1,23 @@
 package net.danieldietrich.protectedregions
 
+import static net.danieldietrich.protectedregions.ProtectedRegionSupport.*
+
 import com.google.common.io.Files
+
 import java.io.File
 import java.nio.charset.Charset
+import java.util.List
+import java.util.Map
+
 import org.slf4j.LoggerFactory
 
-import static net.danieldietrich.protectedregions.ProtectedRegionSupport.*
-import java.util.Map
-import java.util.List
 
 class ProtectedRegionSupport {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionSupport))
 	
 	/** By default the protected region support traverses all output dirs. */
-	@Property var FileFilter globalFilter = new AcceptAllFilter()
+	@Property var FileFilter dirFilter = new AcceptAllFilter()
 	
 	/** Maintain the order of parser addition. The first matching parser wins. */
 	val List<FileFilter> parserFilters = newArrayList()
@@ -22,6 +25,7 @@ class ProtectedRegionSupport {
 	
 	/** Pool of known regions. */
 	val Map<String, Region> knownRegions = newHashMap()
+	val List<String> knownIds = newArrayList()
 	
 	/** Add a parser parsing files with specific file extensions. */
 	def ProtectedRegionParser addParser(ProtectedRegionParser parser, String... fileExtensions) {
@@ -41,8 +45,8 @@ class ProtectedRegionSupport {
 	}
 	
 	/** Scan recursively for marked (= protected/generated) regions. */
-	def read(File dir, (File)=>Charset charsetProvider) {
-		if (dir.exists && globalFilter.accept(dir)) {
+	def void read(File dir, (File)=>Charset charsetProvider) {
+		if (dir.exists && dir.directory && dirFilter.accept(dir)) {
 			logger.debug("Reading directory "+ dir)
 			dir.listFiles.forEach[file |
 				if (file.directory) {
@@ -50,12 +54,15 @@ class ProtectedRegionSupport {
 				} else {
 					val regions = file.parse(charsetProvider)
 					regions.forEach[region |
-						if (region.marked && region.enabled) {
+						if (region.marked) {
 							val id = region.id
-							if (knownRegions.containsKey(id)) {
-								logger.warn("WARNING: Skipping duplicate region with id: '{}'. File {} may not be processed correctly.", id, file)
+							if (knownIds.contains(id)) {
+								throw new IllegalStateException("Duplicate marked region with id '"+ id +"' detected")
 							} else {
-								logger.debug("Found region with id {} in file {}", id, file)
+								knownIds.add(id)
+							}
+							if (region.enabled) {
+								logger.debug("Found enabled region with id {} in file {}", id, file)
 								knownRegions.put(id, region)
 							}
 						}
@@ -65,24 +72,37 @@ class ProtectedRegionSupport {
 		}
 	}
 	
-	def merge(File file, CharSequence contents) {
-		logger.debug("Merging {} with <content>", file)
+	/**
+	 * Returns merged contents, if given file exists and a parser filter matches the file,
+	 * otherwise returns the given contents.
+	 *
+	 * If the underlying parser is inverse, all marked regions (@see RegionResolver.isMarked(String))
+	 * will be overwritten with generated content - if the respective previous region was enabled -
+	 * and all unmarked regions are preserved
+	 * 
+	 * If the underlying parser is not inverse, all marked regions will be overwritten with protected content
+	 * - if the respective previous region was enabled - and all unmarked regions will be overwritten
+	 * with generated content.
+	 */
+	def CharSequence merge(File file, CharSequence contents) {
 		val parser = getParser(file)
 		if (parser != null) {
+			logger.debug("Merging {} with <content>", file)
 			val regions = parser.parse(contents)
 			val inverse = parser.inverse
 			regions.fold(new StringBuffer)[buf, r |
-				val match = r.marked && r.enabled && knownRegions.containsKey(r.id)
+				// regions may not be enabled in *generated* contents!
+				val match = r.marked && knownRegions.containsKey(r.id)
 				val region = if ((match && inverse) || (!match && !inverse)) r else knownRegions.get(r.id)
 				buf.append(region.content)
-			]
+			].toString
 		} else {
 			contents
 		}
 	}
 
 	/** Remove known regions found in given file. Useful for further merge operations. */
-	def removeRegions(File file, (File)=>Charset charsetProvider) {
+	def void removeRegions(File file, (File)=>Charset charsetProvider) {
 		val Iterable<Region> regions = file.parse(charsetProvider)
 		regions.filter[isMarked].forEach[knownRegions.remove(id)]
 	}
@@ -104,9 +124,9 @@ class ProtectedRegionSupport {
 	 * Returns first parser where the corresponding FileFilter accepts the given file
 	 * in the order the parsers were added via one of the add() methods.
 	 */
-	def private getParser(File file) {
+	def private ProtectedRegionParser getParser(File file) {
 		val filter = parserFilters.reduce[f1, f2 | if (f1.accept(file)) f1 else f2]
-		if (filter.accept(file)) parsers.get(filter) else null
+		if (filter?.accept(file)) parsers.get(filter) else null
 	}
 	
 }
