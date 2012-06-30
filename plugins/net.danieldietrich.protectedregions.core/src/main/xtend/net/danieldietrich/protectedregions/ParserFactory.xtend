@@ -206,7 +206,7 @@ class RegionBuffer {
 /** A parser wrapper which postprocesses the resultung AST.  */
 class ProtectedRegionParser {
 	
-	// TODO: parser has to be set after object creation because of dependency to model
+	// dirty: parser has to be set after object creation because of cyclic dependency to model
 	@Property var Parser parser = null
 	@Property var RegionResolver resolver = new DefaultProtectedRegionResolver()
 	@Property var boolean inverse = false
