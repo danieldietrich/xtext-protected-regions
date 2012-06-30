@@ -17,22 +17,22 @@ class ProtectedRegionParserTest {
 	}
 	
 	@Test
-	def void testJavaParser() {
-		test("java parser fails", javaParser, javaContent)
+	def void parsedJavaContentShouldMatchOriginalContent() {
+		assertParsedContentEqualsGivenContent("java parser fails", javaParser, javaContent)
 	}
 	
 	@Test
-	def void testXtendParser() {
-		test("xtend parser fails", xtendParser, xtendContent)
+	def void parsedXtendContentShouldMatchOriginalContent() {
+		assertParsedContentEqualsGivenContent("xtend parser fails", xtendParser, xtendContent)
 	}
 	
 	@Test
-	def void testXmlParser() {
-		test("xml parser fails", xmlParser, xmlContent)
+	def void parsedXmlContentShouldMatchOriginalContent() {
+		assertParsedContentEqualsGivenContent("xml parser fails", xmlParser, xmlContent)
 	}
 	
 	@Test
-	def void testXmlParserCorruptedXml() {
+	def void corruptedXmlContentShouldNotBeParsed() {
 		val msg = "xml parser: Str(') not found at [4,23]"
 		try {
 			xmlParser.parse(xmlContent_corrupted)
@@ -43,43 +43,35 @@ class ProtectedRegionParserTest {
 	}
 	
 	@Test
-	def void testLateBinding() {
+	def void regionResolverShouldBeDynamicallyExchangable() {
 		
 		val parser = javaParser // has DefaultProtectedRegionResolver
 		val protectedRegions = parser.parse(lateBindingContent).filter[marked]
-		assertSize(protectedRegions, 1)
-		assertId(protectedRegions.findFirst[true].id, "dynamic::protected")
+		assertSizeEqualsExpected(protectedRegions, 1)
+		assertIdEqualsExpected(protectedRegions.findFirst[true].id, "dynamic::protected")
 		
 		// switching the RegionResolver on-the-fly should affect the parser model dynamically
 		parser.setResolver(new DefaultGeneratedRegionResolver())
 		val generatedRegions = parser.parse(lateBindingContent).filter[marked]
-		assertSize(generatedRegions, 1)
-		assertId(generatedRegions.findFirst[true].id, "dynamic::generated")
+		assertSizeEqualsExpected(generatedRegions, 1)
+		assertIdEqualsExpected(generatedRegions.findFirst[true].id, "dynamic::generated")
 		
 	}
 	
-	def private test(String msg, ProtectedRegionParser parser, CharSequence content) {
+	def private assertParsedContentEqualsGivenContent(String msg, ProtectedRegionParser parser, CharSequence content) {
 		
 		val regions = parser.parse(content)
-		val parsed = toString(regions)
+		val parsed = regions.fold(new StringBuffer)[buf, region | buf.append(region.content)].toString
 		
 		assertEquals('''«msg»\n\nExpected:\n###«content»###\n\nFound:\n###«parsed»###''', parsed, content.toString)
 		
 	}
 	
-	def private toString(Iterable<Region> regions) {
-		val buf = new StringBuffer()
-		for (region : regions) {
-			buf.append(region.content)
-		}
-		buf.toString()
-	}
-	
-	def private assertSize(Iterable<Region> regions, int expected) {
+	def private assertSizeEqualsExpected(Iterable<Region> regions, int expected) {
 		assertTrue('''Expected 1 region but found «regions.size»''', regions.size == 1)
 	}
 	
-	def private assertId(String id, String expected) {
+	def private assertIdEqualsExpected(String id, String expected) {
 		assertTrue('''Found id «id» but expected «expected»''', id == expected)
 	}
 	

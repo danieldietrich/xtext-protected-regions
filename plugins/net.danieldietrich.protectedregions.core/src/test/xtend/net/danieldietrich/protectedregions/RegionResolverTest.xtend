@@ -6,7 +6,8 @@ import org.junit.Test
 
 class RegionResolverTest {
 	
-	@Test def void testProtectedRegionResolver() {
+	@Test
+	def void defaultProtectedRegionShouldBeValid() {
 		
 		val resolver = new DefaultProtectedRegionResolver()
 		val id = "$Some:123.id_"
@@ -14,11 +15,12 @@ class RegionResolverTest {
 		val startDisabled = "PROTECTED REGION ID("+ id +") START"
 		val end = "PROTECTED REGION END"
 		
-		testRegionResolver(resolver, id, startEnabled, startDisabled, end)
+		assertRegionIsValid(resolver, id, startEnabled, startDisabled, end)
 		
 	}
 	
-	@Test def void testGeneratedRegionResolver() {
+	@Test
+	def void defaultGeneratedRegionShouldBeValid() {
 		
 		val resolver = new DefaultGeneratedRegionResolver()
 		val id = "$Some:123.id_"
@@ -26,11 +28,11 @@ class RegionResolverTest {
 		val startDisabled = "GENERATED  REGION  ID  ( "+ id +" )  START"
 		val end = "GENERATED  REGION  END"
 		
-		testRegionResolver(resolver, id, startEnabled, startDisabled, end)
+		assertRegionIsValid(resolver, id, startEnabled, startDisabled, end)
 
 	}
 	
-	def private void testRegionResolver(RegionResolver resolver, String id, String startEnabled, String startDisabled, String end) {
+	def private void assertRegionIsValid(RegionResolver resolver, String id, String startEnabled, String startDisabled, String end) {
 		
 		val resolverName = resolver.getClass().name
 		
