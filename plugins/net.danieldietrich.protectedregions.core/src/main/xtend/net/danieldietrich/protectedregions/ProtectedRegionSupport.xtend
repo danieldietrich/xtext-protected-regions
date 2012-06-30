@@ -64,15 +64,16 @@ class ProtectedRegionSupport {
 			]
 		}
 	}
-
-	// TODO: inverse regions
+	
 	def merge(File file, CharSequence contents) {
 		logger.debug("Merging {} with <content>", file)
 		val parser = getParser(file)
 		if (parser != null) {
 			val regions = parser.parse(contents)
+			val inverse = parser.inverse
 			regions.fold(new StringBuffer)[buf, r |
-				val region = if (r.marked && r.enabled && knownRegions.containsKey(r.id)) knownRegions.get(r.id) else r
+				val match = r.marked && r.enabled && knownRegions.containsKey(r.id)
+				val region = if ((match && inverse) || (!match && !inverse)) r else knownRegions.get(r.id)
 				buf.append(region.content)
 			]
 		} else {
