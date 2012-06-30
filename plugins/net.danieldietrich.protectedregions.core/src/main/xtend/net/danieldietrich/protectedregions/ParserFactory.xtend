@@ -12,9 +12,9 @@ import net.danieldietrich.protectedregions.parser.Element
 import net.danieldietrich.protectedregions.parser.Leaf
 import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
-import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
+// TODO: howto late bind resolver & set inverse property
 class ParserFactory {
 	
 	static val DEFAULT_RESOLVER = new DefaultProtectedRegionResolver()
@@ -149,7 +149,7 @@ class ParserFactory {
 /** Needed when post-processing the AST. */
 class RegionBuffer {
 	
-	static val Logger logger = LoggerFactory::getLogger(typeof(RegionBuffer))
+	static val logger = LoggerFactory::getLogger(typeof(RegionBuffer))
 	
 	val List<Region> regions = newArrayList()
 	
@@ -204,7 +204,7 @@ class RegionBuffer {
 
 	val String id
 	val String content
-	val Boolean eanbled
+	val Boolean enabled
 
 	def isMarked() { id != null }
 	
@@ -243,6 +243,8 @@ class RegionBuffer {
 		
 	}
 	
+	override toString() { "ProtectedRegionParser("+ parser.name +")" }
+	
 	def private text(Node<String> node) {
 		val buf = new StringBuffer()
 		node.traverse[switch it { Leaf<String> : buf.append(it.value) }; true]
@@ -259,6 +261,8 @@ class RegionBuffer {
 
 /** Builds a parser model. */
 class ModelBuilder {
+	
+	static val EOL = Some("\r\n".str, "\n".str, "\r".str, "$".r) // line termination or end of file
 	
 	def model(RegionResolver regionResolver, (ModelBuilderContext)=>void initializer) {
 		Model('Code', "^".r, "\\z".r) => [
@@ -295,7 +299,7 @@ class ModelBuilder {
 	}
 
 	def greedyString(ModelBuilderContext ctx, String s) {
-		(Model('GreedyString', s, s.grstr) => [
+		(Model('GreedyString', s, s.greedy) => [
 			ctx.model.add(it)	
 		]).ctx(ctx.resolver)
 	}

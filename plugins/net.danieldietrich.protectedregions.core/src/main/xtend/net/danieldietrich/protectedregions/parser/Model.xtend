@@ -37,9 +37,7 @@ abstract class ModelExtensions {
 
 abstract class ElementExtensions {
 	
-	public static val EOL = Some("\r\n".str, "\n".str, "\r".str)
-	
-	def static grstr(String s) {
+	def static greedy(String s) {
 		new GreedyStr(s)
 	}
 	
