@@ -14,45 +14,42 @@ import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
 import org.slf4j.LoggerFactory
 
-// TODO: howto late bind resolver & set inverse property
 class ParserFactory {
-	
-	static val DEFAULT_RESOLVER = new DefaultProtectedRegionResolver()
 	
 	@Inject extension ModelBuilder
 	
-	def javaParser() { javaParser(null) }
-	def javaParser(RegionResolver customResolver) {
-		val resolver = getResolver(customResolver)
-		parser("java", resolver, model(resolver)[
-			comment("//")
-			comment("/*", "*/")
-			string('"').withEscape("\\")
-			string("'").withEscape("\\")
-		])
+	def javaParser() {
+		parser("java")[
+			model[
+				comment("//")
+				comment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+			]
+		]
 	}
 	
-	def xmlParser() { xmlParser(null) }
-	def xmlParser(RegionResolver customResolver) {
-		val resolver = getResolver(customResolver)
-		parser("xml", resolver, model(resolver)[
-			comment("<!--", "-->")
-			string("<![CDATA[", "]]>")
-			string("'")
-			string('"')
-		])
+	def xmlParser() {
+		parser("xml")[
+			model[
+				comment("<!--", "-->")
+				string("<![CDATA[", "]]>")
+				string("'")
+				string('"')
+			]
+		]
 	}
 	
-	def xtendParser() { xtendParser(null) }
-	def xtendParser(RegionResolver customResolver) {
-		val resolver = getResolver(customResolver)
-		parser("xtend", resolver, model(resolver)[
-			comment("//")
-			comment("/*", "*/")
-			string('"').withEscape("\\")
-			string("'").withEscape("\\")
-			string("'''").withCode("«", "»") // .withCode("\u00ab", "\u00ba") // french braces
-		])
+	def xtendParser() {
+		parser("xtend")[
+			model[
+				comment("//")
+				comment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+				string("'''").withCode("«", "»") // .withCode("\u00ab", "\u00ba") // french braces
+			]
+		]
 	}
 	
 //  def clojureParser() {
@@ -133,15 +130,11 @@ class ParserFactory {
 //    ]
 //  }
 	
-	def private parser(String name, RegionResolver resolver, Node<Element> model) {
-		new ProtectedRegionParser(
-			new Parser(name, model),
-			resolver
-		)
-	}
-	
-	def private getResolver(RegionResolver customResolver) {
-		if (customResolver == null) DEFAULT_RESOLVER else customResolver
+	def private parser(String name, (ProtectedRegionParser)=>Node<Element> initializer) {
+		new ProtectedRegionParser() => [
+			val model = initializer.apply(it)
+			parser = new Parser(name, model)
+		]
 	}
 	
 }
@@ -211,10 +204,12 @@ class RegionBuffer {
 }
 
 /** A parser wrapper which postprocesses the resultung AST.  */
-@Data class ProtectedRegionParser {
+class ProtectedRegionParser {
 	
-	val Parser parser
-	val RegionResolver resolver
+	// TODO: parser has to be set after object creation because of dependency to model
+	@Property var Parser parser = null
+	@Property var RegionResolver resolver = new DefaultProtectedRegionResolver()
+	@Property var boolean inverse = false
 	
 	def parse(CharSequence input) {
 		
@@ -255,8 +250,14 @@ class RegionBuffer {
 
 /** Needed to pass informations when building the model. */
 @Data class ModelBuilderContext {
+	
 	val Node<Element> model
-	val RegionResolver resolver
+	val ProtectedRegionParser parser
+	
+	def clone(Node<Element> newModel) {
+		new ModelBuilderContext(newModel, parser)
+	}
+	
 }
 
 /** Builds a parser model. */
@@ -264,50 +265,61 @@ class ModelBuilder {
 	
 	static val EOL = Some("\r\n".str, "\n".str, "\r".str, "$".r) // line termination or end of file
 	
-	def model(RegionResolver regionResolver, (ModelBuilderContext)=>void initializer) {
+	def model(ProtectedRegionParser parser, (ModelBuilderContext)=>void initializer) {
 		Model('Code', "^".r, "\\z".r) => [
-			initializer.apply(ctx(regionResolver))	
+			val ctx = new ModelBuilderContext(it, parser)
+			initializer.apply(ctx)
 		]
 	}
 	
 	def comment(ModelBuilderContext ctx, String s) {
-		(Model('Comment', s, EOL) => [
+		ctx.clone(Model('Comment', s, EOL) => [
 			ctx.model.add(it)
-			ctx(ctx.resolver).withProtectedRegion
-		]).ctx(ctx.resolver)
+			ctx.clone(it).withProtectedRegion
+		])
 	}
 	
 	def comment(ModelBuilderContext ctx, String start, String end) {
-		(Model('Comment', start, end) => [
-			ctx.model.add(it)
-			ctx(ctx.resolver).withProtectedRegion
-		]).ctx(ctx.resolver)
+		ctx.clone(
+			Model('Comment', start, end) => [
+				ctx.model.add(it)
+				ctx.clone(it).withProtectedRegion
+			]
+		)
 	}
 	
 	def nestableComment(ModelBuilderContext ctx, String start, String end) {
-		(Model('Comment', start, end) => [
-			ctx.model.add(it)
-			ctx(ctx.resolver).withProtectedRegion
-			add(Link(it)) // nestable: comment may contain comments
-		]).ctx(ctx.resolver)
+		ctx.clone(
+			Model('Comment', start, end) => [
+				ctx.model.add(it)
+				ctx.clone(it).withProtectedRegion
+				add(Link(it)) // nestable: comment may contain comments
+			]
+		)
 	}
 	
 	def string(ModelBuilderContext ctx, String s) {
-		(Model('String', s, s) => [
-			ctx.model.add(it)
-		]).ctx(ctx.resolver)
+		ctx.clone(
+			Model('String', s, s) => [
+				ctx.model.add(it)
+			]
+		)
 	}
 
 	def greedyString(ModelBuilderContext ctx, String s) {
-		(Model('GreedyString', s, s.greedy) => [
-			ctx.model.add(it)	
-		]).ctx(ctx.resolver)
+		ctx.clone(
+			Model('GreedyString', s, s.greedy) => [
+				ctx.model.add(it)	
+			]
+		)
 	}
 		
 	def string(ModelBuilderContext ctx, String start, String end) {
-		(Model('String', start, end) => [
-			ctx.model.add(it)
-		]).ctx(ctx.resolver)
+		ctx.clone(
+			Model('String', start, end) => [
+				ctx.model.add(it)
+			]
+		)
 	}
 	
 	def void withEscape(ModelBuilderContext ctx, String escape) {
@@ -325,15 +337,11 @@ class ModelBuilder {
   	}
   	
   	def void withProtectedRegion(ModelBuilderContext ctx) {
-  		val resolver = ctx.resolver
+  		val parser = ctx.parser // the minimum information Deferred can be given
   		ctx.model => [
-  			add(Model('RegionStart', resolver.start.pattern.r, None))
-  			add(Model('RegionEnd', resolver.end.pattern.r, None))
+  			add(Model('RegionStart', Dynamic[| parser.resolver.start.pattern.r], None))
+  			add(Model('RegionEnd', Dynamic[| parser.resolver.end.pattern.r], None))
   		]
   	}
-  	
-  	def private ctx(Node<Element> model, RegionResolver resolver) {
-		new ModelBuilderContext(model, resolver)
-	}
 	
 }

@@ -41,6 +41,10 @@ abstract class ElementExtensions {
 		new GreedyStr(s)
 	}
 	
+	def static Dynamic(()=>Element delegate) {
+		new Dynamic(delegate)
+	}
+	
   	def static None() {
 		new None()
 	}
@@ -109,6 +113,25 @@ class GreedyStr extends Element {
 	
 }
 
+/** A late bindable Element. */
+class Dynamic extends Element {
+	
+	val ()=>Element delegate
+	
+	new(()=>Element delegate) {
+		this.delegate = delegate
+	}
+	
+	override indexOf(String source, int index) {
+		delegate.apply().indexOf(source, index)
+	}
+	
+	override String toString() {
+		"Dynamic("+ delegate.apply() +")"
+	}
+	
+}
+
 /** Placeholder for no Element. */
 class None extends Element {
 	
@@ -141,7 +164,7 @@ class RegEx extends Element {
 	}
 	
 	override String toString() {
-		"RegEx("+ pattern.pattern() + ")"
+		"RegEx("+ pattern.pattern() +")"
 	}
 	
 }
