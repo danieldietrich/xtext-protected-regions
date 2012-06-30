@@ -96,7 +96,7 @@ public class ProtectedRegionSupportTest {
       fsa.setOutputPath("src/test/resources");
       assertTrue("Duplicate id not recognized", false);
     } catch (IllegalStateException x) {
-      assertTrue("Other exception catched as expected: " + x.getMessage(),
+      assertTrue("Other exception catched as expected: "+ x.getMessage(),
           "Duplicate protected region id: 'duplicate'. Protected region ids have to be globally unique."
               .equals(x.getMessage()));
     }
@@ -166,7 +166,7 @@ public class ProtectedRegionSupportTest {
       fsa.setOutputPath("src/test/resources");
     } catch (IllegalStateException x) {
       assertTrue(
-          "Comments in string literals are not ignored. Original message: " + x.getMessage(), false);
+          "Comments in string literals are not ignored. Original message: "+ x.getMessage(), false);
     }
   }
   

@@ -32,7 +32,7 @@ abstract class Strings {
 		val eol = max(documentToCursor.lastIndexOf("\r"), documentToCursor.lastIndexOf("\n"))
 		val len = documentToCursor.length()
 		val column = if (len == 0) 1 else len - (if (eol == -1) 0 else eol)
-		return "[" + line + "," + column + "]"
+		return "["+ line +","+ column +"]"
 	}
 	
 }

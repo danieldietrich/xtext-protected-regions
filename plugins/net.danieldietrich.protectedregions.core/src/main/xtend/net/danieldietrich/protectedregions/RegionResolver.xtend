@@ -53,7 +53,7 @@ abstract class RegionResolver {
 class DefaultProtectedRegionResolver extends RegionResolver {
 	
 	static val ID = "([\\p{L}\\p{N}\\.:_$]*)"
-	static val PR_START = "PROTECTED\\s+REGION\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
+	static val PR_START = "PROTECTED\\s+REGION\\s+ID\\s*\\(\\s*"+ ID +"\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
 	static val PR_END = "PROTECTED\\s+REGION\\s+END"
 	
 	new() { super(PR_START, PR_END) }
@@ -67,7 +67,7 @@ class DefaultProtectedRegionResolver extends RegionResolver {
 class DefaultGeneratedRegionResolver extends RegionResolver {
 
 	static val ID = "([\\p{L}\\p{N}\\.:_$]*)"
-	static val GR_START = "GENERATED\\s+REGION\\s+ID\\s*\\(\\s*" + ID + "\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
+	static val GR_START = "GENERATED\\s+REGION\\s+ID\\s*\\(\\s*"+ ID +"\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
 	static val GR_END = "GENERATED\\s+REGION\\s+END"
 	
 	new() { super(GR_START, GR_END) }

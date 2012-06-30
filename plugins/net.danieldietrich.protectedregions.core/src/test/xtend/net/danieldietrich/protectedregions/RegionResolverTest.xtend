@@ -10,8 +10,8 @@ class RegionResolverTest {
 		
 		val resolver = new DefaultProtectedRegionResolver()
 		val id = "$Some:123.id_"
-		val startEnabled = "PROTECTED REGION ID("+ id + ") ENABLED START"
-		val startDisabled = "PROTECTED REGION ID("+ id + ") START"
+		val startEnabled = "PROTECTED REGION ID("+ id +") ENABLED START"
+		val startDisabled = "PROTECTED REGION ID("+ id +") START"
 		val end = "PROTECTED REGION END"
 		
 		testRegionResolver(resolver, id, startEnabled, startDisabled, end)
@@ -22,8 +22,8 @@ class RegionResolverTest {
 		
 		val resolver = new DefaultGeneratedRegionResolver()
 		val id = "$Some:123.id_"
-		val startEnabled = "GENERATED REGION ID( "+ id + " )  ENABLED  START"
-		val startDisabled = "GENERATED  REGION  ID  ( "+ id + " )  START"
+		val startEnabled = "GENERATED REGION ID( "+ id +" )  ENABLED  START"
+		val startDisabled = "GENERATED  REGION  ID  ( "+ id +" )  START"
 		val end = "GENERATED  REGION  END"
 		
 		testRegionResolver(resolver, id, startEnabled, startDisabled, end)

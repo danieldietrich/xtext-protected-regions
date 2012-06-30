@@ -37,7 +37,7 @@ class ParserTest {
 		val regions = parser.parse(content)
 		val parsed = toString(regions)
 		if (!parsed.equals(content.toString)) {
-			throw new IllegalStateException(msg + "\n\nOriginal:\n###" + content + "###\n\nParsed:\n###" + parsed + "###\n\n")
+			throw new IllegalStateException(msg +"\n\nOriginal:\n###"+ content +"###\n\nParsed:\n###"+ parsed +"###\n\n")
 		}
 	}
 	
@@ -52,7 +52,7 @@ class ParserTest {
 	def private testException(String msg, ProtectedRegionParser parser, CharSequence content, String exception) {
 		try {
 			parser.parse(content)
-			throw new IllegalStateException("Parser DIDN'T throw exception " + exception)
+			throw new IllegalStateException("Parser DIDN'T throw exception "+ exception)
 		} catch(Exception x) {
 			if (!x.message.equals(exception)) {
 				throw new IllegalStateException(msg, x)
