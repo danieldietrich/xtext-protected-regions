@@ -52,28 +52,28 @@ abstract class RegionResolver {
 
 class DefaultProtectedRegionResolver extends RegionResolver {
 	
-	static val ID = "([\\p{L}\\p{N}\\.:_$]*)"
-	static val PR_START = "PROTECTED\\s+REGION\\s+ID\\s*\\(\\s*"+ ID +"\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
+	static val ID = "[\\p{L}\\p{N}\\.:_$]*"
+	static val PR_START = "PROTECTED\\s+REGION\\s+ID\\s*\\(\\s*("+ ID +")\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
 	static val PR_END = "PROTECTED\\s+REGION\\s+END"
 	
 	new() { super(PR_START, PR_END) }
 	
 	override isEnabled(String regionStart) {
-		"ENABLED".equals(getEnabled(regionStart)?.trim)
+		"ENABLED".equals(getEnabled(regionStart))
 	}
 	
 }
 
 class DefaultGeneratedRegionResolver extends RegionResolver {
 
-	static val ID = "([\\p{L}\\p{N}\\.:_$]*)"
-	static val GR_START = "GENERATED\\s+REGION\\s+ID\\s*\\(\\s*"+ ID +"\\s*\\)\\s+(?:(ENABLED)\\s+)?START"
+	static val ID = "[\\p{L}\\p{N}\\.:_$]*"
+	static val GR_START = "GENERATED\\s+REGION\\s+ID\\s*\\(\\s*("+ ID +")\\s*\\)\\s+(?:(DISABLED)\\s+)?START"
 	static val GR_END = "GENERATED\\s+REGION\\s+END"
 	
 	new() { super(GR_START, GR_END) }
 	
 	override isEnabled(String regionStart) {
-		"ENABLED".equals(getEnabled(regionStart)?.trim)
+		!"DISABLED".equals(getEnabled(regionStart))
 	}
 	
 }
