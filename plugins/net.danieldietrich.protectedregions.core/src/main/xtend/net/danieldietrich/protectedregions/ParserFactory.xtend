@@ -18,6 +18,14 @@ class ParserFactory {
 	
 	@Inject extension ModelBuilder
 	
+	/** Custom parser builder */
+	def parser(String name, (ProtectedRegionParser)=>Node<Element> initializer) {
+		new ProtectedRegionParser() => [
+			val model = initializer.apply(it)
+			parser = new Parser(name, model)
+		]
+	}
+	
 	def javaParser() {
 		parser("java")[
 			model[
@@ -25,6 +33,21 @@ class ParserFactory {
 				comment("/*", "*/")
 				string('"').withEscape("\\")
 				string("'").withEscape("\\")
+			]
+		]
+	}
+	
+	def scalaParser() {
+		parser("scala")[
+			model[
+				comment("//")
+				nestableComment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+				greedyString('"""')
+				// TODO: XML mode
+				// TODO: XML mode vs. operator overloading ('<', '>', ...)
+				// @see http://www.scala-lang.org/docu/files/ScalaReference.pdf
 			]
 		]
 	}
@@ -130,13 +153,6 @@ class ParserFactory {
 //    ]
 //  }
 	
-	def private parser(String name, (ProtectedRegionParser)=>Node<Element> initializer) {
-		new ProtectedRegionParser() => [
-			val model = initializer.apply(it)
-			parser = new Parser(name, model)
-		]
-	}
-	
 }
 
 /** Needed when post-processing the AST. */
@@ -153,6 +169,7 @@ class RegionBuffer {
 	/** Called when a protected region start is found in the AST. */
 	def void begin(String start, String id, boolean enabled) {
 		if (this.id != null) {
+			// TODO: Message like "Detected ... between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			logger.warn("Already started a region with id '"+ this.id +"'")
 		} else {
 			regions.add(new Region(null, buf.toString, null))
@@ -166,6 +183,7 @@ class RegionBuffer {
 	/** Called when a protected region end is found in the AST. */
 	def void end(String end) {
 		if (id == null) {
+			// TODO: Message like "Detected marked region end without corresponding marked region start between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			logger.warn("Missing region start")
 		} else {
 			buf.append(end)
