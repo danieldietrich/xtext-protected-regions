@@ -12,7 +12,6 @@ import net.danieldietrich.protectedregions.parser.Element
 import net.danieldietrich.protectedregions.parser.Leaf
 import net.danieldietrich.protectedregions.parser.Node
 import net.danieldietrich.protectedregions.parser.Parser
-import org.slf4j.LoggerFactory
 
 class ParserFactory {
 	
@@ -157,8 +156,6 @@ class ParserFactory {
 
 /** Needed when post-processing the AST. */
 class RegionBuffer {
-	
-	static val logger = LoggerFactory::getLogger(typeof(RegionBuffer))
 	
 	val List<Region> regions = newArrayList()
 	
