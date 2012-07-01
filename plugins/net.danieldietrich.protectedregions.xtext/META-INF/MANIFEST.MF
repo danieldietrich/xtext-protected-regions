@@ -6,7 +6,7 @@ Bundle-Version: 2.0.0.SNAPSHOT
 Bundle-SymbolicName: net.danieldietrich.protectedregions.xtext;singleton:=true
 Bundle-ActivationPolicy: lazy
 Export-Package: net.danieldietrich.protectedregions.xtext
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Require-Bundle: org.eclipse.xtext.xbase.lib;bundle-version="2.3.0",
  org.eclipse.xtend.lib;bundle-version="2.3.0",
  org.junit4;bundle-version="4.8.1",

@@ -13,7 +13,7 @@
 		<!-- encoding -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<!-- java version -->
-		<java-version>1.6</java-version>
+		<java-version>1.5</java-version>
 		<!-- plugin versions -->
 		<tycho-version>0.15.0</tycho-version>
 		<junit-version>4.8.1</junit-version>
