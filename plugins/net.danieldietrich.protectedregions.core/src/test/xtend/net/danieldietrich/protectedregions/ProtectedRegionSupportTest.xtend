@@ -170,6 +170,37 @@ class ProtectedRegionSupportTest {
 		assertTrue(regions.findFirst[id == "no.id"] == null)
 	}
 
+	@Test(expected = typeof(IllegalStateException))
+	def void locallyDuplicatedRegionIdsShouldBeDetected() {
+		support.addParser(javaParser, "src/test/resources/locally_duplicated_id.txt".file.filter)
+		support.read(BASE_DIR.file, [CHARSET])
+	}
+
+ 	@Test(expected = typeof(IllegalStateException))
+	def void globallyDuplicatedRegionIdsShouldBeDetected() {
+		support.addParser(xmlParser => [
+			resolver = new DefaultGeneratedRegionResolver
+			inverse = true
+		], "src/test/resources/globally_duplicated_id1.txt".file.filter)
+		support.addParser(javaParser, "src/test/resources/globally_duplicated_id2.txt".file.filter)
+		support.read(BASE_DIR.file, [CHARSET])
+	}
+
+	@Test(expected = typeof(IllegalStateException))
+	def void missingStartMarkerShouldBeDetected() {
+		javaParser.parse("src/test/resources/missing_start_marker.txt".file.read)
+	}
+
+	@Test(expected = typeof(IllegalStateException))
+	def void missingNestedStartMarkerShouldBeDetected() {
+		javaParser.parse("src/test/resources/nested_start_marker.txt".file.read)
+	}
+	
+	@Test(expected = typeof(IllegalStateException))
+	def void missingEndMarkerAtEndOfFileShouldBeDetected() {
+		javaParser.parse("src/test/resources/missing_end_marker.txt".file.read)
+	}
+
 	def private file(CharSequence fileName) {
 		new File(fileName.toString)
 	}

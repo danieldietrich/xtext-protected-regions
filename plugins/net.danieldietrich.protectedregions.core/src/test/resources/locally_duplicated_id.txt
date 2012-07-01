@@ -1,0 +1,15 @@
+public class Test {
+
+	/* PROTECTED REGION ID(uh.oh) START */
+	
+	/* PROTECTED REGION END */
+
+	/* PROTECTED REGION ID(some.id) START */
+	
+	/* PROTECTED REGION END */
+
+	/* PROTECTED REGION ID(uh.oh) START */
+	
+	/* PROTECTED REGION END */
+
+}

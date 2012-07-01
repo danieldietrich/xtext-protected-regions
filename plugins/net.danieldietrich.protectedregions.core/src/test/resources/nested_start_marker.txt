@@ -1,0 +1,9 @@
+public class Test {
+
+	/* PROTECTED REGION ID(dup.id) START */
+	
+	/* PROTECTED REGION ID(dup.id) START */
+	
+	/* PROTECTED REGION END */
+
+}

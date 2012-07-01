@@ -21,12 +21,7 @@ public class FunWithXtext {
   
   private void renamedGeneratedMethod() {
     /*PROTECTED REGION ID (_i_.like.generatedMethod$) ENABLED START*/
-    
-    // protected region start within protected regions are
-    // treatet as regular comment analogue to comment starts
-    // within regular comments.
-    /*PROTECTED REGION ID (_i_.like.generatedMethod$) ENABLED START*/
-    
+    // implement me
     /*PROTECTED REGION END*/
   }
   
