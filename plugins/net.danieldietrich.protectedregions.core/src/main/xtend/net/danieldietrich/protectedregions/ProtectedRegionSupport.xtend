@@ -64,7 +64,7 @@ class ProtectedRegionSupport {
 								knownIds.add(id)
 							}
 							if (region.enabled) {
-								logger.debug("Found enabled region with id {} in file {}", id, file)
+								logger.debug("Found enabled region with id '{}' in file {}", id, file)
 								knownRegions.put(id, region)
 							}
 						}
