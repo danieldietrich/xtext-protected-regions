@@ -57,6 +57,8 @@ class ProtectedRegionSupport {
 						if (region.marked) {
 							val id = region.id
 							if (knownIds.contains(id)) {
+								// TODO: Message like "Detected duplicate region id in src-gen/xxx/SomeFile.java between (5,7) and (5,32), near [ PROTECTED REGION ID(duplicate.id) ENABLED START ]."
+								// Github Issue #33
 								throw new IllegalStateException("Duplicate marked region with id '"+ id +"' detected")
 							} else {
 								knownIds.add(id)

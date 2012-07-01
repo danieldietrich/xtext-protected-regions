@@ -170,7 +170,8 @@ class RegionBuffer {
 	def void begin(String start, String id, boolean enabled) {
 		if (this.id != null) {
 			// TODO: Message like "Detected ... between (5,7) and (5,32), near [ PROTECTED REGION END ]."
-			logger.warn("Already started a region with id '"+ this.id +"'")
+			// Github Issue #33
+			throw new IllegalStateException("Trying to start a region with id '"+ id +"' within a region with id '"+ this.id +"'")
 		} else {
 			buf.append(start) // Github Issue #31: move this line behind buf.setLength(0) to include start marker in region
 			regions.add(new Region(null, buf.toString, null))
@@ -184,7 +185,8 @@ class RegionBuffer {
 	def void end(String end) {
 		if (id == null) {
 			// TODO: Message like "Detected marked region end without corresponding marked region start between (5,7) and (5,32), near [ PROTECTED REGION END ]."
-			logger.warn("Missing region start")
+			// Github Issue #33
+			throw new IllegalStateException("Missing region start")
 		} else {
 			regions.add(new Region(id, buf.toString, enabled))
 			buf.setLength(0) // clear buffer
