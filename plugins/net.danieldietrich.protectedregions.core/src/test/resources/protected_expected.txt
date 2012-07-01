@@ -19,19 +19,19 @@ public class FunWithXtext {
   }
   
   public void tryToDeleteMe() {
-    //PROTECTED REGION ID (will.not.disappear) START
+    //PROTECTED REGION ID (will.not.disappear) ENABLED START
     // generated content overwrites manual code
     //PROTECTED REGION END
   }
   
   private void renamedGeneratedMethod() {
-    /*PROTECTED   REGION  ID (  _i_.like.generatedMethod$  ) ENABLED START */
+    /*PROTECTED REGION ID (_i_.like.generatedMethod$) ENABLED START */
         
     System.out.println("manual code");
 
   // the following protected region end will remain there because all
   // characters before start of comment are protected(!)  
-  /* PROTECTED  REGION  END*/
+  /* PROTECTED REGION END*/
   }
   
 }

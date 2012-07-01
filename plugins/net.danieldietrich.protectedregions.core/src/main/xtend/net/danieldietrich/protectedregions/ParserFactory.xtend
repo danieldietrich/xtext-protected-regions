@@ -172,9 +172,9 @@ class RegionBuffer {
 			// TODO: Message like "Detected ... between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			logger.warn("Already started a region with id '"+ this.id +"'")
 		} else {
+			buf.append(start) // Github Issue #31: move this line behind buf.setLength(0) to include start marker in region
 			regions.add(new Region(null, buf.toString, null))
 			buf.setLength(0)
-			buf.append(start)
 			this.id = id
 			this.enabled = enabled
 		}
@@ -186,9 +186,9 @@ class RegionBuffer {
 			// TODO: Message like "Detected marked region end without corresponding marked region start between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			logger.warn("Missing region start")
 		} else {
-			buf.append(end)
 			regions.add(new Region(id, buf.toString, enabled))
 			buf.setLength(0) // clear buffer
+			buf.append(end) // Github Issue #31: move this line in front of regions.add(...) to include end marker in region 
 			id = null
 			enabled = null
 		}

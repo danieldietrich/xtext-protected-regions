@@ -50,6 +50,7 @@ abstract class RegionResolver {
 	
 }
 
+// By default protected regions should be generated in enabled state (@see Github issue #31)
 class DefaultProtectedRegionResolver extends RegionResolver {
 	
 	static val ID = "[\\p{L}\\p{N}\\.:_$]*"
@@ -64,6 +65,7 @@ class DefaultProtectedRegionResolver extends RegionResolver {
 	
 }
 
+// By default generated regions should be generated in disabled state (@see Github issue #31)
 class DefaultGeneratedRegionResolver extends RegionResolver {
 
 	static val ID = "[\\p{L}\\p{N}\\.:_$]*"
