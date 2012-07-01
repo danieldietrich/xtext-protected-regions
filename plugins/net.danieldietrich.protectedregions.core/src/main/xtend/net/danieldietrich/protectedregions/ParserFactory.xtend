@@ -203,7 +203,8 @@ class RegionBuffer {
 	
 	/** Called once at the end of AST processing to retrieve the result. */
 	def Iterable<Region> get() {
-		if (id != null) logger.warn("Missing end of last region with id '"+ id +"'")
+		// Github Issue #33
+		if (id != null) throw new IllegalStateException("Missing end of last region with id '"+ id +"'")
 		if (buf.length > 0) {
 			regions.add(new Region(id, buf.toString, enabled))
 		}
