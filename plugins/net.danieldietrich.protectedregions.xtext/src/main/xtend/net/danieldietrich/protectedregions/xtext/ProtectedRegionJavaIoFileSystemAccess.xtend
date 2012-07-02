@@ -41,7 +41,7 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 		logger.debug("postProcess('{}', '{}', <content>)", fileName, outputConfiguration)
 		val postProcessed = super.postProcess(fileName, outputConfiguration, content)
 		val file = getFile(fileName, outputConfiguration)
-		protectedRegionSupport.merge(file, postProcessed)
+		protectedRegionSupport.merge(file, postProcessed, charsetProvider.curry(outputConfiguration))
 	}
 	
 	override setOutputConfigurations(Map<String, OutputConfiguration> outputs) {
