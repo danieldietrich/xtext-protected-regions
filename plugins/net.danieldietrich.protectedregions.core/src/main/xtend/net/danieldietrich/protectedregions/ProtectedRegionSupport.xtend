@@ -103,7 +103,7 @@ class ProtectedRegionSupport {
 				// fill in generated regions
 				if (file.exists) {
 					// do not filter region.enabled, because the generated regions are disabled by default (Github Issue #33)
-					val generatedRegions = parser.parse(contents).filter[marked].toMap([id], [it])
+					val generatedRegions = parser.parse(contents).filter[marked].asMap[id -> it]
 					val regions = file.parse(charsetProvider)
 					mergeContents(generatedRegions, regions)
 				} else {
