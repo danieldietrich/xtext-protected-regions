@@ -164,30 +164,32 @@ class RegionBuffer {
 	var buf = new StringBuffer()
 	
 	/** Called when a protected region start is found in the AST. */
-	def void begin(String start, String id, boolean enabled) {
+	def void begin(String start, String id, boolean enabled, boolean inverse) {
 		if (this.id != null) {
 			// TODO: Message like "Detected ... between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			// Github Issue #33
 			throw new IllegalStateException("Trying to start a region with id '"+ id +"' within a region with id '"+ this.id +"'")
 		} else {
-			buf.append(start) // Github Issue #31: move this line behind buf.setLength(0) to include start marker in region
+			if (!inverse) buf.append(start) // Github Issue #31
 			regions.add(new Region(null, buf.toString, null))
 			buf.setLength(0)
+			if (inverse) buf.append(start) // Github Issue #31
 			this.id = id
 			this.enabled = enabled
 		}
 	}
 	
 	/** Called when a protected region end is found in the AST. */
-	def void end(String end) {
+	def void end(String end, boolean inverse) {
 		if (id == null) {
 			// TODO: Message like "Detected marked region end without corresponding marked region start between (5,7) and (5,32), near [ PROTECTED REGION END ]."
 			// Github Issue #33
 			throw new IllegalStateException("Missing region start")
 		} else {
+			if (inverse) buf.append(end) // Github Issue #31
 			regions.add(new Region(id, buf.toString, enabled))
 			buf.setLength(0) // clear buffer
-			buf.append(end) // Github Issue #31: move this line in front of regions.add(...) to include end marker in region 
+			if (!inverse) buf.append(end) // Github Issue #31 
 			id = null
 			enabled = null
 		}
@@ -233,17 +235,17 @@ class ProtectedRegionParser {
 		
 		val ast = parser.parse(input)
 		val regions = new RegionBuffer()
-		
+				
 		ast.traverse[switch it {
 			Node<String> case id == 'RegionStart' : {
 				val start = it.text
 				val id = resolver.getId(start)
 				val enabled = resolver.isEnabled(start)
-				regions.begin(start, id, enabled)
+				regions.begin(start, id, enabled, inverse)
 				false
 			}
 			Node<String> case id == 'RegionEnd' : {
-				regions.end(it.text)
+				regions.end(it.text, inverse)
 				false
 			}
 			Leaf<String> : {

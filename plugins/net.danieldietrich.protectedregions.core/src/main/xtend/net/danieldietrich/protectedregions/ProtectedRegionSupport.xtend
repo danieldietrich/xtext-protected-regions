@@ -1,6 +1,7 @@
 package net.danieldietrich.protectedregions
 
 import static net.danieldietrich.protectedregions.ProtectedRegionSupport.*
+import static extension net.danieldietrich.protectedregions.util.IterableExtensions.*
 
 import com.google.common.io.Files
 
@@ -10,7 +11,6 @@ import java.util.List
 import java.util.Map
 
 import org.slf4j.LoggerFactory
-
 
 class ProtectedRegionSupport {
 	
@@ -52,10 +52,12 @@ class ProtectedRegionSupport {
 				if (file.directory) {
 					file.read(charsetProvider)
 				} else {
+					val inverse = file.parser?.inverse
 					val regions = file.parse(charsetProvider)
 					regions.forEach[region |
 						if (region.marked) {
 							val id = region.id
+							logger.debug("Found {} region with id '{}' in file {}", newArrayList(if (region.enabled) "enabled" else "disabled", id, file))
 							if (knownIds.contains(id)) {
 								// TODO: Message like "Detected duplicate region id in src-gen/xxx/SomeFile.java between (5,7) and (5,32), near [ PROTECTED REGION ID(duplicate.id) ENABLED START ]."
 								// Github Issue #33
@@ -63,8 +65,7 @@ class ProtectedRegionSupport {
 							} else {
 								knownIds.add(id)
 							}
-							if (region.enabled) {
-								logger.debug("Found enabled region with id '{}' in file {}", id, file)
+							if (region.enabled && !inverse) {
 								knownRegions.put(id, region)
 							}
 						}
@@ -85,19 +86,38 @@ class ProtectedRegionSupport {
 	 * If the underlying parser is not inverse, all marked regions will be overwritten with protected content
 	 * - if the respective previous region was enabled - and all unmarked regions will be overwritten
 	 * with generated content.
+	 * @param file contains manual changes
+	 * @param contents are newly generated
+	 * @param charsetProvider needed for inverse parsing
 	 */
-	def CharSequence merge(File file, CharSequence contents) {
+	def CharSequence merge(File file, CharSequence contents, (File)=>Charset charsetProvider) {
 		val parser = getParser(file)
 		if (parser != null) {
 			logger.debug("Merging {} with <content>", file)
-			val regions = parser.parse(contents)
 			val inverse = parser.inverse
-			regions.fold(new StringBuffer)[buf, r |
-				// regions may not be enabled in *generated* contents!
-				val match = r.marked && knownRegions.containsKey(r.id)
-				val region = if ((match && inverse) || (!match && !inverse)) r else knownRegions.get(r.id)
-				buf.append(region.content)
-			].toString
+			if (inverse) {
+				// fill in
+				if (file.exists) {
+					// do not filter region.enabled, because the generated regions are disabled by default (Github Issue #33)
+					val localRegions = parser.parse(contents).filter[marked].toMap([id], [it])
+					val regions = file.parse(charsetProvider)
+					regions.fold(new StringBuffer)[buf, r |
+						val match = r.marked && r.enabled && localRegions.containsKey(r.id)
+						val region = if (match) localRegions.get(r.id) else r
+						buf.append(region.content)
+					].toString
+				} else {
+					contents
+				}
+			} else {
+				// merge
+				val regions = parser.parse(contents)
+				regions.fold(new StringBuffer)[buf, r |
+					val match = r.marked && r.enabled && knownRegions.containsKey(r.id)
+					val region = if (match) knownRegions.get(r.id) else r 
+					buf.append(region.content)
+				].toString
+			}
 		} else {
 			contents
 		}

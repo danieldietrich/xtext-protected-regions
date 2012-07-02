@@ -78,7 +78,7 @@ class ProtectedRegionSupportTest {
 		support.read(BASE_DIR.file, [CHARSET])
 		
 		val generatedContent = currentFile.read
-		val mergedContent = support.merge(previousFile, generatedContent) // pass previous to use the correct parser
+		val mergedContent = support.merge(previousFile, generatedContent, [CHARSET]) // pass previous to use the correct parser
 		val expectedContent = expectedFile.read
 		
 		assertEquals(expectedContent, mergedContent)
@@ -87,7 +87,7 @@ class ProtectedRegionSupportTest {
 
 	@Test
 	def void nonExistingFilesShouldByHandledGracefully() {
-		support.merge(new File("does_not_exist"), "")
+		support.merge(new File("does_not_exist"), "", [CHARSET])
 	}
 		
 	@Test

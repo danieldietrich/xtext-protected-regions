@@ -4,7 +4,7 @@ public class AllProtectedByDefault {
 
   public static void main(String[] args) {
 
-    //GENERATED ID(0) START
+    //GENERATED ID(0) DISABLED START
 
     new AllProtectedByDefault().go();
 
