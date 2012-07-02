@@ -17,7 +17,14 @@ class ParserFactory {
 	
 	@Inject extension ModelBuilder
 	
-	/** Custom parser builder */
+	/** Common parser which will fit in 99% of all cases. */
+	def genericParser() {
+		parser("generic")[
+			model[withProtectedRegion]
+		]
+	}
+	
+	/** Custom parser builder used when all other parsers do not fit. */
 	def parser(String name, (ProtectedRegionParser)=>Node<Element> initializer) {
 		new ProtectedRegionParser() => [
 			val model = initializer.apply(it)
