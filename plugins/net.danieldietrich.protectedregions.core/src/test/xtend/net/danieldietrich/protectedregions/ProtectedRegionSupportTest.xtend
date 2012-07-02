@@ -14,7 +14,7 @@ import org.junit.Test
 
 /**
  * Note: These test cases access the file system instead of passing
- *       CharSequencesto simulate real parsing conditions.
+ *       CharSequences to simulate real parsing conditions.
  */
 class ProtectedRegionSupportTest {
 	
@@ -36,7 +36,6 @@ class ProtectedRegionSupportTest {
 	// TODO: RegionResolver test when 2nd regex group is empty && id == enabled/disabled keyword
 	// TODO: Test delete protected region start and end identifiert because they are part of
 	//       the protected region (-> to remember enabled/disabled state)
-	// TODO: throw exceptions when detecting missing region start/end?
 	
 	@Test
 	def void mergeShouldMatchExpected() {
