@@ -2,8 +2,8 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: net.danieldietrich.protectedregions.core
 Bundle-Vendor: Daniel Dietrich
-Bundle-Version: 2.0.0.SNAPSHOT
-Bundle-SymbolicName: net.danieldietrich.protectedregionsc.core;singleton:=true
+Bundle-Version: 2.0.0.qualifier
+Bundle-SymbolicName: net.danieldietrich.protectedregions.core;singleton:=true
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: J2SE-1.5
 Export-Package: net.danieldietrich.protectedregions

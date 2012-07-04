@@ -2,6 +2,10 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<!-- Tycho requires Maven 3 -->
+	<prerequisites>
+		<maven>3.0</maven>
+	</prerequisites>
 
 	<groupId>net.danieldietrich.protectedregions</groupId>
 	<artifactId>net.danieldietrich.protectedregions</artifactId>
@@ -44,6 +48,38 @@
 				<version>${tycho-version}</version>
 				<configuration>
 					<resolver>p2</resolver>
+					<environments>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>linux</os>
+							<ws>gtk</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86_64</arch>
+						</environment>
+						<environment>
+							<os>macosx</os>
+							<ws>cocoa</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86</arch>
+						</environment>
+						<environment>
+							<os>win32</os>
+							<ws>win32</ws>
+							<arch>x86_64</arch>
+						</environment>
+					</environments>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -85,10 +121,21 @@
 						<includeAllDependencies>false</includeAllDependencies>
 					</configuration>
 				</plugin>
+				<!-- xtend-compiler -->
+				<plugin>
+					<groupId>org.eclipse.xtend</groupId>
+					<artifactId>xtend-maven-plugin</artifactId>
+					<version>2.3.0</version>
+					<configuration>
+						<!-- need to prefix by basedir to generate to currently built module -->
+						<outputDirectory>${basedir}/src/main/xtend-gen</outputDirectory>
+					</configuration>
+				</plugin>
+				<!-- /xtend-compiler -->
 			</plugins>
 		</pluginManagement>
 	</build>
-
+	
 	<repositories>
 		<repository>
 			<id>eclipse</id>
@@ -100,27 +147,33 @@
 			<layout>p2</layout>
 			<url>${orbit-site}</url>
 		</repository>
+		<!-- xtext dependency also used by xtend-compiler -->
 		<repository>
 			<id>xtext</id>
 			<layout>p2</layout>
 			<url>${xtext-site}</url>
 		</repository>
+		<!-- xtend-compiler -->
+		<repository>
+			<id>maven.eclipse.org</id>
+			<url>http://maven.eclipse.org/nexus/content/groups/public/</url>
+		</repository>
 	</repositories>
 
+	<pluginRepositories>
+		<!-- xtend-compiler -->
+		<pluginRepository>
+			<id>xtend</id>
+			<url>http://build.eclipse.org/common/xtend/maven/</url>
+		</pluginRepository>
+		<pluginRepository>
+			<id>fornax</id>
+			<url>http://fornax-platform.org/nexus/content/groups/public/</url>
+		</pluginRepository>
+		<!-- /xtend-compiler -->
+	</pluginRepositories>
+
 	<profiles>
-		<profile>
-			<id>platform-indigo</id>
-			<activation>
-				<property>
-					<name>platform-version-name</name>
-					<value>indigo</value>
-				</property>
-			</activation>
-			<properties>
-				<eclipse-site>http://download.eclipse.org/releases/indigo</eclipse-site>
-				<platform-version>[3.7,3.8)</platform-version>
-			</properties>
-		</profile>
 		<profile>
 			<id>platform-juno</id>
 			<activation>
