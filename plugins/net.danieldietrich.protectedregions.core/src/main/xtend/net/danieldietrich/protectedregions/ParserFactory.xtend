@@ -286,7 +286,7 @@ class ModelBuilder {
   	}
   	
   	def void withProtectedRegion(ModelBuilderContext ctx) {
-  		val parser = ctx.parser // the minimum information Deferred can be given
+  		val parser = ctx.parser // the minimum information Dynamic can be given to obtain RegionResolver
   		ctx.model => [
   			add(Model('RegionStart', Dynamic[|parser.resolver.start.pattern.r], None))
   			add(Model('RegionEnd', Dynamic[|parser.resolver.end.pattern.r], None))

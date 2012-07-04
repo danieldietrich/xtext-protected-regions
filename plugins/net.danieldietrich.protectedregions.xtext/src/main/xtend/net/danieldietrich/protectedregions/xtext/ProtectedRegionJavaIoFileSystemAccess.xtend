@@ -1,5 +1,7 @@
 package net.danieldietrich.protectedregions.xtext
 
+import com.google.inject.Inject
+
 import java.nio.charset.Charset
 import java.util.Map
 
@@ -18,23 +20,25 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionJavaIoFileSystemAccess))
 	
-	val ProtectedRegionSupport protectedRegionSupport
-	
 	val (String,File)=>Charset charsetProvider = [outputName, file |
 		val encoding = getEncoding(getURI(file.path, outputName))
 		if (Charset::isSupported(encoding)) Charset::forName(encoding) else Charset::defaultCharset
 	]
 	
-	new(ProtectedRegionSupport protectedRegionSupport, IResourceServiceProvider$Registry registry, IEncodingProvider encodingProvider) {
+	@Inject ProtectedRegionSupport support
+	
+	@Inject
+	new(IResourceServiceProvider$Registry registry, IEncodingProvider encodingProvider) {
 		super(registry, encodingProvider)
-		this.protectedRegionSupport = protectedRegionSupport
-		logger.debug("{} created", getClass.getSimpleName)
+		logger.debug("{} created", getClass.simpleName)
 	}
+	
+	def support() { support }
 	
 	override deleteFile(String fileName, String outputName) {
 		logger.debug("deleteFile('{}', '{}')", fileName, outputName)
 		val file = getFile(fileName, outputName)
-		protectedRegionSupport.removeRegions(new JavaIoFile(file), charsetProvider.curry(outputName))
+		support.removeRegions(new JavaIoFile(file), charsetProvider.curry(outputName))
 		super.deleteFile(fileName, outputName)
 	}
 	
@@ -42,20 +46,20 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 		logger.debug("postProcess('{}', '{}', <content>)", fileName, outputConfiguration)
 		val postProcessed = super.postProcess(fileName, outputConfiguration, content)
 		val file = file(fileName, outputConfiguration)
-		protectedRegionSupport.merge(file, postProcessed, charsetProvider.curry(outputConfiguration))
+		support.merge(file, postProcessed, charsetProvider.curry(outputConfiguration))
 	}
 	
 	override setOutputConfigurations(Map<String, OutputConfiguration> outputs) {
 		logger.debug("setOutputConfigurations(<outputs>)")
 		super.setOutputConfigurations(outputs)
-		outputs.values.forEach[protectedRegionSupport.read(file("", it.name), charsetProvider.curry(it.name))]
+		outputs.values.forEach[support.read(file("", it.name), charsetProvider.curry(it.name))]
 	}
 	
 	override setOutputPath(String outputName, String path) {
 		logger.debug("setOutputPath('{}', '{}')", outputName, path)
 		super.setOutputPath(outputName, path)
 		val file = file("", outputName)
-		protectedRegionSupport.read(file, charsetProvider.curry(outputName))
+		support.read(file, charsetProvider.curry(outputName))
 	}
 	
 	def private file(String path, String outputName) {

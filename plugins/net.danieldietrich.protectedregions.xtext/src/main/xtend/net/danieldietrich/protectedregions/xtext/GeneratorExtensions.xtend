@@ -7,11 +7,7 @@ import org.eclipse.xtext.generator.IFileSystemAccess
 import org.eclipse.xtext.generator.OutputConfiguration
 import org.eclipse.xtext.xbase.lib.Pair
 
-import java.util.logging.Logger
-
 abstract class GeneratorExtensions {
-	
-	static val logger = Logger::getLogger(typeof(GeneratorExtensions).name)
 	
 	def static setOutputPaths(IFileSystemAccess fsa, Pair<String,String>... configs) {
 		val outputs = configs.fold(new LinkedHashMap<String,OutputConfiguration>)[map, pair |
