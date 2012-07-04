@@ -3,9 +3,6 @@ package net.danieldietrich.protectedregions
 import static net.danieldietrich.protectedregions.ProtectedRegionSupport.*
 import static extension net.danieldietrich.protectedregions.util.IterableExtensions.*
 
-import com.google.common.io.Files
-
-import java.io.File
 import java.nio.charset.Charset
 import java.util.List
 import java.util.Map
@@ -29,6 +26,12 @@ class ProtectedRegionSupport {
 	/** Known (globally unique) id's of protected *and* generated regions. */
 	val List<String> knownIds = newArrayList()
 	
+	/** Add a parser parsing all files. */
+	def ProtectedRegionParser addParser(ProtectedRegionParser parser) {
+		logger.debug("Adding {} (for all files)", parser)
+		internal_addParser(parser, new AcceptAllFilter())
+	}
+	
 	/** Add a parser parsing files with specific file extensions. */
 	def ProtectedRegionParser addParser(ProtectedRegionParser parser, String... fileExtensions) {
 		logger.debug("Adding {}, given file extensions {}", parser, fileExtensions)
@@ -46,11 +49,12 @@ class ProtectedRegionSupport {
 		parsers.put(filter, parser)
 	}
 	
+	// TODO: visited paths
 	/** Scan recursively for marked (= protected/generated) regions containing (potentially) manual changes. */
 	def void read(File dir, (File)=>Charset charsetProvider) {
 		if (dir.exists && dir.directory && dirFilter.accept(dir)) {
-			logger.debug("Reading directory "+ dir)
-			dir.listFiles.forEach[file |
+			logger.debug("Reading directory {}", dir)
+			dir.children.forEach[file |
 				if (file.directory) {
 					file.read(charsetProvider)
 				} else {
@@ -76,6 +80,12 @@ class ProtectedRegionSupport {
 				}
 			]
 		}
+	}
+	
+	/** Remove all previously read regions. */
+	def clearRegions() {
+		protectedRegions.clear
+		knownIds.clear
 	}
 	
 	/**
@@ -142,7 +152,7 @@ class ProtectedRegionSupport {
 		} else {
 			val charset = charsetProvider.apply(file)
 			logger.debug("Parsing {} with charset {} using "+ parser, file.path, charset.toString)
-			val contents = Files::toString(file, charset)
+			val contents = file.read(charset)
 			parser.parse(contents)
 		}
 	}
@@ -151,9 +161,10 @@ class ProtectedRegionSupport {
 	 * Returns first parser where the corresponding FileFilter accepts the given file
 	 * in the order the parsers were added via one of the add() methods.
 	 */
+	// TODO: parse files with all parsers
 	def private ProtectedRegionParser getParser(File file) {
-		val filter = parserFilters.reduce[f1, f2 | if (f1.accept(file)) f1 else f2]
-		if (filter?.accept(file)) parsers.get(filter) else null
+		val filter = parserFilters.fold(null as FileFilter)[f1, f2 | if (f2.accept(file)) f2 else f1]
+		parsers.get(filter)
 	}
 	
 }

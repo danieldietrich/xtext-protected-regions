@@ -4,8 +4,12 @@ import org.junit.runner.RunWith
 import org.junit.runners.Suite
 import org.junit.runners.Suite$SuiteClasses
 
-@RunWith(typeof(Suite))
+@RunWith(
+	typeof(Suite)
+)
+
 @SuiteClasses({
+	typeof(FileTest),
     typeof(ProtectedRegionParserTest),
     typeof(ProtectedRegionSupportTest),
     typeof(RegionResolverTest)

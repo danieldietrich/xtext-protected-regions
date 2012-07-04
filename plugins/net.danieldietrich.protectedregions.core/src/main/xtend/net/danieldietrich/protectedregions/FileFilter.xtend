@@ -1,6 +1,5 @@
 package net.danieldietrich.protectedregions
 
-import java.io.File
 import java.util.Collection
 
 abstract class FileFilter {

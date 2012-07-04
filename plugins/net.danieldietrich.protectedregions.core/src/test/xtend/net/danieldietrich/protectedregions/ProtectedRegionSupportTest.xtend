@@ -2,10 +2,8 @@ package net.danieldietrich.protectedregions
 
 import static org.junit.Assert.*
 
-import com.google.common.io.Files
 import com.google.inject.Guice
 
-import java.io.File
 import java.io.FileNotFoundException
 import java.nio.charset.Charset
 
@@ -86,7 +84,7 @@ class ProtectedRegionSupportTest {
 
 	@Test
 	def void nonExistingFilesShouldByHandledGracefully() {
-		support.merge(new File("does_not_exist"), "", [CHARSET])
+		support.merge("does_not_exist".file, "", [CHARSET])
 	}
 		
 	@Test
@@ -201,7 +199,7 @@ class ProtectedRegionSupportTest {
 	}
 
 	def private file(CharSequence fileName) {
-		new File(fileName.toString)
+		new JavaIoFile(new java.io.File(fileName.toString))
 	}
 	
 	def private filter(File file) {
@@ -210,7 +208,7 @@ class ProtectedRegionSupportTest {
 
 	def private read(File file) {
 		if (!file.exists) throw new FileNotFoundException("File "+ file +" not found.")
-		Files::toString(file, CHARSET)
+		file.read(CHARSET)
 	}
 	
 }

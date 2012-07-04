@@ -1,9 +1,10 @@
 package net.danieldietrich.protectedregions.xtext
 
-import java.io.File
 import java.nio.charset.Charset
 import java.util.Map
 
+import net.danieldietrich.protectedregions.File
+import net.danieldietrich.protectedregions.JavaIoFile
 import net.danieldietrich.protectedregions.ProtectedRegionSupport
 
 import org.eclipse.xtext.generator.JavaIoFileSystemAccess
@@ -33,27 +34,32 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	override deleteFile(String fileName, String outputName) {
 		logger.debug("deleteFile('{}', '{}')", fileName, outputName)
 		val file = getFile(fileName, outputName)
-		protectedRegionSupport.removeRegions(file, charsetProvider.curry(outputName))
+		protectedRegionSupport.removeRegions(new JavaIoFile(file), charsetProvider.curry(outputName))
 		super.deleteFile(fileName, outputName)
 	}
 	
 	override postProcess(String fileName, String outputConfiguration, CharSequence content) {
 		logger.debug("postProcess('{}', '{}', <content>)", fileName, outputConfiguration)
 		val postProcessed = super.postProcess(fileName, outputConfiguration, content)
-		val file = getFile(fileName, outputConfiguration)
+		val file = file(fileName, outputConfiguration)
 		protectedRegionSupport.merge(file, postProcessed, charsetProvider.curry(outputConfiguration))
 	}
 	
 	override setOutputConfigurations(Map<String, OutputConfiguration> outputs) {
 		logger.debug("setOutputConfigurations(<outputs>)")
 		super.setOutputConfigurations(outputs)
-		outputs.values.forEach[protectedRegionSupport.read(new File(it.outputDirectory), charsetProvider.curry(it.name))]
+		outputs.values.forEach[protectedRegionSupport.read(file("", it.name), charsetProvider.curry(it.name))]
 	}
 	
 	override setOutputPath(String outputName, String path) {
 		logger.debug("setOutputPath('{}', '{}')", outputName, path)
 		super.setOutputPath(outputName, path)
-		protectedRegionSupport.read(new File(path), charsetProvider.curry(outputName))
+		val file = file("", outputName)
+		protectedRegionSupport.read(file, charsetProvider.curry(outputName))
+	}
+	
+	def private file(String path, String outputName) {
+		new JavaIoFile(getFile(path, outputName))
 	}
 
 }
