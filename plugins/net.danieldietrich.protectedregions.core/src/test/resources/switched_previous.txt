@@ -4,7 +4,7 @@ import org.antlr.Tool;
 
 /*PROTECTED REGION ID(custom.imports) START*/
 
-// TODO: need to import some types
+// need to import some types
 
 /*PROTECTED REGION END*/
 

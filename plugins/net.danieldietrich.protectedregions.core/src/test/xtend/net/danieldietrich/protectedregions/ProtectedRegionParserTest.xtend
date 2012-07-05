@@ -81,7 +81,7 @@ class ProtectedRegionParserTest {
 			public void testProtected() {
 			// PROTECTED REGION ID(dynamic::protected) ENABLED START
 			
-			// TODO: testProtected()
+			// implement testProtected()
 			
 			// PROTECTED REGION END
 			}
@@ -89,7 +89,7 @@ class ProtectedRegionParserTest {
 			public void testGenerated() {
 			// GENERATED REGION ID(dynamic::generated) START
 			
-			// TODO: testGenerated()
+			// implement testGenerated()
 			
 			// GENERATED REGION END
 			}
@@ -105,7 +105,7 @@ class ProtectedRegionParserTest {
 			public void generatedMethod() {
 			// PROTECTED REGION ID(test) START
 			
-			// TODO: implementation
+			// implementation
 			System.out.println("Protected regions end with \"/* PROTECTED REGION END */\"");
 			
 			// PROTECTED REGION END

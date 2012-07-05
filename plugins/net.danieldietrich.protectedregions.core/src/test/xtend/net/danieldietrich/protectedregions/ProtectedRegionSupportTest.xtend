@@ -31,10 +31,6 @@ class ProtectedRegionSupportTest {
 		support = injector.getInstance(typeof(ProtectedRegionSupport))
 	}
 	
-	// TODO: RegionResolver test when 2nd regex group is empty && id == enabled/disabled keyword
-	// TODO: Test delete protected region start and end identifiert because they are part of
-	//       the protected region (-> to remember enabled/disabled state)
-	
 	@Test
 	def void mergeShouldMatchExpected() {
 		parsingPreviousAndMergingCurrentShouldMatchExpected(javaParser, "protected")

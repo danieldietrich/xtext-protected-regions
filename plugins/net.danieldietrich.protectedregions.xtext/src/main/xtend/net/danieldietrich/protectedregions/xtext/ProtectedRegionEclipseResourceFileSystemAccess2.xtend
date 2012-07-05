@@ -20,6 +20,7 @@ import org.eclipse.xtext.generator.OutputConfiguration
 import org.slf4j.LoggerFactory
 
 // TODO: JDTAwareEclipseResourceFileSystemAccess2 vs EclipseResourceFileSystemAccess2
+// @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
 class ProtectedRegionEclipseResourceFileSystemAccess2 extends JDTAwareEclipseResourceFileSystemAccess2 {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionEclipseResourceFileSystemAccess2))
@@ -73,7 +74,7 @@ class ProtectedRegionEclipseResourceFileSystemAccess2 extends JDTAwareEclipseRes
 
 class EclipseResourceFile extends File {
 	
-	val IResource resource
+	protected val IResource resource
 	
 	new(IResource resource) {
 		this.resource = resource
@@ -112,6 +113,18 @@ class EclipseResourceFile extends File {
 			}
 			default : throw new UnsupportedOperationException("No IFile")
 		}
+	}
+	
+	override equals(Object o) {
+		o != null && switch o {
+			File : o.equals(resource)
+			IResource : resource.equals(o)
+			default : false
+		}
+	}
+	
+	override hashCode() {
+		resource.hashCode
 	}
 	
 }

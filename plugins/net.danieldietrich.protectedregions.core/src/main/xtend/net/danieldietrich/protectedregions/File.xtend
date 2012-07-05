@@ -3,6 +3,7 @@ package net.danieldietrich.protectedregions
 import com.google.common.io.Files
 import java.nio.charset.Charset
 
+/** equals(Object) and hashCode() have to be overridden */
 abstract class File {
 	
 	def File[] children()
@@ -12,10 +13,6 @@ abstract class File {
 	def boolean isFile()
 	def CharSequence read(Charset charset)
 	
-	override equals(Object o) {
-		o != null && (o instanceof File) && hashCode == o.hashCode
-	}
-	override hashCode() { path.hashCode }
 	override toString() { path }
 	
 }
@@ -37,6 +34,18 @@ class JavaIoFile extends File {
 	override isFile() { file.file }
 	override CharSequence read(Charset charset) {
 		Files::toString(file, charset)
+	}
+	
+	override equals(Object o) {
+		o != null && switch o {
+			File : o.equals(file)
+			java.io.File : file.equals(o)
+			default : false
+		}
+	}
+	
+	override hashCode() {
+		file.hashCode
 	}
 
 }

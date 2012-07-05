@@ -16,6 +16,7 @@ import org.eclipse.xtext.resource.IResourceServiceProvider
 
 import org.slf4j.LoggerFactory
 
+// @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
 class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionJavaIoFileSystemAccess))
