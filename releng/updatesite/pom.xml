@@ -11,5 +11,25 @@
 
 	<artifactId>net.danieldietrich.protectedregions.updatesite</artifactId>
 	<packaging>eclipse-repository</packaging>
+	
+	<build>
+		<sourceDirectory>src/main/xtend</sourceDirectory>
+		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>target</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
 </project>

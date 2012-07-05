@@ -12,10 +12,38 @@
 	<artifactId>net.danieldietrich.protectedregions.xtext</artifactId>
 	<packaging>eclipse-plugin</packaging>
 
-	<!-- xtend-compiler -->
+	<!--
 	<build>
 		<sourceDirectory>src/main/xtend</sourceDirectory>
+		<outputDirectory>target/classes</outputDirectory>
+		<testSourceDirectory>src/test/xtend</testSourceDirectory>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
 		<plugins>
+			<plugin>
+				<artifactId>maven-clean-plugin</artifactId>
+				<version>2.4.1</version>
+				<configuration>
+					<filesets>
+						<fileset>
+							<directory>src/main/xtend-gen</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+						<fileset>
+							<directory>src/test/xtend-gen</directory>
+							<includes>
+								<include>**</include>
+							</includes>
+						</fileset>
+					</filesets>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>build-helper-maven-plugin</artifactId>
@@ -29,25 +57,23 @@
 						</goals>
 						<configuration>
 							<sources>
-								<source>xtend-gen</source>
+								<source>src/main/xtend-gen</source>
+							</sources>
+						</configuration>
+					</execution>
+					<execution>
+						<id>add-test-source</id>
+						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>add-test-source</goal>
+						</goals>
+						<configuration>
+							<sources>
+								<source>src/test/xtend-gen</source>
 							</sources>
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<artifactId>maven-clean-plugin</artifactId>
-				<version>2.4.1</version>
-				<configuration>
-					<filesets>
-						<fileset>
-							<directory>src/main/xtend-gen</directory>
-							<includes>
-								<include>**</include>
-							</includes>
-						</fileset>
-					</filesets>
-				</configuration>
 			</plugin>
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
@@ -58,16 +84,15 @@
 							<goal>compile</goal>
 							<goal>testCompile</goal>
 						</goals>
-						<!-- default outputDirectory: src/main/xtend-gen
 						<configuration>
-							<outputDirectory>xtend-gen</outputDirectory>
+							<outputDirectory>src/main/xtend-gen</outputDirectory>
+							<testOutputDirectory>src/test/xtend-gen</testOutputDirectory>
 						</configuration>
-						-->
 					</execution>
 				</executions>
 			</plugin>
 		</plugins>
 	</build>
-	<!-- /xtend-compiler -->
-
+	-->
+	
 </project>
