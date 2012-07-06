@@ -12,7 +12,7 @@ class ProtectedRegionParserTest {
 
 	@Before
 	def void setup() {
-		parserFactory = Guice::createInjector().getInstance(typeof(ParserFactory))
+		parserFactory = Guice::createInjector.getInstance(typeof(ParserFactory))
 	}
 	
 	@Test

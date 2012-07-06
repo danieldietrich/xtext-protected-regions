@@ -25,7 +25,7 @@ class ProtectedRegionSupportTest {
 	
 	@Before
 	def void setup() {
-		val injector = Guice::createInjector()
+		val injector = Guice::createInjector
 		modelBuilder = injector.getInstance(typeof(ModelBuilder))
 		parserFactory = injector.getInstance(typeof(ParserFactory))
 		support = injector.getInstance(typeof(ProtectedRegionSupport))
