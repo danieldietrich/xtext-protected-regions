@@ -1,85 +1,51 @@
 package net.danieldietrich.protectedregions.xtext
 
+import static org.eclipse.xtext.generator.IFileSystemAccess.*
 import static org.junit.Assert.*
+
+import com.google.inject.Guice
+
+import java.nio.charset.Charset
+import java.util.Map
 
 import net.danieldietrich.protectedregions.ModelBuilder
 import net.danieldietrich.protectedregions.ParserFactory
 
-import org.junit.Before
 import org.junit.Test
-import net.danieldietrich.protectedregions.ProtectedRegionSupport
+import net.danieldietrich.protectedregions.JavaIoFile
+import com.google.inject.Injector
 
 class FileSystemAccessTest {
 
-	extension ModelBuilder modelBuilder = new ModelBuilder
-	extension ParserFactory parserFactory = new ParserFactory
+	val CHARSET = Charset::forName('UTF-8')
 	
-	val fsa = new ProtectedRegionInMemoryFileSystemAccess[outputName, file | 'UTF-8']
-	
-	val cssParser = parser("css")[
-			model[
-				comment("/*", "*/")
-				string('"').withEscape("\\")
-				string("'").withEscape("\\")
-			]
-		]
-	val htmlParser = xmlParser()
-	val javaParser = javaParser()
-	val jsParser = parser("java")[
-			model[
-				comment("//")
-				comment("/*", "*/")
-				string('"').withEscape("\\")
-				string("'").withEscape("\\")
-			]
-		]
-	val phpParser = parser("php")[
-			model[
-				comment("//")
-				comment("/*", "*/")
-				comment("#")
-				string('"').withEscape("\\")
-				string("'").withEscape("\\")
-			]
-		]
-	val xmlParser = xmlParser()
-	
-	@Before
-	def void setup() {
-		
-	}
+	var Injector injector = Guice::createInjector
 
+	extension ModelBuilder modelBuilder = new ModelBuilder
+	extension ParserFactory parserFactory = injector.getInstance(typeof(ParserFactory))
+		
 	@Test
 	def void mergeOfMultilanguageFilesShouldMatchExpected() {
 
-		/*
-		 * css has escaped double quotes in strings, html/xml not. that's currently not considered here
-		 * when combining parsers(!)
-		 */
-		val support = new ProtectedRegionSupport()
-		support.addParser(htmlParser, ".html")
-		support.addParser(phpParser, ".html")
-		support.addParser(jsParser, ".html")
-		support.addParser(cssParser, ".html")
+		val currentFile = "src/test/resources/multilang_current.html"
+		val previousFile = "src/test/resources/multilang_previous.html"
+		val expectedFile = "src/test/resources/multilang_expected.html"
 
-//		// create FileSystemAccess, which reads protected regions when calling setOuputPath(...)
-//		TestableBidiJavaIoFileSystemAccess fsa = new TestableBidiJavaIoFileSystemAccess(support)
-//		fsa.setFilter(new EndsWithFilter("multilang_previous.html"))
-//		fsa.setOutputPath("src/test/resources")
-//
-//		// start generator (writing via fsa.generateFile(...))
-//		testGenerator.doGenerate("src/test/resources/multilang_current.html", fsa)
-//
-//		// test results
-//		String mergedContents = fsa.getSingleResult()
-//		String expectedContents =
-//				IOUtil.toString(new FileReader("src/test/resources/multilang_expected.html"))
-//
-//		assertEquals(expectedContents, mergedContents)
+		val fsa = createProtectedRegionInMemoryFileSystemAccess() => [
+			files => [
+				addFile(previousFile)
+			]
+			support.addParser(xmlParser, ".html") // ~ htmlParser
+			setOutputPath("src/test/resources/")
+			generateFile(previousFile, currentFile.read)
+		]
+				
+		val mergedContents = fsa.files.get(DEFAULT_OUTPUT+previousFile)
+		val expectedContents = expectedFile.read
+		
+		assertEquals(expectedContents, mergedContents)
+
 	}
-
-
-}
 
 //	@Test
 //	public void nonUniqueIdsShouldBeGloballyDetected() throws Exception {
@@ -180,37 +146,49 @@ class FileSystemAccessTest {
 //	fsa.setOutputPath("src/test/resources")
 //	}
 
-//
-//	/**
-//	 * Filter checking if a path ends with a name.
-//	 */
-//	static class EndsWithFilter implements IPathFilter {
-//
-//		private String name
-//
-//		EndsWithFilter(String name) {
-//			this.name = name
-//		}
-//
-//		//@Override
-//		public boolean accept(URI path) {
-//			return path.getPath().endsWith(name)
-//		}
-//	}
-//
-//	/**
-//	 * Filter checking if a pattern matches a path.
-//	 */
-//	static class PatternFilter implements IPathFilter {
-//
-//		private final Pattern pattern
-//
-//		PatternFilter(String pattern) {
-//			this.pattern = Pattern.compile(pattern)
-//		}
-//
-//		//@Override
-//		public boolean accept(URI path) {
-//			return pattern.matcher(path.getPath()).matches()
-//		}
-//	}
+	def private addFile(Map<String,CharSequence> files, String fileName) {
+		files.put(DEFAULT_OUTPUT+fileName, fileName.read)
+	}
+
+	def private createProtectedRegionInMemoryFileSystemAccess() {
+		injector.getInstance(typeof(ProtectedRegionInMemoryFileSystemAccess))
+	}
+	
+	def private read(String fileName) {
+		new JavaIoFile(new java.io.File(fileName)).read(CHARSET)
+	}
+	
+	def private cssParser() {
+		parser("css")[
+			model[
+				comment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+			]
+		]
+	}
+	
+	def private jsParser() {
+		parser("java")[
+			model[
+				comment("//")
+				comment("/*", "*/")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+			]
+		]
+	}
+	
+	def private phpParser() {
+		parser("php")[
+			model[
+				comment("//")
+				comment("/*", "*/")
+				comment("#")
+				string('"').withEscape("\\")
+				string("'").withEscape("\\")
+			]
+		]
+	}
+	
+}
