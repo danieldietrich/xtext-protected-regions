@@ -1,10 +1,12 @@
 h1. Xtext Protected Regions 2.0.0
 
-Completeley rewritten code base. Update of Readme follows...
-
 Supports
 * Eclipse Juno 4.2
 * Xtext 2.3
+
+Eclipse Update sites: "http://danieldietrich.net/protectedregions/updates/releases/2.0.0":http://danieldietrich.net/protectedregions/updates/releases/2.0.0
+
+
 
 ---
 
@@ -39,9 +41,8 @@ h3(#setup). 2-Step Setup
 
 h4(#step1). Step 1: Download
 
-Xtext PRS can be installed from the following update sites:
-* Update site for releases "http://danieldietrich.net/protectedregions/updates/releases":http://danieldietrich.net/protectedregions/updates/releases
-* Update site for stable snapshots "http://danieldietrich.net/protectedregions/updates/snapshots":http://danieldietrich.net/protectedregions/updates/releases
+Xtext PRS can be installed from the following update site:
+* Update site for releases "http://danieldietrich.net/protectedregions/updates/releases/1.0.1":http://danieldietrich.net/protectedregions/updates/releases/1.0.1
 
 h4(#step2). Step 2: Adjust Your Project
 
