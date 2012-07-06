@@ -38,8 +38,7 @@ class JavaIoFile extends File {
 	
 	override equals(Object o) {
 		o != null && switch o {
-			File : o.equals(file)
-			java.io.File : file.equals(o)
+			JavaIoFile : o.file == file
 			default : false
 		}
 	}

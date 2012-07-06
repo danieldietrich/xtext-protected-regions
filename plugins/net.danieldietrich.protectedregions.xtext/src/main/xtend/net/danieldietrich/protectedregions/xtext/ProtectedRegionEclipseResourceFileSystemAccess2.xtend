@@ -117,8 +117,7 @@ class EclipseResourceFile extends File {
 	
 	override equals(Object o) {
 		o != null && switch o {
-			File : o.equals(resource)
-			IResource : resource.equals(o)
+			EclipseResourceFile : o.resource == resource
 			default : false
 		}
 	}

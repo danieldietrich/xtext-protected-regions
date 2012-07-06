@@ -6,32 +6,26 @@ import java.nio.charset.Charset
 import java.util.Map
 
 import net.danieldietrich.protectedregions.File
-import net.danieldietrich.protectedregions.JavaIoFile
 import net.danieldietrich.protectedregions.ProtectedRegionSupport
 
-import org.eclipse.xtext.generator.JavaIoFileSystemAccess
+import org.eclipse.xtext.generator.InMemoryFileSystemAccess
 import org.eclipse.xtext.generator.OutputConfiguration
-import org.eclipse.xtext.parser.IEncodingProvider
-import org.eclipse.xtext.resource.IResourceServiceProvider
 
 import org.slf4j.LoggerFactory
 
 // @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
-class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
+class ProtectedRegionInMemoryFileSystemAccess extends InMemoryFileSystemAccess {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionJavaIoFileSystemAccess))
 	
-	val (String,File)=>Charset charsetProvider = [outputName, file |
-		val encoding = getEncoding(getURI(file.path, outputName))
-		if (Charset::isSupported(encoding)) Charset::forName(encoding) else Charset::defaultCharset
-	]
-	
 	@Inject ProtectedRegionSupport support
 	
-	@Inject
-	new(IResourceServiceProvider$Registry registry, IEncodingProvider encodingProvider) {
-		super(registry, encodingProvider)
-		logger.debug("{} created", getClass.simpleName)
+	val (String,File)=>Charset charsetProvider
+	
+	new((String,String)=>String encodingProvider) {
+		this.charsetProvider = [outputName, file |
+			Charset::forName(encodingProvider.apply(outputName, file.path))
+		]
 	}
 	
 	def support() { support }
@@ -64,7 +58,50 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	}
 	
 	def private file(String path, String outputName) {
-		new JavaIoFile(getFile(path, outputName))
+		new InMemoryFile(files, outputName, path)
 	}
+	
+}
 
+class InMemoryFile extends File {
+
+	// every file maintains a reference to the underlying in-memory file system	
+	val Map<String, CharSequence> fileSystem
+	val String outputName
+	val String path
+	
+	new(Map<String, CharSequence> fileSystem, String outputName, String path) {
+		this.fileSystem = fileSystem
+		this.outputName = outputName
+		this.path = path
+	}
+	
+	override children() {
+		fileSystem.keySet.filter[key |
+			// @@UPDATE-INFO: Check InMemoryAccess#generateFile(...) for content of key
+			key.startsWith(outputName) && key != outputName+path // TODO: currently not prefix-unique
+		].map[path |
+			new InMemoryFile(fileSystem, outputName, path)
+		]
+	}
+	
+	override exists() { true }
+	override getPath() { outputName +"/"+ path }
+	override isDirectory() { path == "" }
+	override isFile() { path != "" }
+	override read(Charset charset) {
+		fileSystem.get(path)
+	}
+	
+	override equals(Object o) {
+		o != null && switch o {
+			InMemoryFile : o.getPath() == getPath()
+			default : false
+		}
+	}
+	
+	override hashCode() {
+		path.hashCode
+	}
+	
 }
