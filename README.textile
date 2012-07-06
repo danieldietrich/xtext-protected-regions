@@ -1,4 +1,14 @@
-h1(#top). Xtext Protected Region Support
+h1. Xtext Protected Regions 2.0.0
+
+Completeley rewritten code base. Update of Readme follows...
+
+Supports
+* Eclipse Juno 4.2
+* Xtext 2.3
+
+---
+
+h1(#top). Xtext Protected Region Support 1.0.1
 
 The Xtext Protected Region Support (PRS) adds protected region support to "Xtext":http://xtext.org, a very powerful language development (and generator) framework.
 
