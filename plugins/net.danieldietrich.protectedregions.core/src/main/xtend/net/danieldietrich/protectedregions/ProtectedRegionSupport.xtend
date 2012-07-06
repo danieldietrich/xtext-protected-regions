@@ -161,8 +161,8 @@ class ProtectedRegionSupport {
 
 	/** May return null if no parser found for given file. */
 	def private Iterable<Region> parse(ProtectedRegionParser parser, File file, (File)=>Charset charsetProvider) {
-		val charset = charsetProvider.apply(file)
-		logger.debug("Parsing {} with charset {} using "+ parser, file.path, charset.toString)
+		val charset = charsetProvider?.apply(file)
+		logger.debug("Parsing {} with charset {} using "+ parser, file.path, charset?.toString)
 		val contents = file.read(charset)
 		parser.parse(contents)
 	}
