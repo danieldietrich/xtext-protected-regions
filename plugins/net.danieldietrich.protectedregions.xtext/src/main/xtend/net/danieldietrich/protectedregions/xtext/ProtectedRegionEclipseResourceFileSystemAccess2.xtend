@@ -14,14 +14,15 @@ import net.danieldietrich.protectedregions.ProtectedRegionSupport
 import org.eclipse.core.resources.IFile
 import org.eclipse.core.resources.IFolder
 import org.eclipse.core.resources.IResource
-import org.eclipse.xtext.builder.JDTAwareEclipseResourceFileSystemAccess2
+import org.eclipse.xtext.builder.EclipseResourceFileSystemAccess2
 import org.eclipse.xtext.generator.OutputConfiguration
 
 import org.slf4j.LoggerFactory
 
 // TODO: JDTAwareEclipseResourceFileSystemAccess2 vs EclipseResourceFileSystemAccess2
 // @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
-class ProtectedRegionEclipseResourceFileSystemAccess2 extends JDTAwareEclipseResourceFileSystemAccess2 {
+// JDTAwareEclipseResourceFileSystemAccess2 is currently used in xtend only
+class ProtectedRegionEclipseResourceFileSystemAccess2 extends EclipseResourceFileSystemAccess2 {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionEclipseResourceFileSystemAccess2))
 	
