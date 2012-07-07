@@ -1,5 +1,7 @@
 h1. Xtext Protected Regions 2.0.0
 
+The project Xtext Protected Regions adds protected region support to Xtext, a very powerful language development (and generator) framework.
+
 Supports
 * Eclipse Juno 4.2
 * Xtext 2.3
