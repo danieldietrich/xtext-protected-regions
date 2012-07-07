@@ -4,9 +4,40 @@ Supports
 * Eclipse Juno 4.2
 * Xtext 2.3
 
-Eclipse Update sites: "http://danieldietrich.net/protectedregions/updates/releases/2.0.0":http://danieldietrich.net/protectedregions/updates/releases/2.0.0
+h2. Installation
 
+**Eclipse Update site:** "http://danieldietrich.net/protectedregions/updates/releases/2.0.0":http://danieldietrich.net/protectedregions/updates/releases/2.0.0
 
+h2. Usage
+
+Given the Xtext sample project 'MyDsl' the protected region support is installed as follows:
+
+Add the dependencies @net.danieldaniel.protectedregions.core@ and @net.danieldietrich.protectedregions.xtext@ to the MANIFEST.MF of the main plugin of the Xtext project where your code generator resides.
+
+For standalone code generators add these lines to the XxxRuntimeModule.java:
+
+bc. @Provides
+public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionJavaIoFileSystemAccess fsa, ParserFactory factory) {
+		fsa.support().addParser(factory.javaParser(), ".java");
+		fsa.support().addParser(factory.xmlParser(), ".xml", ".xsd");
+		return fsa;
+}
+
+For eclipse base code generators add these lines to the XxxRuntimeModule.java:
+
+bc. @Provides
+public EclipseResourceFileSystemAccess2 createEclipseResourceFileSystemAccess2(ProtectedRegionEclipseResourceFileSystemAccess2 fsa, ParserFactory factory) {
+  fsa.support().addParser(factory.genericParser());
+  return fsa;
+}
+
+_Hint: Adding EclipseResourceFileSystemAccess2, the standalone generator can't be run without adding additional plugin dependencies._
+
+That's it. Use your generator as usual.
+
+h2. Additions
+
+_(Documentation follows soon...)_
 
 ---
 
