@@ -142,7 +142,7 @@ class Any extends Element {
 	
 	/** By definition Any is immediately found. */
 	override indexOf(String source, int index) {
-		new Match(index, 1)
+		new Match(index, 1) // not checking source.emptyOrNull || index >= source.length
 	}
 	
 	override String toString() {
@@ -206,12 +206,12 @@ class Seq extends Element {
 			} else if (match == NOT_FOUND) {
 				NOT_FOUND // if one element NOT_FOUND, Seq is NOT_FOUND
 			} else {
-				val idx = index+match.index+match.length
+				val idx = index + match.index + match.length // first char after previous match
 				val curr = element.indexOf(source, idx)
 				if (curr.index != idx) { // no space between element of Seq
 					NOT_FOUND
 				} else {
-					new Match(match.index, match.length+curr.length)
+					new Match(match.index, match.length + curr.length)
 				}
 			}
 		]

@@ -14,7 +14,7 @@ class ModelTest {
 		val should = new Match(1, 2)
 		val match = Seq("\\".str, Any).indexOf(" \\\" /* PROTECTED REGION ID(no.id) ENABLED START */ \\\"; }", 0)
 		
-		assertTrue("match = "+ match + " but should be "+ should, match == should)
+		assertTrue("match = "+ match +" but should be "+ should, match == should)
 		
 	}
 	
