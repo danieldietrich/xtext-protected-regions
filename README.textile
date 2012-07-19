@@ -1,4 +1,4 @@
-h1. Xtext Protected Regions 2.0.0
+h1. Xtext Protected Regions 2.0.1
 
 The project Xtext Protected Regions adds protected region support to Xtext, a very powerful language development (and generator) framework.
 
@@ -39,7 +39,16 @@ That's it. Use your generator as usual.
 
 h2. Additions
 
-_(Documentation follows soon...)_
+_(Documentation follows...)_
+
+---
+
+h1. Changelog
+
+2.0.1 - Bugfix for Issue #37 (parsing of escape sequences)
+2.0.0 - Added Eclipse Juno/Xtext 2.3 support. Completely rewritten with Xtend.
+1.0.1 - Added support for Xtext 2.1
+1.0.0 - Initial version
 
 ---
 
