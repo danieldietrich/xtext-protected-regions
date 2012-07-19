@@ -274,7 +274,7 @@ class ModelBuilder {
 	def void withEscape(ModelBuilderContext ctx, String escape) {
 		val model = ctx.model
 		if (model == model.root) throw new IllegalStateException(model.id +".withEscape() not allowed at root node")
-		model.add(Model('Escape', Seq(escape.str, model.start.value), None))
+		model.add(Model('Escape', Seq(escape.str, Any), None))
   	}
   	
   	def void withCode(ModelBuilderContext ctx, String start, String end) {

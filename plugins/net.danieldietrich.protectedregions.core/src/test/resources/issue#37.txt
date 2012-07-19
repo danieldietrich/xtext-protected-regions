@@ -1,0 +1,48 @@
+public class StringCodec {
+    public final static String encode(String... arStr) {
+        StringBuffer sb = new StringBuffer();
+
+        boolean bFirst = true;
+        for (String str : arStr) {
+            if (!bFirst) {
+                sb.append(",");
+            }
+            if (str == null) {
+                str = "null";
+            } else {
+                str = str.replaceAll("\"", "\\\\\"");
+                str = "\"" + str + "\"";
+            }
+            sb.append(str);
+            bFirst = false;
+        }
+        return sb.toString();
+    }
+
+    public final static String[] decode(String str) {
+        List<String> lstMatches = new ArrayList<String>();
+
+        // Regexp  : [^\\]?"(.*?[^\\])",?
+        // Test sur: "titi","to\"to","ta,ta","te\",\"te",null,"ty\ty"
+
+        Pattern p = Pattern.compile("[^\\\\]?(?:(?:\"(.*?[^\\\\])\")|(?:null)),?");
+        Matcher m = p.matcher(str);
+        while (m.find()) {
+            String strGroup = m.group(1);
+            if(strGroup.equals("null")){
+                strGroup=null;
+            }
+            lstMatches.add(strGroup);
+        }
+
+        return lstMatches.toArray(new String[lstMatches.size()]);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(encode("titi", "to\"to", "ta,ta", "te\",\"te",null, "ty\\ty"));
+        String[] ar = decode("\"titi\",\"to\\\"to\",\"ta,ta\",\"te\\\",\\\"te\",null,\"ty\\ty\"");
+        for(String str:ar){
+            System.out.println("   =>"+str);
+        }
+    }
+}

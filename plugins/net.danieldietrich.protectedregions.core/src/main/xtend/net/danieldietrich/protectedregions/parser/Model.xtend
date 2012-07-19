@@ -2,6 +2,7 @@ package net.danieldietrich.protectedregions.parser
 
 import static extension net.danieldietrich.protectedregions.parser.ElementExtensions.*
 import static extension net.danieldietrich.protectedregions.parser.TreeExtensions.*
+import static extension net.danieldietrich.protectedregions.util.IterableExtensions.*
 
 import static net.danieldietrich.protectedregions.parser.Match.*
 
@@ -39,6 +40,10 @@ abstract class ElementExtensions {
 	
 	def static greedy(String s) {
 		new GreedyStr(s)
+	}
+	
+	def static Any() {
+		new Any()
 	}
 	
 	def static Dynamic(()=>Element delegate) {
@@ -132,10 +137,24 @@ class Dynamic extends Element {
 	
 }
 
+/** Placeholder for any Element. */
+class Any extends Element {
+	
+	/** By definition Any is immediately found. */
+	override indexOf(String source, int index) {
+		new Match(index, 1)
+	}
+	
+	override String toString() {
+		"Any"
+	}
+	
+}
+
 /** Placeholder for no Element. */
 class None extends Element {
 	
-	/** By definition NoElement cannot be found. */
+	/** By definition None cannot be found. */
 	override indexOf(String source, int index) {
 		NOT_FOUND
 	}
@@ -181,12 +200,21 @@ class Seq extends Element {
 	
 	/** Matches the concatenation of this sequence or NOT_FOUND. */
 	override indexOf(String source, int index) {
-		sequence.map[indexOf(source, index)].reduce(m1, m2 |
-			if (m1 == NOT_FOUND || m2 == NOT_FOUND || m2.index != m1.index + m1.length)
-				NOT_FOUND
-			else
-				new Match(m1.index, m1.length + m2.length)
-		)
+		sequence.fold(null as Match)[match, element |
+			if (match == null) {
+				element.indexOf(source, index) // start at the index of first element of Seq (or NOT_FOUND)
+			} else if (match == NOT_FOUND) {
+				NOT_FOUND // if one element NOT_FOUND, Seq is NOT_FOUND
+			} else {
+				val idx = index+match.index+match.length
+				val curr = element.indexOf(source, idx)
+				if (curr.index != idx) { // no space between element of Seq
+					NOT_FOUND
+				} else {
+					new Match(match.index, match.length+curr.length)
+				}
+			}
+		]
 	}
 	
 	override String toString() {

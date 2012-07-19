@@ -193,6 +193,11 @@ class ProtectedRegionSupportTest {
 	def void missingEndMarkerAtEndOfFileShouldBeDetected() {
 		javaParser.parse("src/test/resources/missing_end_marker.txt".file.read)
 	}
+	
+	@Test
+	def void issue37ShouldBeSolved() {
+		javaParser.parse("src/test/resources/issue#37.txt".file.read)
+	}
 
 	def private file(CharSequence fileName) {
 		new JavaIoFile(new java.io.File(fileName.toString))

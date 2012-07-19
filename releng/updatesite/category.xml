@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <site>
-   <feature url="features/net.danieldietrich.protectedregions.feature_2.0.0.qualifier.jar" id="net.danieldietrich.protectedregions.feature" version="2.0.0.qualifier">
+   <feature url="features/net.danieldietrich.protectedregions.feature_2.0.1.qualifier.jar" id="net.danieldietrich.protectedregions.feature" version="2.0.1.qualifier">
       <category name="xtext-protected-regions"/>
    </feature>
    <category-def name="xtext-protected-regions" label="Xtext Protected Regions">
