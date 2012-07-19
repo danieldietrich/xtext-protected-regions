@@ -8,7 +8,7 @@ Supports
 
 h2. Installation
 
-**Eclipse Update site:** "http://danieldietrich.net/protectedregions/updates/releases/2.0.0":http://danieldietrich.net/protectedregions/updates/releases/2.0.0
+**Eclipse Update site:** "http://danieldietrich.net/protectedregions/updates/releases/current":http://danieldietrich.net/protectedregions/updates/releases/current
 
 h2. Usage
 
