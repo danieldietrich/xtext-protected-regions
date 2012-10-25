@@ -5,7 +5,7 @@
 	<parent>
 		<groupId>net.danieldietrich.protectedregions</groupId>
 		<artifactId>net.danieldietrich.protectedregions</artifactId>
-		<version>2.0.1-SNAPSHOT</version>
+		<version>2.0.2-SNAPSHOT</version>
 		<relativePath>../../releng/pom.xml</relativePath>
 	</parent>
 
