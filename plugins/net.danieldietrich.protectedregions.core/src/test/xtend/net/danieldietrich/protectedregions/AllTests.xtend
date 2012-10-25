@@ -10,6 +10,7 @@ import org.junit.runners.Suite$SuiteClasses
 
 @SuiteClasses({
 	typeof(FileTest),
+	typeof(ModelTest),
     typeof(ProtectedRegionParserTest),
     typeof(ProtectedRegionSupportTest),
     typeof(RegionResolverTest)

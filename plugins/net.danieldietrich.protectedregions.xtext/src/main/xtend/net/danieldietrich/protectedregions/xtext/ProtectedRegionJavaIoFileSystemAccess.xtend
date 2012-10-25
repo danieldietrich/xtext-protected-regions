@@ -14,6 +14,7 @@ import org.eclipse.xtext.generator.OutputConfiguration
 import org.eclipse.xtext.parser.IEncodingProvider
 import org.eclipse.xtext.resource.IResourceServiceProvider
 
+import org.eclipse.emf.common.util.URI
 import org.slf4j.LoggerFactory
 
 // @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
@@ -21,8 +22,9 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionJavaIoFileSystemAccess))
 	
-	val (String,File)=>Charset charsetProvider = [outputName, file |
-		val encoding = getEncoding(getURI(file.path, outputName))
+	val (File)=>Charset charsetProvider = [file |
+		val URI uri = URI::createURI(file.toURI)
+		val encoding = getEncoding(uri)
 		if (Charset::isSupported(encoding)) Charset::forName(encoding) else Charset::defaultCharset
 	]
 	
@@ -39,7 +41,7 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 	override deleteFile(String fileName, String outputName) {
 		logger.debug("deleteFile('{}', '{}')", fileName, outputName)
 		val file = file(fileName, outputName)
-		support.removeRegions(file, charsetProvider.curry(outputName))
+		support.removeRegions(file, charsetProvider)
 		super.deleteFile(fileName, outputName)
 	}
 	
@@ -47,20 +49,20 @@ class ProtectedRegionJavaIoFileSystemAccess extends JavaIoFileSystemAccess {
 		logger.debug("postProcess('{}', '{}', <content>)", fileName, outputConfiguration)
 		val postProcessed = super.postProcess(fileName, outputConfiguration, content)
 		val file = file(fileName, outputConfiguration)
-		support.merge(file, postProcessed, charsetProvider.curry(outputConfiguration))
+		support.merge(file, postProcessed, charsetProvider)
 	}
 	
 	override setOutputConfigurations(Map<String, OutputConfiguration> outputs) {
 		logger.debug("setOutputConfigurations(<outputs>)")
 		super.setOutputConfigurations(outputs)
-		outputs.values.forEach[support.read(file("", it.name), charsetProvider.curry(it.name))]
+		outputs.values.forEach[support.read(file("", it.name), charsetProvider)]
 	}
 	
 	override setOutputPath(String outputName, String path) {
 		logger.debug("setOutputPath('{}', '{}')", outputName, path)
 		super.setOutputPath(outputName, path)
 		val file = file("", outputName)
-		support.read(file, charsetProvider.curry(outputName))
+		support.read(file, charsetProvider)
 	}
 	
 	def private file(String path, String outputName) {

@@ -19,9 +19,8 @@ import org.eclipse.xtext.generator.OutputConfiguration
 
 import org.slf4j.LoggerFactory
 
-// TODO: JDTAwareEclipseResourceFileSystemAccess2 vs EclipseResourceFileSystemAccess2
+// NOTE: JDTAwareEclipseResourceFileSystemAccess2 is currently used in xtend only
 // @@UPDATE-INFO: Check class hierarchie for new API annotated with @since
-// JDTAwareEclipseResourceFileSystemAccess2 is currently used in xtend only
 class ProtectedRegionEclipseResourceFileSystemAccess2 extends EclipseResourceFileSystemAccess2 {
 	
 	static val logger = LoggerFactory::getLogger(typeof(ProtectedRegionEclipseResourceFileSystemAccess2))
@@ -105,7 +104,7 @@ class EclipseResourceFile extends File {
 			default : false
 		}
 	}
-	override CharSequence read(Charset charset) {
+	override read(Charset charset) {
 		switch resource {
 			IFile : {
 				val InputSupplier<? extends InputStream> streamSupplier = [|resource.contents]
@@ -114,6 +113,9 @@ class EclipseResourceFile extends File {
 			}
 			default : throw new UnsupportedOperationException("No IFile")
 		}
+	}
+	override toURI() {
+		resource.location.toFile.toURI.toString
 	}
 	
 	override equals(Object o) {

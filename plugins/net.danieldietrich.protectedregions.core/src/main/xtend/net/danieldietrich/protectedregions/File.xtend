@@ -12,6 +12,7 @@ abstract class File {
 	def boolean isDirectory()
 	def boolean isFile()
 	def CharSequence read(Charset charset)
+	def String toURI()
 	
 	override toString() { path }
 	
@@ -32,9 +33,10 @@ class JavaIoFile extends File {
 	override getPath() { file.path }
 	override isDirectory() { file.directory }
 	override isFile() { file.file }
-	override CharSequence read(Charset charset) {
+	override read(Charset charset) {
 		Files::toString(file, charset)
 	}
+	override toURI() { file.toURI.toString }
 	
 	override equals(Object o) {
 		o != null && switch o {

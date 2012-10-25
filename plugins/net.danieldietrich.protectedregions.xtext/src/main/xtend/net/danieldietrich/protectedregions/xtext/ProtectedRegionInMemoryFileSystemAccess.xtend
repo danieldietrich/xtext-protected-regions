@@ -103,6 +103,7 @@ class InMemoryFile extends File {
 	override read(Charset charset) {
 		fileSystem.get(getPath)
 	}
+	override toURI() { outputName+path }
 	
 	override equals(Object o) {
 		o != null && switch o {
