@@ -25,7 +25,7 @@ public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionJavaIo
 		return fsa;
 }
 
-For eclipse base code generators add these lines to the XxxRuntimeModule.java:
+For eclipse based code generators add these lines to the XxxRuntimeModule.java:
 
 bc. @Provides
 public EclipseResourceFileSystemAccess2 createEclipseResourceFileSystemAccess2(ProtectedRegionEclipseResourceFileSystemAccess2 fsa, ParserFactory factory) {
