@@ -45,8 +45,8 @@ _(Documentation follows...)_
 
 h1. Changelog
 
-2.0.2 - Bugfix for Issue #47 (reading file encoding)
-2.0.1 - Bugfix for Issue #37 (parsing of escape sequences)
+2.0.2 - Bugfix for Issue "#47":https://github.com/danieldietrich/xtext-protected-regions/issues/41 (reading file encoding)
+2.0.1 - Bugfix for Issue "#37":https://github.com/danieldietrich/xtext-protected-regions/issues/37 (parsing of escape sequences)
 2.0.0 - Added Eclipse Juno/Xtext 2.3 support. Completely rewritten with Xtend.
 1.0.1 - Added support for Xtext 2.1
 1.0.0 - Initial version
