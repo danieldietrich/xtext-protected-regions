@@ -1,4 +1,4 @@
-h1. Xtext Protected Regions 2.0.2
+h1. Xtext Protected Regions
 
 The project Xtext Protected Regions adds protected region support to Xtext, a very powerful language development (and generator) framework.
 
@@ -10,19 +10,31 @@ h2. Installation
 
 **Eclipse Update site:** "http://danieldietrich.net/protectedregions/updates/releases/current":http://danieldietrich.net/protectedregions/updates/releases/current
 
+h2. Changelog
+
+2.0.2 - Bugfix for Issue "#47":https://github.com/danieldietrich/xtext-protected-regions/issues/41 (reading file encoding)
+2.0.1 - Bugfix for Issue "#37":https://github.com/danieldietrich/xtext-protected-regions/issues/37 (parsing of escape sequences)
+2.0.0 - Added Eclipse Juno/Xtext 2.3 support. Completely rewritten with Xtend.
+1.0.1 - Added support for Xtext 2.1
+1.0.0 - Initial version
+
 h2. Usage
+
+h3. Adding project dependencies
 
 Given the Xtext sample project 'MyDsl' the protected region support is installed as follows:
 
 Add the dependencies @net.danieldaniel.protectedregions.core@ and @net.danieldietrich.protectedregions.xtext@ to the MANIFEST.MF of the main plugin of the Xtext project where your code generator resides.
 
+h3. Configuring dependency injection via "Google Guice":http://code.google.com/p/google-guice/
+
 For standalone code generators add these lines to the XxxRuntimeModule.java:
 
 bc. @Provides
 public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionJavaIoFileSystemAccess fsa, ParserFactory factory) {
-		fsa.support().addParser(factory.javaParser(), ".java");
-		fsa.support().addParser(factory.xmlParser(), ".xml", ".xsd");
-		return fsa;
+  fsa.support().addParser(factory.javaParser(), ".java");
+  fsa.support().addParser(factory.xmlParser(), ".xml", ".xsd");
+  return fsa;
 }
 
 For eclipse based code generators add these lines to the XxxRuntimeModule.java:
@@ -35,102 +47,26 @@ public EclipseResourceFileSystemAccess2 createEclipseResourceFileSystemAccess2(P
 
 _Hint: Adding EclipseResourceFileSystemAccess2, the standalone generator can't be run without adding additional plugin dependencies._
 
-That's it. Use your generator as usual.
-
-h2. Additions
-
-_(Documentation follows...)_
-
----
-
-h1. Changelog
-
-2.0.2 - Bugfix for Issue "#47":https://github.com/danieldietrich/xtext-protected-regions/issues/41 (reading file encoding)
-2.0.1 - Bugfix for Issue "#37":https://github.com/danieldietrich/xtext-protected-regions/issues/37 (parsing of escape sequences)
-2.0.0 - Added Eclipse Juno/Xtext 2.3 support. Completely rewritten with Xtend.
-1.0.1 - Added support for Xtext 2.1
-1.0.0 - Initial version
-
----
-
-h1(#top). Xtext Protected Region Support 1.0.1
-
-The Xtext Protected Region Support (PRS) adds protected region support to "Xtext":http://xtext.org, a very powerful language development (and generator) framework.
-
-h2(#toc). Table of Contents
-
-* "Table of Contents":#toc
-* "User Guide":#userguide
-** "2-Step Setup":#setup
-*** "Step 1: Download":#step1
-*** "Step 2: Adjust Your Project":#step2
-** "Usage":#usage
-** "That's All?":#thatsall
-* "Developer Guide":#devguide
-** "Prequisites":#prequisites
-** "Download":#download
-** "Setup Eclipse Workspace":#workspace
-*** "Import Projects":#import
-*** "Set Target Platform":#target
-** "Build Process":#build
-** "Documentation":#docs
-* "Samples":#samples
-
-h2(#userguide). User Guide
-
-The user guide is addressed to developers which want to _use_ the Xtext PRS to enhance their existing Xtext generator.
-
-h3(#setup). 2-Step Setup
-
-h4(#step1). Step 1: Download
-
-Xtext PRS can be installed from the following update site:
-* Update site for releases "http://danieldietrich.net/protectedregions/updates/releases/1.0.1":http://danieldietrich.net/protectedregions/updates/releases/1.0.1
-
-h4(#step2). Step 2: Adjust Your Project
-
-Add the following dependencies to the @META-INF/MANIFEST.MF@ of your Xtext project
-
-bc.. Require-Bundle:
- net.danieldietrich.protectedregions.core,
- net.danieldietrich.protectedregions.xtext
-
-bc.. Import-Package: org.apache.commons.io,
- org.slf4j
-
-p. and adjust the @RuntimeModule@. Example:
-
-bc. @Provides
-public JavaIoFileSystemAccess createJavaIoFileSystemAccess(ProtectedRegionSupport support) {
-  support.addParser(RegionParserFactory.createJavaParser(), ".java");
-  support.addParser(RegionParserFactory.createXmlParser(), ".xml", ".xsd");
-  BidiJavaIoFileSystemAccess fsa = new BidiJavaIoFileSystemAccess(support);
-  // fsa.setFilter(...); // (optional)
-  return fsa;
-}
-
-_Hint: Xtext PRS is shipped with @BidiJavaIoFileSystemAccess@_
-
-h3(#usage). Usage
+h3. Declaring protected regions in your code
 
 Now just begin to denote protected regions in the comments of your favorite language. Protected regions start with @PROTECTED REGION ID(unique.id) ENABLED START@ and end with @PROTECTED REGION END@, where @unique.id@ is a gobally unique id (in the scope of the project) and syntactically equivalent to a full qualified Java identifier . These regions are protected on subsequential generator calls, even if files move, are merged or renamed (_content over containers_).
 
-For an in-depth description and more options (like generated regions) please take a look at the "PRS Core documentation":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile.
+For an in-depth description and more options (like generated regions) please take a look at the "PRS Core documentation":https://github.com/danieldietrich/xtext-protected-regions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile.
 
-h3(#thatsall). That's All?
+h3. Configuring the generator
 
-Yes. That's all. Your generator stays untouched. But where is all the magic?
+Xtext projects which are started in a seperate eclipse instance do just need a Guice provider for @ProtectedRegionEclipseResourceFileSystemAccess2@ (as described above).
 
-PRS performs the following tasks, assuming your generator (generally) looks like this:
+Xtext standalone code generator, which is started manually via a main method, are configured like this:
 
-*1. Inject FileSystemAccess*
+*1. Injecting FileSystemAccess*
 
 bc. @Inject
 privte JavaIoFileSystemAccess fsa;
 
-With the adjusted @RuntimeModule@ Google Guice provides here a @BidiJavaIoFileSystemAccess@, the control center of PRS.
+With the adjusted @RuntimeModule@ Google Guice provides here a @ProtectedRegionJavaIoFileSystemAccess@, the control center of PRS.
 
-*2. Define output path*
+*2. Defining the output path*
 
 bc. fsa.setOutputPath([slot,] outputPath); // slot is optional
 
@@ -138,24 +74,24 @@ By calling setOutputPath(...) PRS parses all existing files in the given path an
 
 _Hint: A developer may want to generate the sources into a temp dir. Before and after setting output path(s) there may be manual implemented copy & clean tasks._
 
-*3. Write output*
+*3. Writing the output*
 
 bc. fsa.generateFile(fileName, [slot,] contents); // slot is optional
 
 Before writing a file to the file system, the PRS file system access implementation substitutes protected regions which were collected in step 2.
 
-_Hint: Also here a developer may want to perform additional file system tasks, like finally copying temporary files to source folders._ 
+---
 
-h2(#devguide). Developer Guide
+h1(#devguide). Developer Guide
 
 The developer guide is addressed to developers which want _modify_ the Xtext PRS. Contributors are welcome :-)
 
-h3(#prequisites). Prequisites
+h2(#prequisites). Prequisites
 
 The following software should be installed to your system:
 
 * "JDK 6+":http://www.oracle.com/technetwork/java/javase/downloads/index.html (The only feature used of Java 1.6 is the @Override annotation in conjunction with interface implementations.)
-* "Eclipse (Indigo)":http://www.eclipse.org/downloads/ (The JEE version is fine.)
+* "Eclipse (Juno)":http://www.eclipse.org/downloads/ (The JEE version is fine.)
 * "Git":http://git-scm.com/ (To clone (download) the project.)
 * "Maven":http://maven.apache.org/download.html (To build the project.)
 
@@ -164,36 +100,19 @@ Please install the following plugins (via Marketplace) with _Eclipse_:
 * Maven Integration for Eclipse (m2e)
 * EGit - Git Team Provider _(optional)_
 
-h3(#download). Download
+h2(#download). Download
 
 To get a local copy of xtext-protectedregions you have to clone the project hosted on GitHub:
 
-bc. git clone git@github.com:danieldietrich/xtext-protectedregions.git
+bc. git clone git@github.com:danieldietrich/xtext-protected-regions.git
 
-h3(#workspace). Setup Eclipse Workspace
-
-h4(#import). Import Projects
+h2(#workspace). Setup Eclipse Workspace
 
 Maven Tycho is used to build the plugins, feature and update site. In Eclipse select Import / Maven / Existing Maven Projects and navigate to the root of xtext-protectedregions cloned before. Download necessary plugins if asked for.
 
-The Xtext PRS consists of the following projects:
+h2(#build). Build Process
 
-table(#tableborders){border:1px solid black}.
-|@net.danieldietrich.protectedregionsupport@|Parent maven project. Defining all necessary maven modules and maven plugins. Contains the eclipse target platform definition.|
-|@net.danieldietrich.protectedregionsupport.core@|Protected Regions Core plugin. Base of protected region support for arbitrary generators.|
-|@net.danieldietrich.protectedregionsupport.xtext@|Xtext Protected Region Support plugin. Xtext specific implementation, based on the Protected Regions Core.|
-|@net.danieldietrich.protectedregionsupport.feature@|The feature project is needed for distributing Xtext PRS via an eclipse p2 update site. It bundles the Core and the Xtext PRS plugin.|
-|@net.danieldietrich.protectedregionsupport.updatesite@|The update site project is used to create releases and snapshots of Xtext PRS. (The maven build currently resolves dependencies via p2 resources defined in the parent pom.)|
-
-h4(#target). Set Target Platform
-
-To solve missing dependencies, open @net.dd.prs/targetplatform/indigo.target@ (with the _Target Editor_) and select _Set as Target Platform_ (in the upper right corner).
-
-_Hint: It is good practice to use a second copy of the Eclipse IDE with a minimal set of plugins to develop other plugins and features. Use target platform definitions to switch between specific project dependencies._
-
-h3(#build). Build Process
-
-To build an eclipse update site containing all artifacts, open a shell, jump to @xtext-protectedregions/releng@ and type
+To build an eclipse update site containing all artifacts, open a shell, jump to @xtext-protected-regions/releng@ and type
 
 bc. mvn package
 
@@ -203,13 +122,13 @@ h3(#docs). Documentation
 
 The technical documentation of the Xtext PRS can be found here:
 
-* "Protected Regions Core":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile
-* "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protectedregions/blob/master/plugins/net.danieldietrich.protectedregions.xtext/README.textile
+* "Protected Regions Core":https://github.com/danieldietrich/xtext-protected-regions/blob/master/plugins/net.danieldietrich.protectedregions.core/README.textile
+* "Xtext Protected Region Support":https://github.com/danieldietrich/xtext-protected-regions/blob/master/plugins/net.danieldietrich.protectedregions.xtext/README.textile
 
 h2(#samples). Samples
 
 * "Saentity Sample Project at GitHub":https://github.com/soluvas/saentity
-* "Google Web Toolkit / JPA Domain Model Sample":https://github.com/danieldietrich/xtext-javatools (work in progress, will likely move soon)
+* "Google Web Toolkit / JPA Domain Model Sample":https://github.com/danieldietrich/xtext-javatools (work in progress)
 
 
 "top":#top
