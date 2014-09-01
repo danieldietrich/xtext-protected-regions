@@ -273,16 +273,16 @@ class ModelBuilder {
 	
 	def void withEscape(ModelBuilderContext ctx, String escape) {
 		val model = ctx.model
-		if (model == model.root) throw new IllegalStateException(model.id +".withEscape() not allowed at root node")
+		if (model == model.root()) throw new IllegalStateException(model.id +".withEscape() not allowed at root node")
 		model.add(Model('Escape', Seq(escape.str, Any), None))
   	}
   	
   	def void withCode(ModelBuilderContext ctx, String start, String end) {
   		val model = ctx.model
-		if (model == model.root) throw new IllegalStateException(model.id +".withCode() not allowed at root node")
+		if (model == model.root()) throw new IllegalStateException(model.id +".withCode() not allowed at root node")
   		val code = Model('EmbeddedCode', start, end)
   		model.add(code)
-  		code.add(Link(model.root))
+		code.add(Link(model.root()))
   	}
   	
   	def void withProtectedRegion(ModelBuilderContext ctx) {
