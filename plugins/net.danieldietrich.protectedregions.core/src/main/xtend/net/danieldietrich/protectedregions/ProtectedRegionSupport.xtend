@@ -136,7 +136,9 @@ class ProtectedRegionSupport {
 				// preserved regions are read from memory
 				logger.debug("Merging protected regions into {}", file)
 				val regions = parser.parse(result.x)
-				result.x = mergeContents(protectedRegions, regions)
+				if (! regions.empty) {
+					result.x = mergeContents(protectedRegions, regions)
+				}
 			}
 		]
 		result.x
