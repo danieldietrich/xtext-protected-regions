@@ -181,6 +181,9 @@ class ProtectedRegionParser {
 				regions.append(it.value)
 				true
 			}
+			default : {
+				true
+			}
 		}]
 		
 		regions.get()
