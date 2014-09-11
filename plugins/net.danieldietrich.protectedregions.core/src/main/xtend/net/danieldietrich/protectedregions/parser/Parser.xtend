@@ -25,8 +25,7 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 		output
 	}
 	
-	def private parse(Node<Element> model, String input, Node<String> output, int startIndex) {
-		
+	def private int parse(Node<Element> model, String input, Node<String> output, int startIndex) {
 		val end = model.end
 		val children = model.nodes // it is specific for the model that the children are of type Node (vice versa)
 		
@@ -48,7 +47,7 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 			}
 			if (next == end) {
 				if (hasEnd) {
-					if (model != model.root) {
+					if (model != model.root()) {
 						output.add(input.copy(match))
 					}
 					index = match.end
@@ -58,7 +57,7 @@ import static net.danieldietrich.protectedregions.util.Strings.*
 				val child = next.parent
 				val ast = Node(child.id, input.copy(match))
 				output.add(ast)
-				index = if (!hasEnd) match.end else parse(child, input, ast, match.end)						
+				index = if (!hasEnd) match.end else parse(child, input, ast, match.end)
 			}
 			
 		} while (!finished)
