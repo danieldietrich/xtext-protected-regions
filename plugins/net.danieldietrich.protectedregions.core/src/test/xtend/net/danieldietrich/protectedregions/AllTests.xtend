@@ -8,12 +8,12 @@ import org.junit.runners.Suite$SuiteClasses
 	typeof(Suite)
 )
 
-@SuiteClasses({
+@SuiteClasses(#[
 	typeof(FileTest),
 	typeof(ModelTest),
     typeof(ProtectedRegionParserTest),
     typeof(ProtectedRegionSupportTest),
     typeof(RegionResolverTest)
-})
+])
 
 class AllTests {}
