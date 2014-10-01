@@ -37,11 +37,15 @@
 			<plugin>
 				<groupId>org.eclipse.xtend</groupId>
 				<artifactId>xtend-maven-plugin</artifactId>
-				<version>2.7.1</version>
+				<version>2.7.2</version>
 				<executions>
 					<execution>
 						<id>gensrc</id>
 						<phase>generate-sources</phase>
+						<goals>
+							<goal>compile</goal>
+							<goal>xtend-install-debug-info</goal>
+						</goals>
 						<configuration>
 							<outputDirectory>${basedir}/src/main/xtend-gen</outputDirectory>
 						</configuration>
@@ -49,6 +53,10 @@
 					<execution>
 						<id>gentestsrc</id>
 						<phase>generate-test-sources</phase>
+						<goals>
+							<goal>testCompile</goal>
+							<goal>xtend-test-install-debug-info</goal>
+						</goals>
 						<configuration>
 							<testOutputDirectory>${basedir}/src/test/xtend-gen</testOutputDirectory>
 						</configuration>
