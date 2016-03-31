@@ -1,3 +1,7 @@
+h1. THIS REPOSITORY IS NO LONGER MAINTAINED.
+
+---
+
 h1. Xtext Protected Regions
 
 The project Xtext Protected Regions adds protected region support to Xtext, a very powerful language development (and generator) framework.
