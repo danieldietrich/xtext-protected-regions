@@ -1,3 +1,7 @@
+THIS PROJECT IS DISCONTINUED. IF THE GENERATE SOURCE OF YOUR LANGUAGE SUPPORTS INHERITANCE PLEASE CONSIDER TO USE THE "GENERATION GAP PATTERN":https://en.wikipedia.org/wiki/Generation_gap_(pattern).
+
+---
+
 h1. Xtext Protected Regions
 
 The project Xtext Protected Regions adds protected region support to Xtext, a very powerful language development (and generator) framework.
